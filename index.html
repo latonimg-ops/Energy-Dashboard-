@@ -182,7 +182,8 @@ section.pipeline .dek{margin-top:6px}
 .yb[aria-pressed="false"].anysel{opacity:.35}
 .filters{display:flex;flex-wrap:wrap;gap:10px 20px;align-items:center;margin:26px 0 10px}
 .tablewrap{overflow-x:auto;border:1px solid var(--rule);border-radius:10px;background:var(--panel)}
-table.pt{width:100%;border-collapse:collapse;font-size:13.5px;min-width:1540px}
+table.pt{width:100%;border-collapse:collapse;font-size:13.5px;min-width:1620px}
+.pt td.cod{vertical-align:top}
 .proc{display:inline-block;font-size:12px;font-weight:600;color:var(--pc,var(--ink-2));border:1px solid color-mix(in srgb,var(--pc,var(--rule)) 32%,transparent);border-left:3px solid var(--pc,var(--rule));border-radius:4px;padding:1px 7px;white-space:nowrap;background:color-mix(in srgb,var(--pc,var(--panel)) 9%,var(--panel))}
 .prockey{display:flex;flex-wrap:wrap;gap:6px 10px;margin:4px 0 10px;font-size:12px;color:var(--ink-3);align-items:center}
 .procx{color:var(--ink-3);font-size:11.5px;margin-top:3px;line-height:1.3}
@@ -251,6 +252,8 @@ table.pm{width:100%;border-collapse:collapse;font-size:13px;min-width:720px}
 .stagerow{display:flex;flex-wrap:wrap;gap:5px;align-items:center}
 .pt .csx.clamp{display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
 .codd{font-weight:600;white-space:nowrap}
+.lprog{height:4px;border-radius:2px;background:var(--rule-2);margin:5px 0 4px;width:110px;overflow:hidden}
+.lprog i{display:block;height:100%;border-radius:2px}
 .codx{color:var(--ink-3);font-size:12.5px;margin-top:2px}
 .passed{display:inline-block;margin-top:4px;font-size:11.5px;font-weight:600;color:var(--warn);background:var(--warn-soft);padding:1px 7px;border-radius:999px}
 .underrev{color:var(--st-review);font-weight:600}
@@ -412,6 +415,8 @@ footer{margin-top:28px;padding-top:14px;border-top:1px solid var(--rule);font-si
         <li><b>The tracker's Power Expectations row is stale.</b> It still lists the 400 MW Aguirre contract as active and executed on June 10, 2026, but the Board revoked its approval on August 14, 2026, and LUMA's October 2026 report refers to "the contract cancellation of one provider". The page keeps it revoked.</li>
         <li>The 100 MW Yabucoa Energy Park solar PPOA is confirmed as a Go Green contract under Tranche 1, so LUMA's Table 7 simply does not carry it. It is separate from the 100 MW Yabucoa Energy battery submitted under the accelerated evaluation process, and both are counted.</li>
         <li>Only one project now has no disclosed site: the Xzerta Energy Volt battery, which is therefore not drawn on the map.</li>
+        <li>LUMA's Table 7 carries 18 projects. Every one is matched here, and each cell names the LUMA row, developer and capacity it was matched to so the match can be checked. Projects absent from Table 7 read "Not in Table 7" rather than being left blank — among them Pattern Barceloneta Solar, since LUMA lists only the Barceloneta storage contract.</li>
+        <li>Four of LUMA's rows disagree with the contract record and are flagged in place: Salinas repeats the Jobos capacities, Vega Baja reads 49 MW against the Board's 60 MW, CIRO One tracks phase 1 only, and San Germán still carries its original date.</li>
         <li>Rates for the submissions still under review are the figures supplied with the project list, not approved terms: Emerald II Helios $33,750/MW-month over six hours, Montalva storage $29,325/MW-month over five hours, Yabucoa Energy and Xzerta Energy Volt $15,500/MW-month, Montalva solar $0.1245/kWh and Coquí storage $23,500/MW-month. They are submitted terms, not approved ones.</li>
         <li>Peaker capacities and the Costa Sur approval come from the project owner, not from LUMA's report, which gives only the 244 MW program total and no per-site split. Its milestone table also differs on timing, showing Costa Sur at Q3 2027 and Jobos and Daguao as pending decommissioning authorisation, against the owner's Q4 2027 to Q1 2028, Q2 2028 and Q2 to Q3 2028.</li>
         <li>Gothams carries a fuel-indexed rate rather than a fixed one, so it is excluded from the procurement averages, which compare fixed year-one prices.</li>
@@ -451,7 +456,7 @@ footer{margin-top:28px;padding-top:14px;border-top:1px solid var(--rule);font-si
         <th class="num"><button data-sort="mw">Capacity (MW)</button></th>
         <th><button data-sort="date">First Board approval</button></th>
         <th><button data-sort="cod">Expected COD</button><div style="font-weight:400;color:var(--ink-3);font-size:11.5px">operative date</div></th>
-        <th><button data-sort="codluma">Amended COD</button><div style="font-weight:400;color:var(--ink-3);font-size:11.5px">LUMA, October 2026</div></th>
+        <th><button data-sort="codluma">Amended COD</button><div style="font-weight:400;color:var(--ink-3);font-size:11.5px">LUMA Table 7, Oct 2026 · with progress</div></th>
         <th><button data-sort="behind">Against base case</button><div style="font-weight:400;color:var(--ink-3);font-size:11.5px">24 months from approval</div></th>
         <th>Current status</th>
         <th><button data-sort="fp">Fixed payment</button><div style="font-weight:400;color:var(--ink-3);font-size:11.5px">$/kWh or $/MW-month</div></th>
@@ -1247,15 +1252,30 @@ Object.entries(EXTRA_APPR).forEach(([id,list])=>{ const p=PROJECTS.find(q=>q.id=
   p.appr=[{d:"2023-10-01", mo:true, a:"Approved", w:"ESSA ("+TW+")"},{d:"2025-01-01", mo:true, a:"Approved", w:"Amendment for DOE financing ("+TW+")"}];
   p.src=[...new Set([...p.src,"trk"])]; });
 
-// ---------- LUMA's amended commercial operation dates (Table 7, October 2026 collaborative report) ----------
-const COD_LUMA = {
- "ciro1p":"2027-02", "xzerta":"2028-12", "cfe-jobos":"2026-05", "cfe-salinas":"2027-02",
- "yfn":"2026-12", "penuelas-bess":"2028-04", "guayama-solar":"2028-08", "tetris":"2027-12",
- "caguas-bess":"2028-04", "ponce-bess":"2028-04", "pattern-bar-bess":"2028-05",
- "rev-yabucoa-energy":"2028-07", "naguabo-ep":"2028-12", "solaner":"2026-10", "t2-marisol":"2027-12",
- "t2-sj":"na", "t2-vb":"na", "infinigen-isabela":"na"
+// ---------- LUMA Table 7, October 2026 collaborative report ----------
+// row/ipp/desc are transcribed exactly as LUMA prints them, so each match can be checked by eye.
+// pct is LUMA's interconnection progress column. note records where LUMA's figures differ from the contract.
+const LUMA_T7 = {
+ "ciro1p":            {row:"CIRO One", ipp:"Putnam", desc:"90 MW PV", pct:100, cod:"2027-02", note:"LUMA tracks phase 1 only; the contract is 140 MW across two phases"},
+ "xzerta":            {row:"Xzerta", ipp:"Xzerta", desc:"60 MW PV", pct:0, cod:"2028-12"},
+ "cfe-jobos":         {row:"Jobos", ipp:"AES", desc:"80 MW PV, 110 MW BESS", pct:75, cod:"2026-05"},
+ "cfe-salinas":       {row:"Salinas", ipp:"AES", desc:"80 MW PV, 110 MW BESS", pct:50, cod:"2027-02", note:"LUMA repeats the Jobos capacities; the contract is 120 MW PV and 175 MW BESS"},
+ "yfn":               {row:"Yabucoa Solar", ipp:"Infinigen", desc:"32 MW PV", pct:75, cod:"2026-12", note:"LUMA names the developer Infinigen; the tracker names Sonnedix / YFN"},
+ "penuelas-bess":     {row:"Pe\u00f1uelas Energy Storage", ipp:"Convergent", desc:"100 MW BESS", pct:0, cod:"2028-04"},
+ "guayama-solar":     {row:"Guayama Solar", ipp:"Putnam", desc:"50 MW PV", pct:0, cod:"2028-08"},
+ "tetris":            {row:"Tetris", ipp:"Yarotek", desc:"20 MW PV", pct:0, cod:"2027-12"},
+ "caguas-bess":       {row:"Caguas Energy Storage", ipp:"Convergent", desc:"25 MW BESS", pct:0, cod:"2028-04"},
+ "ponce-bess":        {row:"Ponce Energy Storage", ipp:"Convergent", desc:"25 MW BESS", pct:0, cod:"2028-04"},
+ "pattern-bar-bess":  {row:"Barceloneta Storage", ipp:"Pattern", desc:"120 MW BESS", pct:0, cod:"2028-05"},
+ "rev-yabucoa-energy":{row:"Yabucoa Energy Park", ipp:"Go Green", desc:"100 MW BESS", pct:0, cod:"2028-07", note:"Matched on capacity. LUMA attributes the site to Go Green, who hold the separate 80 MW Tranche 1 battery"},
+ "naguabo-ep":        {row:"Naguabo Energy Park", ipp:"Go Green", desc:"80 MW BESS", pct:0, cod:"2028-12", note:"LUMA attributes it to Go Green; the tracker names JORD LLC"},
+ "solaner":           {row:"San Germ\u00e1n", ipp:"Solaner", desc:"40 MW PV", pct:0, cod:"2026-10", note:"LUMA still carries the original date; PREPA recommends an extension to December 20, 2027"},
+ "t2-marisol":        {row:"Marisol Power", ipp:"Yarotek", desc:"40 MW PV", pct:0, cod:"2027-12"},
+ "t2-sj":             {row:"San Juan Solar", ipp:"Fonroche", desc:"20 MW PV", pct:0, cod:"na"},
+ "t2-vb":             {row:"Vega Baja", ipp:"CS-UR", desc:"49 MW BESS", pct:0, cod:"na", note:"LUMA lists 49 MW against the Board's 60 MW"},
+ "infinigen-isabela": {row:"Isabela", ipp:"Infinigen", desc:"50 MW BESS", pct:0, cod:"na"}
 };
-PROJECTS.forEach(p=>{ p.codLuma = COD_LUMA[p.id] || null; });
+PROJECTS.forEach(p=>{ p.luma = LUMA_T7[p.id] || null; p.codLuma = p.luma ? p.luma.cod : null; });
 
 // ---------- derived ----------
 PROJECTS.forEach(p=>{
@@ -1595,6 +1615,8 @@ function renderStory(){
   const worst = ap.filter(p=>p.behind!=null).sort((a,b)=>b.behind-a.behind)[0];
   const lapsed = ap.filter(p=>p.codD && p.codD < TODAY && p.stage!=="test");
   const notStarted = ap.filter(p=>p.stage==="pre"||p.stage==="safe");
+  const lrows = Object.values(LUMA_T7);
+  const lt = {n:lrows.length, zero:lrows.filter(r=>r.pct===0).length, done:lrows.filter(r=>r.pct===100).length};
   const list = modelSet();
   const at = y => { const r = arrivalByYear(list, SCEN[y].m()).rows.find(r=>r.y===2028); return r?r.tot:0; };
   document.getElementById("storySection").innerHTML = `
@@ -1602,7 +1624,7 @@ function renderStory(){
     <span class="beat">On paper, yes</span>
     <p>The Board has approved <b>${fmt(apMW)} MW</b> since 2021, with another <b>${fmt(rvMW)} MW</b> still before it. Set against the <b>${fmt(ns)} MW</b> of net summer capacity the island actually has today, the approved pipeline alone is close to the size of the existing fleet, and far larger than the ${"700–850"} MW adequacy gap the Energy Bureau has identified. Authorisation is not the binding constraint.</p>
     <span class="beat">In practice, almost none of it is here</span>
-    <p>Of that ${fmt(apMW)} MW, <b>${fmt(onMW)} MW</b> has reached the grid — <b>${(onMW/apMW*100).toFixed(1)}%</b> — and even that one project is still in compliance testing rather than commercial operation. <b>${notStarted.length} approved projects</b> have no construction on site at all. EIA's own planned-generator inventory for Puerto Rico, which records a unit once it is firmly scheduled, lists <b>22.2 MW</b>.</p>
+    <p>Of that ${fmt(apMW)} MW, <b>${fmt(onMW)} MW</b> has reached the grid — <b>${(onMW/apMW*100).toFixed(1)}%</b> — and even that one project is still in compliance testing rather than commercial operation. <b>${notStarted.length} approved projects</b> have no construction on site at all. Of the ${lt.n} projects LUMA tracks through interconnection, <b>${lt.zero} report zero progress</b>, and only ${lt.done} is complete. EIA's own planned-generator inventory for Puerto Rico, which records a unit once it is firmly scheduled, lists <b>22.2 MW</b>.</p>
     <span class="beat">And the dates keep moving</span>
     <p>Measured against a base case of commercial operation two years after Board approval, the median approved project is <b>${med} days</b> behind. ${worst?`${esc(worst.name)} is ${worst.behind.toLocaleString("en-US")} days behind that base, having been approved in ${fmtM(worst.first)} for a date now given as ${fmtD(worst.codD)}.`:""} ${lapsed.length?`${lapsed.length} project${lapsed.length===1?"":"s"} carr${lapsed.length===1?"ies":"y"} a reported date that has already passed without commercial operation.`:""}</p>
     <span class="beat">So when can the island expect it</span>
@@ -1661,11 +1683,13 @@ PROJECTS.forEach(p=>{
 });
 function stagePill(p){ const s=STAGES[p.stage]; return `<span class="stg ${p.stage==='rev'?'revoked':''}" style="--c:var(${s.v})">${s.l}</span>`; }
 function lumaCell(p){
-  if(!p.codLuma) return `<span style="color:var(--ink-3)">Not listed</span>`;
-  if(p.codLuma==="na") return `<div style="color:var(--ink-2)">Not available</div><div class="codx">Listed by LUMA with no date</div>`;
-  const d = fmtM(p.codLuma+"-01");
-  const same = p.codD && p.codD.slice(0,7)===p.codLuma;
-  return `<div class="codd">${d}</div><div class="codx">${same?"Matches the operative date":"Differs from the operative date"}</div>`;
+  const L = p.luma;
+  if(!L) return `<span style="color:var(--ink-3)">Not in Table 7</span>`;
+  const head = L.cod==="na"
+    ? `<div style="color:var(--ink-2)">Not available</div>`
+    : `<div class="codd">${fmtM(L.cod+"-01")}</div>${p.codD && p.codD.slice(0,7)!==L.cod?`<div class="codx" style="color:var(--warn)">Differs from the operative date</div>`:""}`;
+  const bar = `<div class="lprog" title="LUMA interconnection progress ${L.pct}%"><i style="width:${Math.max(L.pct,2)}%;background:${L.pct>=75?"var(--st-test)":L.pct>0?"var(--st-build)":"var(--rule)"}"></i></div>`;
+  return `${head}${bar}<div class="codx"><b>${L.pct}%</b> progress · matched to \u201c${esc(L.row)}\u201d (${esc(L.ipp)}, ${esc(L.desc)})${L.note?`<div style="color:var(--warn);margin-top:2px">${esc(L.note)}</div>`:""}</div>`;
 }
 function behindCell(p){
   if(p.status==="review") return `<span style="color:var(--ink-3)">No approval yet</span>`;
