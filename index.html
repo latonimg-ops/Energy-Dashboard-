@@ -385,6 +385,24 @@ footer{margin-top:28px;padding-top:14px;border-top:1px solid var(--rule);font-si
           <tr><td>Aguirre temporary generation rate</td><td>$0.224/kWh, full term (tracker)</td><td>$0.160/kWh excluding fuel (Board)</td></tr>
           <tr><td>Energiza COD</td><td>Oct 26, 2029 (approved)</td><td>Oct 30, 2030 (developer, after losing the turbine slot)</td></tr>
         </tbody></table></div></div>
+      <div class="chk fix"><h3>The existing fleet, rebuilt from the primary filing</h3><ul>
+        <li>The asset list previously rested on the WRI Global Power Plant Database and on EIA figures taken from a third-party summary. It is now built directly from <b>EIA-860M, September 2026</b>: 105 generators across 38 plants in the Electric Utility and independent power producer sectors, 5,704.0 MW of nameplate and 5,167.4 MW of net summer capacity, plus the two landfill-gas sites and the 350 MW of FEMA temporary units EIA does not carry. Total <b>6,058.8 MW nameplate, 5,522.2 MW net summer</b>.</li>
+        <li>This resolved all four discrepancies the old list flagged against its own sources. Costa Sur is 1,032 MW, not 862: EIA still carries units 3 and 4, commissioned in 1962 and 1963. Palo Seco is 728 MW, not 582, for the same reason. EcoEléctrica, at 580 MW, is now covered by the plant's own EIA record.</li>
+        <li><b>CIRO One Salinas is no longer counted as existing capacity.</b> It is in testing, not commercial operation, and EIA does not list it as operating. That removes a roughly 140 MW double-count with the approved pipeline.</li>
+        <li><b>Palo Seco unit 4 carries 216 MW of nameplate and zero net summer capacity in EIA's record</b>, against LUMA's report of 180 MW of actual output in September 2026. Both figures are shown; the discrepancy is unresolved.</li>
+        <li>EIA's planned inventory for Puerto Rico contains <b>22.2 MW</b>. None of the Board-approved pipeline has reached the stage at which EIA records a generator as planned.</li>
+      </ul></div>
+      <div class="chk warn"><h3>What the rebuild changed, and one unresolved conflict</h3>
+        <p class="cnote" style="margin:0 0 8px">The fuel mix moved more than the total did. EIA codes each generator by its reported primary energy source, and on that basis the fleet is far more oil-bound than the previous list showed.</p>
+        <div class="ctabw"><table class="ctab"><thead><tr><th>Fuel</th><th>Previous list</th><th>EIA-860M</th></tr></thead><tbody>
+          <tr><td>Fuel oil No. 6</td><td>1,732 MW</td><td>2,080.7 MW</td></tr>
+          <tr><td>Distillate oil</td><td>1,317.5 MW</td><td>1,881.5 MW</td></tr>
+          <tr><td>Natural gas</td><td>2,117 MW</td><td>1,172.6 MW</td></tr>
+          <tr><td>Coal</td><td>454 MW</td><td>510 MW</td></tr>
+          <tr><td>Solar, wind, hydro, storage</td><td>508 MW</td><td>409.2 MW</td></tr>
+        </tbody></table></div>
+        <p class="cnote"><b>The unresolved conflict:</b> EIA codes San Juan's 2008 combined-cycle units and Aguirre's combined cycle as distillate fuel oil, roughly 1,070 MW that the previous list showed as natural gas. San Juan 5 and 6 are documented as burning LNG supplied by New Fortress Energy, so EIA's coding may simply lag the conversion. EIA's codes are shown because it is the primary source, but the gas share is probably understated and the oil share overstated by several hundred megawatts. Treat the fuel split as the weakest part of this rebuild.</p>
+      </div>
       <div class="chk fix"><h3>Source errors handled</h3><ul>
         <li>The tracker prints Yabucoa Energy Park's rate as $13.97/kWh; the page reads it as $0.1397/kWh and flags the row.</li>
         <li>The tracker's summary page shows Tetris Power's amended COD as the spreadsheet value 46752; this converts to December 31, 2027, which the Tetris detail page confirms.</li>
@@ -450,7 +468,8 @@ footer{margin-top:28px;padding-top:14px;border-top:1px solid var(--rule);font-si
   <div>
     <h3>How to read the numbers</h3>
     <ul>
-      <li>Capacities are nameplate, not available capacity. Much of the PREPA thermal fleet runs well below nameplate because of forced outages and derates; the Energy Bureau's resource adequacy work puts the current shortfall at roughly 700–850 MW.</li>
+      <li>The asset list is rebuilt from the primary filing: EIA's Preliminary Monthly Electric Generator Inventory (EIA-860M), September 2026 release, Puerto Rico sheet. Every plant carries both <b>nameplate</b> and <b>net summer capacity</b>, EIA's own measure of what a unit can actually deliver in summer conditions. The two differ by 537 MW across the fleet, and the gap is not spread evenly: Palo Seco alone accounts for 249 MW of it. Net summer capacity is the figure to use against the Energy Bureau's 700–850 MW adequacy shortfall.</li>
+      <li>Each plant is placed by EIA's own coordinates, and its municipality is derived by testing those coordinates against the Census boundary file rather than being read off the project name.</li>
       <li>Thermal units are shown by primary fuel. Costa Sur 5–6 and San Juan 5–6 burn natural gas with oil backup; Cambalache 2–3 and several other units have gas conversions in progress.</li>
       <li>Current status and expected commercial operation date (COD) come from two documents: PREPA's Appendix A, Renewable Generation Projects Tracker (July 2026), which compiles developer-reported updates, and LUMA's October 2026 Collaborative Report (Energy Bureau case NEPR-MI-2024-0005, September 2026 data), whose Table 7 tracks interconnection progress. Where they disagree the contracted figure is shown and the other value is noted on the row and in the Data checks tab. The six LUMA ASAP battery projects instead reflect LUMA's ASAP quarterly report for July to September 2026 (Energy Bureau case NEPR-MI-2024-0002, filed October 30, 2026), which redacts participant names; projects were matched by capacity and approval dates. Where the tracker gives an amended COD, that date is shown; the original date and reason appear in the row detail. Capacities in the tracker that differ from Board records are noted in the status, not substituted.</li>
       <li>Project capacity is the contracted amount in the most recent Board letter or regulatory record found. Storage is shown in MW of power, with MWh where disclosed.</li>
@@ -460,7 +479,9 @@ footer{margin-top:28px;padding-top:14px;border-top:1px solid var(--rule);font-si
   <div>
     <h3>What is and isn't included</h3>
     <ul>
-      <li>Included: PREPA-owned plants (thermal operated by Genera PR; hydro retained by PREPA), independent power producers, FEMA-funded temporary units, and utility-scale renewables connected to LUMA's grid.</li>
+      <li>Included: every generator EIA-860M classes in the Electric Utility or independent power producer sectors, which is EIA's own definition of bulk supply. That covers PREPA's plants (thermal operated by Genera PR, hydro retained by PREPA), the coal and gas independents, and utility-scale renewables. The two landfill-gas sites are added back by hand because EIA classes their owner as commercial although they sell to PREPA.</li>
+      <li>Excluded by that rule: 680 MW of industrial combined heat and power and about 90 MW of other commercial and industrial generation, all of which serves its host facility rather than the grid.</li>
+      <li>The FEMA-funded temporary units at San Juan (200 MW) and Palo Seco (150 MW) appear in no EIA inventory at all. They are included on operator-reported capacity and flagged as such, because they are physically generating.</li>
       <li>Genera's four replacement peaker sites and its six batteries are PREPA-owned programs rather than power purchase agreements, so they carry no contracted rate. The peakers are counted as under review because their EPC contract has not yet gone to the Board.</li>
       <li>Not included: roughly 1,230 MW of rooftop solar (June 2025), customer-sited generators, and projects approved only by PREPA or the Energy Bureau but not yet reviewed by the Board.</li>
       <li>Coquí Power's eleven sites appear as 22 rows, one per contract, because the solar PPOAs are approved while the companion storage ESSAs are still under Board review.</li>
@@ -499,7 +520,8 @@ const css = v => getComputedStyle(document.documentElement).getPropertyValue(v).
 const fc = f => css(FUEL[f].v);
 
 const SRC = {
-  eia:{t:"EIA plant inventory as summarized by Mapscaping, May 2026", u:"https://mapscaping.com/puerto-rico-power-plants/"},
+  eia860m:{t:"U.S. EIA, Preliminary Monthly Electric Generator Inventory (EIA-860M), September 2026 release, Operating_PR sheet", u:"https://www.eia.gov/electricity/data/eia860m/"},
+  eia:{t:"EIA plant inventory as summarized by Mapscaping, May 2026 (superseded by EIA-860M)", u:"https://mapscaping.com/puerto-rico-power-plants/"},
   crs:{t:"Congressional Research Service, R45023, Repair or Rebuild: Options for Electric Power in Puerto Rico", u:"https://www.congress.gov/crs-product/R45023"},
   wri:{t:"WRI Global Power Plant Database (coordinates, hydro unit sizes)", u:"https://github.com/wri/global-power-plant-database"},
   prfaa:{t:"PRFAA, generation restoration update, October 2025", u:"https://www.prfaa.pr.gov/recent-press-releases/government-of-puerto-rico-continues-increasing-puerto-ricos-power-generation-capacity"},
@@ -542,54 +564,149 @@ const PREPA_H = {owner:"PREPA", operator:"PREPA", sector:"public"};
 const IPP = o => ({owner:o, operator:o, sector:"private"});
 
 const ASSETS = [
- {id:"aguirre", name:"Aguirre Power Complex", muni:"Salinas", lat:17.9519, lon:-66.2308, ...PREPA_T, units:[
-   {u:"Steam unit 1", f:"bunker", mw:450}, {u:"Steam unit 2", f:"bunker", mw:450},
-   {u:"Combined cycle (2 blocks)", f:"diesel", mw:592}, {u:"Peaking turbines (2 × 21 MW)", f:"diesel", mw:42}],
-   note:"Largest plant on the island. Steam unit 2 was restored mid-2025 and three combined-cycle units were reactivated in August 2025. LUMA's October 2026 collaborative report gives September 2026 output: unit 2 ran at 285 MW against a 450 MW nameplate, regulating between 230 and 280 MW. A major overhaul in March and April 2027 would raise it to 400 MW, but depends on approval of a budget increase.", src:["crs","eia","prfaa"]},
- {id:"costasur", name:"Costa Sur Power Plant", muni:"Guayanilla", lat:18.008, lon:-66.768, ...PREPA_T, units:[
-   {u:"Steam unit 5", f:"gas", mw:410, n:"dual-fuel, oil backup"}, {u:"Steam unit 6", f:"gas", mw:410, n:"dual-fuel, oil backup"},
-   {u:"Peaking turbines (2 × 21 MW)", f:"diesel", mw:42}],
-   note:"Units 3–4 are retired. A 410 MW unit returned from repair in May 2025. EIA reports 966 MW for the full site. LUMA's October 2026 collaborative report gives September 2026 output: unit 5 ran at its full 410 MW with no outages. A required environmental inspection is due November 5, 2026 and was not funded in Genera's approved budget.", src:["eia","prfaa","wri"]},
- {id:"sanjuan", name:"San Juan Power Plant", muni:"San Juan", lat:18.427, lon:-66.1045, ...PREPA_T, units:[
-   {u:"Steam units 7–10 (4 × 100 MW)", f:"bunker", mw:400}, {u:"Combined cycle unit 5", f:"gas", mw:220, n:"diesel backup"},
-   {u:"Combined cycle unit 6", f:"gas", mw:220, n:"diesel backup"}, {u:"Temporary TM2500 units (FEMA-funded)", f:"gas", mw:200, n:"placed in service Sept 2023"}],
-   note:"Temporary units were installed by NFE under a federally funded program. EIA reports 784 MW for the permanent plant. LUMA's October 2026 collaborative report gives September 2026 output: combined-cycle unit 6 ran at 160 MW against a 220 MW nameplate. Its steam-unit repair was moved up to October 2026 and should add 60 MW, for 210 MW.", src:["eia","nfe","luma24"]},
- {id:"paloseco", name:"Palo Seco Power Plant", muni:"Toa Baja", lat:18.4553, lon:-66.1486, ...PREPA_T, units:[
-   {u:"Steam unit 3", f:"bunker", mw:216}, {u:"Steam unit 4", f:"bunker", mw:216, n:"back in service 2025 after stator fire"},
-   {u:"Temporary TM units (FEMA-funded)", f:"gas", mw:150, n:"in service June 2023"}],
-   note:"Units 1–2 are retired. Gas conversion of units 3–4 was reported as under way in June 2026. LUMA's October 2026 collaborative report gives September 2026 output: unit 4 rose to 180 MW from 150 MW against a 216 MW nameplate. A required environmental inspection is due April 2027 and was not funded in the current budget.", src:["prfaa","nfe","vocero"]},
- {id:"cambalache", name:"Cambalache Power Plant", muni:"Arecibo", lat:18.4691, lon:-66.6968, ...PREPA_T, units:[
-   {u:"Combustion turbines 1–3 (3 × 82.5 MW)", f:"diesel", mw:247.5}],
-   note:"Peaking plant. Natural gas conversion of units 2–3 was reported as under way in June 2026.", src:["wri","eia","vocero"]},
- {id:"mayaguez", name:"Mayagüez Power Plant", muni:"Mayagüez", lat:18.2194, lon:-67.16, ...PREPA_T, units:[
-   {u:"Combustion turbines (4 × 55 MW)", f:"diesel", mw:220}], note:"Peaking plant serving the west.", src:["eia"]},
- {id:"daguao", name:"Daguao peakers", muni:"Ceiba", lat:18.2325, lon:-65.6677, ...PREPA_T, units:[{u:"Gas turbines (2 × 21 MW)", f:"diesel", mw:42}], note:"Slated for replacement under Genera's peaker program.", src:["eia","prebList"]},
- {id:"jobos", name:"Jobos peakers", muni:"Guayama", lat:17.9615, lon:-66.1402, ...PREPA_T, units:[{u:"Gas turbines (2 × 21 MW)", f:"diesel", mw:42}], note:"Slated for replacement under Genera's peaker program.", src:["eia","prebList"]},
- {id:"vegabaja", name:"Vega Baja peakers", muni:"Vega Baja", lat:18.4458, lon:-66.3914, ...PREPA_T, units:[{u:"Gas turbines (2 × 21 MW)", f:"diesel", mw:42}], src:["eia"]},
- {id:"yabucoa", name:"Yabucoa peakers", muni:"Yabucoa", lat:18.06, lon:-65.86, ...PREPA_T, units:[{u:"Gas turbines (2 × 21 MW)", f:"diesel", mw:42}], note:"EIA geocodes this plant to Humacao; Genera and PREB list it as Yabucoa.", src:["eia","prebList"]},
- {id:"vieques", name:"Vieques emergency plant", muni:"Vieques", lat:18.1429, lon:-65.444, ...PREPA_T, units:[{u:"Diesel generators", f:"diesel", mw:6}], note:"Backup for the island municipality.", src:["wri"]},
- {id:"dosbocas", name:"Dos Bocas hydro", muni:"Utuado", lat:18.30, lon:-66.67, ...PREPA_H, units:[{u:"Hydro units", f:"hydro", mw:15}], note:"PREPA retained the hydro fleet; several units are out of service.", src:["wri","eia"]},
- {id:"caonillas", name:"Caonillas hydro 1–2", muni:"Utuado", lat:18.2961, lon:-66.6432, ...PREPA_H, units:[{u:"Caonillas 1", f:"hydro", mw:18},{u:"Caonillas 2", f:"hydro", mw:3.6}], src:["wri"]},
- {id:"yauco", name:"Yauco hydro 1–2", muni:"Yauco", lat:18.08, lon:-66.87, ...PREPA_H, units:[{u:"Yauco 1", f:"hydro", mw:25},{u:"Yauco 2", f:"hydro", mw:9}], note:"EIA lists Yauco at 34 MW.", src:["eia","wri"]},
- {id:"toronegro1", name:"Toro Negro hydro 1", muni:"Villalba", lat:18.1318, lon:-66.4879, ...PREPA_H, units:[{u:"Toro Negro 1", f:"hydro", mw:8.64}], src:["wri"]},
- {id:"toronegro2", name:"Toro Negro hydro 2", muni:"Orocovis", lat:18.1664, lon:-66.5116, ...PREPA_H, units:[{u:"Toro Negro 2", f:"hydro", mw:1.92}], src:["wri"]},
- {id:"garzas", name:"Garzas hydro 1–2", muni:"Peñuelas", lat:18.09, lon:-66.733, ...PREPA_H, units:[{u:"Garzas 1", f:"hydro", mw:7.2},{u:"Garzas 2", f:"hydro", mw:5.04}], src:["wri"]},
- {id:"rioblanco", name:"Río Blanco hydro", muni:"Naguabo", lat:18.2436, lon:-65.7852, ...PREPA_H, units:[{u:"Hydro unit", f:"hydro", mw:5}], src:["wri"]},
- {id:"carite", name:"Carite hydro 1", muni:"Guayama", lat:18.0447, lon:-66.106, ...PREPA_H, units:[{u:"Hydro unit", f:"hydro", mw:10}], src:["wri"]},
- {id:"eco", name:"EcoEléctrica", muni:"Peñuelas", lat:18.0, lon:-66.742, ...IPP("EcoEléctrica, L.P."), units:[{u:"Combined cycle (2 CTs + steam turbine)", f:"gas", mw:507, n:"with LNG terminal and desalination"}], note:"Private cogenerator under a PPOA with PREPA. EIA reports 580 MW.", src:["wri","eia"]},
- {id:"aes", name:"AES Puerto Rico", muni:"Guayama", lat:17.9474, lon:-66.1494, ...IPP("AES Puerto Rico, L.P."), units:[{u:"Fluidized-bed units 1–2 (2 × 227 MW)", f:"coal", mw:454}], note:"Only coal plant on the island. Act 1-2025 requires coal to end by December 31, 2032. PREB's 2025 list shows a proposed 700 MW AES Guayama replacement, not yet Board-reviewed.", src:["eia","ruta","prebList"]},
- {id:"ilumina", name:"AES Ilumina", muni:"Guayama", lat:17.9468, lon:-66.1591, ...IPP("AES"), units:[{u:"Solar PV", f:"solar", mw:20}], src:["crs","wri"]},
- {id:"patternwind", name:"Pattern Santa Isabel wind", muni:"Santa Isabel", lat:17.9853, lon:-66.398, ...IPP("Pattern Energy"), units:[{u:"Wind turbines", f:"wind", mw:75}], src:["eia"]},
- {id:"puntalima", name:"Punta Lima wind", muni:"Naguabo", lat:18.1868, lon:-65.6948, ...IPP("Punta Lima Wind Farm"), units:[{u:"Wind turbines", f:"wind", mw:26}], note:"Heavily damaged in 2017; listed in LUMA's storage addition program as an existing IPP. Confirm current output before citing.", src:["wri","prebList"]},
- {id:"oriana", name:"Oriana Solar", muni:"Isabela", lat:18.4729, lon:-67.0443, ...IPP("Oriana Energy (Sonnedix)"), units:[{u:"Solar PV (AC)", f:"solar", mw:45}], note:"EIA lists the hybrid site at 67 MW; 57.7 MW DC.", src:["eia","wri"]},
- {id:"humacao", name:"Humacao Solar", muni:"Humacao", lat:18.135, lon:-65.817, ...IPP("Humacao Solar Project"), units:[{u:"Solar PV (AC)", f:"solar", mw:40}], note:"About 46.7 MW DC.", src:["wri"]},
- {id:"sanfermin", name:"San Fermín Solar", muni:"Loíza", lat:18.4055, lon:-65.9077, ...IPP("San Fermín Solar Farm"), units:[{u:"Solar PV (AC)", f:"solar", mw:20}], note:"About 27 MW DC.", src:["wri","prebList"]},
- {id:"horizon", name:"Horizon Energy solar", muni:"Salinas", lat:17.9786, lon:-66.2205, ...IPP("Horizon Energy (Sonnedix)"), units:[{u:"Solar PV (AC)", f:"solar", mw:10}], note:"About 15.5 MW DC.", src:["wri","prebList"]},
- {id:"lajas", name:"Lajas Solar (Fonroche)", muni:"Lajas", lat:18.02, lon:-67.06, ...IPP("Fonroche / Lajas Solar Project"), units:[{u:"Solar PV (approx.)", f:"solar", mw:20}], note:"Capacity approximate; site is the host for an 80 MW ASAP battery the Board approved in May 2026.", src:["prebList","metroMay"]},
- {id:"windmar", name:"Windmar Cantera Martinó", muni:"Ponce", lat:18.0623, lon:-66.5485, ...IPP("Windmar Renewable Energy"), units:[{u:"Solar PV", f:"solar", mw:2.1}], src:["crs","wri"]},
- {id:"fajlfg", name:"Fajardo landfill gas", muni:"Fajardo", lat:18.31, lon:-65.67, ...IPP("Landfill Gas Technologies of Fajardo"), units:[{u:"Engine generators (approx.)", f:"lfg", mw:2.4}], note:"EIA reports about 5 MW for the two landfill gas sites combined.", src:["eia","prebList"]},
- {id:"tblfg", name:"Toa Baja landfill gas", muni:"Toa Baja", lat:18.43, lon:-66.22, ...IPP("Landfill Gas Technologies"), units:[{u:"Engine generators (approx.)", f:"lfg", mw:2.4}], src:["eia","prebList"]},
- {id:"ciro1", name:"CIRO One Salinas (phase 1)", muni:"Salinas", lat:17.99, lon:-66.27, ...IPP("CIRO Energy Group"), isNew:true, units:[{u:"Solar PV", f:"solar", mw:90}, {u:"Co-located battery (206 MWh)", f:"bess", mw:51.5}], note:"First utility-scale solar connected in nearly a decade (January 2026). Also listed in the approved-projects drilldown.", src:["luma26","pvtech","fombCiro"]}
+ {id:"aguirre", name:"Aguirre Power Complex", muni:"Salinas", lat:17.9492, lon:-66.234, ...PREPA_T, units:[
+   {u:"Fuel oil No. 6 steam (2 units, 1975)", f:"bunker", mw:900.0, ns:849.8},
+   {u:"Distillate turbines (12 units, 1972\u20131977)", f:"diesel", mw:634.0, ns:611.4}],
+   ns:1461.2,
+   note:"Largest plant on the island, and entirely oil-fired. LUMA's October 2026 report gives September 2026 output for unit 2 of 285 MW against a 450 MW nameplate, regulating between 230 and 280 MW; a March\u2013April 2027 overhaul would raise it to 400 MW but depends on a budget increase being approved.", src:["eia860m","collab"]},
+ {id:"costasur", name:"Costa Sur Power Plant", muni:"Guayanilla", lat:18.003, lon:-66.7597, ...PREPA_T, units:[
+   {u:"Natural gas (2 units, 1972\u20131973)", f:"gas", mw:820.0, ns:765.6},
+   {u:"Fuel oil No. 6 steam (2 units, 1962\u20131963)", f:"bunker", mw:170.0, ns:158.9},
+   {u:"Distillate turbines (2 units, 1972)", f:"diesel", mw:42.0, ns:42.0}],
+   ns:966.5,
+   note:"Units 3\u20134 (85 MW each, commissioned 1962\u201363) remain in the operating inventory alongside the two 410 MW gas steam units. LUMA reports unit 5 ran at its full 410 MW in September 2026; a required environmental inspection due November 5, 2026 was not funded in Genera's approved budget.", src:["eia860m","collab"]},
+ {id:"sanjuan", name:"San Juan Power Plant", muni:"San Juan", lat:18.4271, lon:-66.1045, ...PREPA_T, units:[
+   {u:"Distillate turbines (4 units, 2008)", f:"diesel", mw:440.0, ns:429.4},
+   {u:"Fuel oil No. 6 steam (4 units, 1965\u20131969)", f:"bunker", mw:400.0, ns:354.5}],
+   ns:783.9,
+   note:"Carries the newest large thermal units on the island, commissioned in 2008. LUMA reports combined-cycle unit 6 at 160 MW against its 220 MW rating in September 2026, with a steam repair due to add 60 MW.", src:["eia860m","collab"]},
+ {id:"paloseco", name:"Palo Seco Power Plant", muni:"Toa Baja", lat:18.4559, lon:-66.1484, ...PREPA_T, units:[
+   {u:"Fuel oil No. 6 steam (4 units, 1960\u20131970)", f:"bunker", mw:602.0, ns:353.4},
+   {u:"Distillate turbines (6 units, 1972\u20131973)", f:"diesel", mw:126.0, ns:126.0}],
+   ns:479.4,
+   note:"EIA carries unit 4 at 216 MW nameplate but zero net summer capacity, against LUMA's report of 180 MW of output in September 2026. Every unit here dates from 1960 to 1973. A required environmental inspection due April 2027 was not funded in the current budget.", src:["eia860m","collab"]},
+ {id:"aespr", name:"AES Puerto Rico (coal)", muni:"Guayama", lat:17.947115, lon:-66.149897, ...IPP("AES Puerto Rico LP"), units:[
+   {u:"Coal steam (2 units, 2001)", f:"coal", mw:510.0, ns:454.4}],
+   ns:454.4,
+   note:"The island's only coal plant, selling to PREPA under a power purchase agreement.", src:["eia860m"]},
+ {id:"cambalache", name:"Cambalache Power Plant", muni:"Arecibo", lat:18.471, lon:-66.6969, ...PREPA_T, units:[
+   {u:"Distillate turbines (3 units, 1997)", f:"diesel", mw:247.5, ns:241.5}],
+   ns:241.5, src:["eia860m"]},
+ {id:"mayaguez", name:"Mayag\u00fcez Power Plant", muni:"Mayag\u00fcez", lat:18.2186, lon:-67.1592, ...PREPA_T, units:[
+   {u:"Distillate turbines (4 units, 2009)", f:"diesel", mw:220.0, ns:220.0}],
+   ns:220.0, src:["eia860m"]},
+ {id:"w-santaisabel", name:"Pattern Santa Isabel wind", muni:"Santa Isabel", lat:17.971696, lon:-66.393154, ...IPP("Pattern Operators LP"), units:[
+   {u:"Wind (1 unit, 2012)", f:"wind", mw:101.2, ns:75.0}],
+   ns:75.0,
+   note:"EIA carries 101.2 MW of nameplate against 75 MW of net summer capacity.", src:["eia860m"]},
+ {id:"s-oriana", name:"Oriana Energy solar + storage", muni:"Isabela", lat:18.475032, lon:-67.046411, ...IPP("Oriana Energy LLC"), units:[
+   {u:"Solar PV (1 unit, 2016)", f:"solar", mw:45.0, ns:45.0},
+   {u:"Battery storage (1 unit, 2016)", f:"bess", mw:21.8, ns:21.8}],
+   ns:66.8, src:["eia860m"]},
+ {id:"pk-jobos", name:"Jobos peakers", muni:"Guayama", lat:17.9602, lon:-66.1398, ...PREPA_T, units:[
+   {u:"Distillate turbines (2 units, 1973)", f:"diesel", mw:42.0, ns:42.0}],
+   ns:42.0, src:["eia860m"]},
+ {id:"pk-daguao", name:"Daguao peakers", muni:"Ceiba", lat:18.2364, lon:-65.6656, ...PREPA_T, units:[
+   {u:"Distillate turbines (2 units, 1972)", f:"diesel", mw:42.0, ns:42.0}],
+   ns:42.0, src:["eia860m"]},
+ {id:"pk-vegabaja", name:"Vega Baja peakers", muni:"Vega Baja", lat:18.446, lon:-66.391, ...PREPA_T, units:[
+   {u:"Distillate turbines (2 units, 1971)", f:"diesel", mw:42.0, ns:42.0}],
+   ns:42.0, src:["eia860m"]},
+ {id:"pk-yabucoa", name:"Yabucoa peakers", muni:"Yabucoa", lat:18.047, lon:-65.864, ...PREPA_T, units:[
+   {u:"Distillate turbines (2 units, 1971)", f:"diesel", mw:42.0, ns:42.0}],
+   ns:42.0, src:["eia860m"]},
+ {id:"h-yauco", name:"Yauco hydro", muni:"Yauco", lat:18.1105, lon:-66.871, ...PREPA_H, units:[
+   {u:"Hydro (3 units, 1956)", f:"hydro", mw:34.0, ns:34.0}],
+   ns:34.0, src:["eia860m"]},
+ {id:"s-sanfermin", name:"San Ferm\u00edn solar + storage", muni:"Lo\u00edza", lat:18.4115, lon:-65.9045, ...IPP("San Fermin Solar Farm LLC"), units:[
+   {u:"Solar PV (1 unit, 2015)", f:"solar", mw:20.0, ns:20.0},
+   {u:"Distillate turbines (1 unit, 2015)", f:"diesel", mw:4.0, ns:4.0},
+   {u:"Battery storage (1 unit, 2015)", f:"bess", mw:3.6, ns:3.6}],
+   ns:27.6, src:["eia860m"]},
+ {id:"w-puntalima", name:"Punta Lima wind", muni:"Naguabo", lat:18.189872, lon:-65.695197, ...IPP("Punta Lima Wind Farm, LLC"), units:[
+   {u:"Wind (1 unit, 2024)", f:"wind", mw:26.0, ns:26.0}],
+   ns:26.0,
+   note:"A further 23.4 MW at this site was retired in September 2017 after hurricane damage.", src:["eia860m"]},
+ {id:"h-caonillas", name:"Caonillas hydro", muni:"Utuado", lat:18.277, lon:-66.656, ...PREPA_H, units:[
+   {u:"Hydro (3 units, 1949\u20131952)", f:"hydro", mw:22.0, ns:22.0}],
+   ns:22.0, src:["eia860m"]},
+ {id:"s-ilumina", name:"AES Ilumina", muni:"Guayama", lat:17.947524, lon:-66.158874, ...IPP("AES ILUMINA, LLC"), units:[
+   {u:"Solar PV (1 unit, 2012)", f:"solar", mw:20.0, ns:15.0}],
+   ns:15.0, src:["eia860m"]},
+ {id:"s-humacao", name:"Humacao Solar", muni:"Humacao", lat:18.134597, lon:-65.822342, ...IPP("Fonroche Energy America, Inc."), units:[
+   {u:"Solar PV (1 unit, 2016)", f:"solar", mw:20.0, ns:20.0}],
+   ns:20.0, src:["eia860m"]},
+ {id:"s-horizon", name:"Horizon Energy solar + storage", muni:"Salinas", lat:17.979256, lon:-66.220533, ...IPP("Horizon Energy LLC"), units:[
+   {u:"Solar PV (1 unit, 2015)", f:"solar", mw:10.0, ns:10.0},
+   {u:"Battery storage (1 unit, 2015)", f:"bess", mw:5.1, ns:5.1}],
+   ns:15.1, src:["eia860m"]},
+ {id:"h-dosbocas", name:"Dos Bocas hydro", muni:"Arecibo", lat:18.337, lon:-66.667, ...PREPA_H, units:[
+   {u:"Hydro (3 units, 1942\u20131945)", f:"hydro", mw:15.0, ns:15.0}],
+   ns:15.0, src:["eia860m"]},
+ {id:"h-garzas", name:"Garzas hydro", muni:"Pe\u00f1uelas", lat:18.0733, lon:-66.73, ...PREPA_H, units:[
+   {u:"Hydro (3 units, 1941)", f:"hydro", mw:12.2, ns:12.2}],
+   ns:12.2, src:["eia860m"]},
+ {id:"s-cotolaurel", name:"Coto Laurel Solar", muni:"Ponce", lat:18.059965, lon:-66.550428, ...IPP("PV Properties, Inc."), units:[
+   {u:"Solar PV (1 unit, 2020)", f:"solar", mw:10.0, ns:10.0}],
+   ns:10.0, src:["eia860m"]},
+ {id:"h-toronegro", name:"Toro Negro hydro", muni:"Villalba", lat:18.1317, lon:-66.488, ...PREPA_H, units:[
+   {u:"Hydro (4 units, 1937)", f:"hydro", mw:8.5, ns:8.5}],
+   ns:8.5, src:["eia860m"]},
+ {id:"vieques", name:"Vieques emergency plant", muni:"Vieques", lat:18.152679, lon:-65.431763, ...PREPA_T, units:[
+   {u:"Fuel oil No. 6 steam (2 units, 2004)", f:"bunker", mw:6.6, ns:6.4}],
+   ns:6.4, src:["eia860m"]},
+ {id:"s-ftbuchanan", name:"Fort Buchanan distributed", muni:"Guaynabo", lat:18.408354, lon:-66.116163, ...IPP("Directorate Of Public Works USAG Fort Buchanan"), units:[
+   {u:"Solar PV (1 unit, 2014)", f:"solar", mw:5.8, ns:5.8},
+   {u:"Wind (1 unit, 2014)", f:"wind", mw:0.6, ns:0.6}],
+   ns:6.4, src:["eia860m"]},
+ {id:"s-gasna", name:"GASNA 18P solar", muni:"San Juan", lat:18.453211, lon:-66.092419, ...IPP("X-Elio North America Inc"), units:[
+   {u:"Solar PV (1 unit, 2014)", f:"solar", mw:5.0, ns:5.0}],
+   ns:5.0, src:["eia860m"]},
+ {id:"h-rioblanco", name:"R\u00edo Blanco hydro", muni:"Naguabo", lat:18.268, lon:-65.794, ...PREPA_H, units:[
+   {u:"Hydro (2 units, 1929)", f:"hydro", mw:5.0, ns:5.0}],
+   ns:5.0, src:["eia860m"]},
+ {id:"s-medtronic", name:"Medtronic solar", muni:"Juncos", lat:18.236289, lon:-65.911609, ...IPP("REA Investments, LLC"), units:[
+   {u:"Solar PV (1 unit, 2019)", f:"solar", mw:4.0, ns:4.0}],
+   ns:4.0, src:["eia860m"]},
+ {id:"s-martino", name:"Martino solar", muni:"Ponce", lat:18.05695, lon:-66.578949, ...IPP("PV Properties, Inc."), units:[
+   {u:"Solar PV (1 unit, 2011)", f:"solar", mw:3.6, ns:3.6}],
+   ns:3.6, src:["eia860m"]},
+ {id:"s-pfizer", name:"Pfizer Vega Alta solar", muni:"Vega Alta", lat:18.450607, lon:-66.350001, ...IPP("PV Properties, Inc."), units:[
+   {u:"Solar PV (1 unit, 2016)", f:"solar", mw:3.1, ns:3.1}],
+   ns:3.1, src:["eia860m"]},
+ {id:"s-amo", name:"AMO Puerto Rico solar", muni:"A\u00f1asco", lat:18.291344, lon:-67.135141, ...IPP("Enernet CHP One LLC"), units:[
+   {u:"Natural gas (2 units, 2026)", f:"gas", mw:2.6, ns:2.6}],
+   ns:2.6, src:["eia860m"]},
+ {id:"s-uscg", name:"US Coast Guard solar", muni:"Aguadilla", lat:18.498007, lon:-67.130519, ...IPP("United States Coast Guard Puerto Rico"), units:[
+   {u:"Solar PV (1 unit, 2011)", f:"solar", mw:2.3, ns:1.7}],
+   ns:1.7, src:["eia860m"]},
+ {id:"culebra", name:"Culebra emergency plant", muni:"Culebra", lat:18.316713, lon:-65.27956, ...PREPA_T, units:[
+   {u:"Fuel oil No. 6 steam (4 units, 1972)", f:"bunker", mw:2.1, ns:2.1}],
+   ns:2.1, src:["eia860m"]},
+ {id:"s-elyunque", name:"El Yunque filtration solar", muni:"R\u00edo Grande", lat:18.37739, lon:-65.817551, ...IPP("PV Properties, Inc."), units:[
+   {u:"Solar PV (1 unit, 2013)", f:"solar", mw:2.0, ns:2.0}],
+   ns:2.0, src:["eia860m"]},
+ {id:"h-patillas", name:"Patillas hydro", muni:"Patillas", lat:18.017, lon:-66.019, ...PREPA_H, units:[
+   {u:"Hydro (2 units, 1985)", f:"hydro", mw:1.4, ns:1.4}],
+   ns:1.4, src:["eia860m"]},
+ {id:"s-arecibofp", name:"Arecibo filtration solar", muni:"Arecibo", lat:18.426418, lon:-66.632501, ...IPP("PV Properties, Inc."), units:[
+   {u:"Solar PV (1 unit, 2014)", f:"solar", mw:1.0, ns:1.0}],
+   ns:1.0, src:["eia860m"]},
+ {id:"s-canovanasfp", name:"Can\u00f3vanas filtration solar", muni:"Can\u00f3vanas", lat:18.377243, lon:-65.879311, ...IPP("PV Properties, Inc."), units:[
+   {u:"Solar PV (1 unit, 2013)", f:"solar", mw:1.0, ns:1.0}],
+   ns:1.0, src:["eia860m"]},
+ {id:"lfg-fajardo", name:"Fajardo landfill gas", muni:"Fajardo", lat:18.2939, lon:-65.6813, ...IPP("Landfill Gas Technologies of Fajardo, LLC"), units:[
+   {u:"Landfill gas (2 units)", f:"lfg", mw:2.4, ns:2.4}],
+   ns:2.4, note:"Sells to PREPA under a power purchase agreement. EIA classes the owner's sector as commercial rather than independent power producer, so this site falls outside the sector filter used for the rest of this list and is added back explicitly.", src:["eia860m","prebList"]},
+ {id:"lfg-toabaja", name:"Toa Baja landfill gas", muni:"Toa Baja", lat:18.4221, lon:-66.2019, ...IPP("Landfill Gas Technologies of Fajardo, LLC"), units:[
+   {u:"Landfill gas (2 units)", f:"lfg", mw:2.4, ns:2.4}],
+   ns:2.4, note:"Sells to PREPA under a power purchase agreement. Classed commercial by EIA and added back for the same reason as the Fajardo site.", src:["eia860m","prebList"]},
+ {id:"tempsanjuan", name:"San Juan temporary units (FEMA)", muni:"San Juan", lat:18.429, lon:-66.106, ...PREPA_T, units:[
+   {u:"TM2500 mobile turbines (FEMA-funded, in service Sept 2023)", f:"gas", mw:200, ns:200}],
+   ns:200, note:"Absent from EIA's September 2026 inventory, which carries no record of the FEMA-funded temporary units. Included because they are physically on the grid; the capacity is as reported by the operator, not by EIA, and is not independently verified.", src:["nfe","vocero"]},
+ {id:"temppaloseco", name:"Palo Seco temporary units (FEMA)", muni:"Toa Baja", lat:18.457, lon:-66.15, ...PREPA_T, units:[
+   {u:"FT8 MobilePac units (FEMA-funded, in service June 2023)", f:"gas", mw:150, ns:150}],
+   ns:150, note:"Absent from EIA's September 2026 inventory. LUMA's October 2026 report refers to an environmental waiver to operate three FT8 MobilePac units at Palo Seco on an emergency basis. Capacity is as reported by the operator, not by EIA.", src:["nfe","collab"]},
 ];
 
 // ---- Board-approved projects (2020 onward) ----
@@ -1152,6 +1269,7 @@ function techParts(list){
 }
 function renderFigures(){
   const ex = d3.sum(ASSETS,a=>a.mw);
+  const ns = d3.sum(ASSETS,a=>d3.sum(a.units,u=>u.ns==null?u.mw:u.ns));
   const priv = d3.sum(ASSETS.filter(a=>a.sector==="private"),a=>a.mw);
   const ap = PROJECTS.filter(live), rv = PROJECTS.filter(p=>p.status==="review");
   const apMW = d3.sum(ap,p=>p.mw), rvMW = d3.sum(rv,p=>p.mw);
@@ -1169,7 +1287,7 @@ function renderFigures(){
     <div class="kpi hero">
       <div class="lab">On the grid today</div>
       ${kpiNum(ex,"MW")}
-      <div class="sub">Nameplate across ${ASSETS.length} utility-scale assets · ${Math.round(priv/ex*100)}% privately owned</div>
+      <div class="sub"><b style="color:var(--ink)">${fmt(ns)} MW</b> net summer capacity, the figure that counts for adequacy · ${ASSETS.length} assets · ${Math.round(priv/ex*100)}% privately owned</div>
       ${segBlock(exParts, ex)}
     </div>
     <div class="kpi accent">
