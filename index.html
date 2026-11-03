@@ -77,6 +77,7 @@ h1{font-size:clamp(24px,3.2vw,36px);line-height:1.12;font-weight:700;letter-spac
 .tlabel{font-size:13px;color:var(--ink-3);margin-right:6px}
 .check{display:inline-flex;align-items:center;gap:6px;font-size:13.5px;cursor:pointer;color:var(--ink-2)}
 .check input{accent-color:var(--ink);width:15px;height:15px}
+.check[hidden],.seg[hidden]{display:none}
 select.muni{padding:6px 8px;border:1px solid var(--rule);border-radius:6px;background:var(--panel);min-width:190px}
 
 .layout>*{min-width:0}
@@ -316,9 +317,31 @@ footer{margin-top:28px;padding-top:14px;border-top:1px solid var(--rule);font-si
   <div class="tabs" role="tablist" aria-label="Pipeline views">
     <button role="tab" id="t-projects" data-tab="projects" aria-selected="true" aria-controls="tab-projects">Projects</button>
     <button role="tab" id="t-procurement" data-tab="procurement" aria-selected="false" aria-controls="tab-procurement">Procurement averages</button>
+    <button role="tab" id="t-model" data-tab="model" aria-selected="false" aria-controls="tab-model">Arrival model</button>
     <button role="tab" id="t-checks" data-tab="data-checks" aria-selected="false" aria-controls="tab-checks">Data checks</button>
   </div>
   <div class="tabpanel" id="tab-procurement" role="tabpanel" aria-labelledby="t-procurement" hidden><div id="procsum"></div></div>
+  <div class="tabpanel" id="tab-model" role="tabpanel" aria-labelledby="t-model" hidden>
+    <p class="dek" style="max-width:88ch;margin:16px 0 0">Developers report commercial operation dates, and those dates move. This model takes the slippage this portfolio has already recorded and projects it forward, so the question is not when each developer says a project will arrive but when it arrives if the next amendment looks like the last one.</p>
+    <div class="filters" style="margin:18px 0 6px">
+      <div><span class="tlabel">Scenario</span>
+        <span class="seg" id="scenSeg">
+          <button data-v="reported" aria-pressed="true">Developer dates</button>
+          <button data-v="p50" aria-pressed="false">Median slip</button>
+          <button data-v="p90" aria-pressed="false">P90 slip</button>
+          <button data-v="custom" aria-pressed="false">Custom</button>
+        </span>
+      </div>
+      <label class="check" id="slipWrap" hidden><span class="tlabel">Months added</span>
+        <input type="range" id="slipRange" min="0" max="48" step="1" value="18" style="width:170px">
+        <b id="slipVal" style="min-width:68px">18 months</b></label>
+      <label class="check"><input type="checkbox" id="inclReview"> Include capacity under Board review</label>
+    </div>
+    <div id="scenCompare"></div>
+    <div id="arrivalChart"></div>
+    <div id="modelTable"></div>
+    <div id="slipEvidence"></div>
+  </div>
   <div class="tabpanel" id="tab-checks" role="tabpanel" aria-labelledby="t-checks" hidden>
     <div class="checks">
       <div class="chk ok"><h3>Reconciled and verified</h3><ul>
@@ -741,14 +764,14 @@ const PROJECTS = [
   terms:"25 years; capacity price averaging $23,526/MW-month of maximum contract capacity",
   note:"PREPA's tracker lists the counterparty as JORD LLC; LUMA's October 2026 report calls the site Naguabo Energy Park and attributes it to Go Green.",
   fpOwn:[{v:23526,u:"MWmo",n:"Average over the term"}], src:["trk","collab","prebApr"],
-  cs:"Interconnection agreement signed; site work under way. LUMA (October 2026): after system impact and facility site assessments the developer must supply a new PSS\u00aee model before further studies, and must execute pending contracts.", cod:"Dec 31, 2028", codD:"2028-12-31", codN:"LUMA (October 2026) gives December 2028; PREPA's tracker shows Dec 31, 2027", con:"Yes (land movement)", ix:"Yes"},
+  cs:"Interconnection agreement signed; site work under way. LUMA (October 2026): after system impact and facility site assessments the developer must supply a new PSS\u00aee model before further studies, and must execute pending contracts.", codOrig:"2027-12-31", cod:"Dec 31, 2028", codD:"2028-12-31", codN:"LUMA (October 2026) gives December 2028; PREPA's tracker shows Dec 31, 2027", con:"Yes (land movement)", ix:"Yes"},
  {id:"gogreen-yab-bess", name:"Yabucoa Energy Park storage", dev:"Go Green USA America", muni:"Yabucoa", program:"Tranche 1", own:true,
   comps:[{f:"bess",mw:80}], status:"approved", statusText:"Approved June 2026 as a capacity increase; interconnection agreement signed and land movement under way",
   appr:[{d:"2026-06-01", mo:true, a:"Approved", w:"Capacity increase (Listed in PREPA's July 2026 tracker)"}],
   terms:"25 years; capacity price averaging $23,866/MW-month of maximum contract capacity",
   note:"A Tranche 1 contract, distinct from the 100 MW Yabucoa Energy storage submitted under the accelerated evaluation procurement.",
   fpOwn:[{v:23866,u:"MWmo",n:"Average over the term"}], src:["trk","collab","prebApr"],
-  cs:"Interconnection agreement signed; site work under way. LUMA (October 2026): the developer must supply a new Power System Simulator model and execute pending contracts before implementation.", cod:"Dec 31, 2027", codD:"2027-12-31", codN:"LUMA gives July 2028", con:"Yes (land movement)", ix:"Yes"},
+  cs:"Interconnection agreement signed; site work under way. LUMA (October 2026): the developer must supply a new Power System Simulator model and execute pending contracts before implementation.", codOrig:"2027-12-31", cod:"Dec 31, 2027", codD:"2027-12-31", codN:"LUMA gives July 2028", con:"Yes (land movement)", ix:"Yes"},
  {id:"coqui-aguirre", name:"Aguirre Solar Farm", dev:"Coquí Power", muni:"Salinas", program:"Accelerated procurement (EO 2025-047)", own:true,
   comps:[{f:"solar",mw:34}], status:"approved", statusText:"One of eleven Coquí Power solar PPOAs approved with observations on July 3, 2026 (522.5 MW in total)",
   appr:[{d:"2026-07-03", a:"Approved with observations", w:"PPOA under the accelerated evaluation process (Executive Order 2025-047)"}],
@@ -975,27 +998,27 @@ const PROJECTS = [
 // cs: current status; cod: expected COD as displayed; codD: ISO date used for sorting (latest component); codN: amendment note; con: in construction; ix: interconnection study completed
 const TRACKER = {
  "ciro1p":{cs:"Phase 1 achieved Initial Synchronization on November 26, 2025 and is undergoing testing to reach commercial operation. Companion 90 MW and 25 MW battery contracts remain under Board review.", cod:"Feb 28, 2027", codD:"2027-02-28", codN:"LUMA gives commercial operation as February 2027; PREPA's tracker states only \u201c24 months after full notice to proceed\u201d", con:"Yes", ix:"Yes"},
- "xzerta":{cs:"Design is being finalized and construction has started to preserve ITC eligibility. Notice to proceed for CDBG construction disbursement received April 2026.", cod:"Dec 31, 2028", codD:"2028-12-31", codN:"LUMA (October 2026) gives December 2028; PREPA's tracker still shows Nov 30, 2027, amended from Mar 30, 2024 owing to third-party delays and disputes", con:"Yes", ix:"Yes"},
- "cfe-salinas":{cs:"Under construction; back-feed power expected by the end of July 2026.", cod:"PV May 29, 2026; storage phase 1 May 29, 2026; phase 2 Feb 26, 2027", codD:"2027-02-26", codN:"Amended from Nov 30, 2025 (phase 2: Aug 30, 2026) owing to permitting delays", con:"Yes", ix:"Yes"},
- "cfe-jobos":{cs:"Under construction; back-feed power expected by the end of July 2026.", cod:"May 29, 2026 (PV and storage)", codD:"2026-05-29", codN:"Amended from Nov 30, 2025 owing to permitting delays", con:"Yes", ix:"Yes"},
- "coamo":{cs:"Development of the PV and storage project is paused at DOE's request, as a condition to advancing financing of the Convergent storage projects. Not in construction.", cod:"Apr 30, 2028", codD:"2028-04-30", codN:"Amended from Dec 31, 2026", con:"No", ix:"Yes"},
- "penuelas-bess":{cs:"Resource provider is working to satisfy DOE funding conditions precedent before construction can start.", cod:"Apr 30, 2028", codD:"2028-04-30", codN:"Amended from Dec 31, 2026 to accommodate DOE financing requirements", con:"No", ix:"Yes"},
- "ponce-bess":{cs:"Resource provider is working to satisfy DOE funding conditions precedent before construction can start.", cod:"Apr 30, 2028", codD:"2028-04-30", codN:"Amended from Dec 31, 2026 to accommodate DOE financing requirements", con:"No", ix:"Yes"},
- "caguas-bess":{cs:"Resource provider is working to satisfy DOE funding conditions precedent before construction can start.", cod:"Apr 30, 2028", codD:"2028-04-30", codN:"Amended from Dec 31, 2026 to accommodate DOE financing requirements", con:"No", ix:"Yes"},
- "juncos":{cs:"Not in construction; interconnection study completed. No status comment provided.", cod:"Sep 30, 2025 (lapsed)", codD:"2025-09-30", codN:"Original COD; no amendment recorded in the tracker", con:"No", ix:"Yes"},
- "pattern-pv":{cs:"DOE declined in December 2025 to proceed with financing despite its conditional commitment and asked Pattern to redirect the funds to a thermal facility (offer submitted to P3 RFP 001-2026). Pattern is pursuing alternate financing.", cod:"Mar 31, 2028", codD:"2028-03-31", codN:"Amended from Nov 30, 2025 (DOE domestic-content conditions, capacity increase, lower price)", con:"No", ix:"Yes"},
- "pattern-bar-bess":{cs:"Financial close and construction notice to proceed scheduled for July 2026. The tracker lists this contract at 120 MW.", cod:"May 22, 2028", codD:"2028-05-22", codN:"Amended from Mar 31, 2028 (force majeure: equipment supply delay)", con:"No", ix:"Yes"},
- "pattern-si-bess":{cs:"Financial close and construction notice to proceed scheduled for July 2026. The tracker lists this contract at 100 MW.", cod:"May 22, 2028", codD:"2028-05-22", codN:"Amended from Mar 31, 2028 (force majeure: equipment supply delay)", con:"No", ix:"Yes"},
+ "xzerta":{codOrig:"2024-03-30", cs:"Design is being finalized and construction has started to preserve ITC eligibility. Notice to proceed for CDBG construction disbursement received April 2026.", cod:"Dec 31, 2028", codD:"2028-12-31", codN:"LUMA (October 2026) gives December 2028; PREPA's tracker still shows Nov 30, 2027, amended from Mar 30, 2024 owing to third-party delays and disputes", con:"Yes", ix:"Yes"},
+ "cfe-salinas":{codOrig:"2026-08-30", cs:"Under construction; back-feed power expected by the end of July 2026.", cod:"PV May 29, 2026; storage phase 1 May 29, 2026; phase 2 Feb 26, 2027", codD:"2027-02-26", codN:"Amended from Nov 30, 2025 (phase 2: Aug 30, 2026) owing to permitting delays", con:"Yes", ix:"Yes"},
+ "cfe-jobos":{codOrig:"2025-11-30", cs:"Under construction; back-feed power expected by the end of July 2026.", cod:"May 29, 2026 (PV and storage)", codD:"2026-05-29", codN:"Amended from Nov 30, 2025 owing to permitting delays", con:"Yes", ix:"Yes"},
+ "coamo":{codOrig:"2026-12-31", cs:"Development of the PV and storage project is paused at DOE's request, as a condition to advancing financing of the Convergent storage projects. Not in construction.", cod:"Apr 30, 2028", codD:"2028-04-30", codN:"Amended from Dec 31, 2026", con:"No", ix:"Yes"},
+ "penuelas-bess":{codOrig:"2026-12-31", cs:"Resource provider is working to satisfy DOE funding conditions precedent before construction can start.", cod:"Apr 30, 2028", codD:"2028-04-30", codN:"Amended from Dec 31, 2026 to accommodate DOE financing requirements", con:"No", ix:"Yes"},
+ "ponce-bess":{codOrig:"2026-12-31", cs:"Resource provider is working to satisfy DOE funding conditions precedent before construction can start.", cod:"Apr 30, 2028", codD:"2028-04-30", codN:"Amended from Dec 31, 2026 to accommodate DOE financing requirements", con:"No", ix:"Yes"},
+ "caguas-bess":{codOrig:"2026-12-31", cs:"Resource provider is working to satisfy DOE funding conditions precedent before construction can start.", cod:"Apr 30, 2028", codD:"2028-04-30", codN:"Amended from Dec 31, 2026 to accommodate DOE financing requirements", con:"No", ix:"Yes"},
+ "juncos":{codOrig:"2025-09-30", cs:"Not in construction; interconnection study completed. No status comment provided.", cod:"Sep 30, 2025 (lapsed)", codD:"2025-09-30", codN:"Original COD; no amendment recorded in the tracker", con:"No", ix:"Yes"},
+ "pattern-pv":{codOrig:"2025-11-30", cs:"DOE declined in December 2025 to proceed with financing despite its conditional commitment and asked Pattern to redirect the funds to a thermal facility (offer submitted to P3 RFP 001-2026). Pattern is pursuing alternate financing.", cod:"Mar 31, 2028", codD:"2028-03-31", codN:"Amended from Nov 30, 2025 (DOE domestic-content conditions, capacity increase, lower price)", con:"No", ix:"Yes"},
+ "pattern-bar-bess":{codOrig:"2028-03-31", cs:"Financial close and construction notice to proceed scheduled for July 2026. The tracker lists this contract at 120 MW.", cod:"May 22, 2028", codD:"2028-05-22", codN:"Amended from Mar 31, 2028 (force majeure: equipment supply delay)", con:"No", ix:"Yes"},
+ "pattern-si-bess":{codOrig:"2028-03-31", cs:"Financial close and construction notice to proceed scheduled for July 2026. The tracker lists this contract at 100 MW.", cod:"May 22, 2028", codD:"2028-05-22", codN:"Amended from Mar 31, 2028 (force majeure: equipment supply delay)", con:"No", ix:"Yes"},
  "ciro2":{cs:"Construction commenced ahead of July 4, 2026 to secure the ITC safe harbor. A companion 35 MW battery remains under Board review.", cod:"Second anniversary of satisfaction of conditions subsequent", codD:null, codN:"No fixed date stated in the tracker", con:"Yes", ix:"Yes"},
  "guayama-solar":{cs:"Construction commenced ahead of July 4, 2026 to secure the ITC safe harbor. A companion 25 MW battery remains under Board review.", cod:"Aug 31, 2028", codD:"2028-08-31", codN:"LUMA gives August 2028, with notice to proceed expected October 2026; PREPA's tracker states only the second anniversary of satisfaction of conditions subsequent", con:"Yes", ix:"Yes"},
- "yep":{cs:"Interconnection agreement signed; site work (land movement) under way. The tracker lists the project at 100 MW following a capacity increase approved June 2026.", cod:"Dec 31, 2027", codD:"2027-12-31", codN:"Reset with the capacity increase", con:"Yes", ix:"Yes"},
- "solaner":{cs:"In construction. Approved and designed capacity is 40 MW. PREPA recommends granting the developer's January 20, 2026 request to extend the guaranteed COD.", cod:"Dec 20, 2027 (extension recommended)", codD:"2027-12-20", codN:"Original Oct 1, 2026", con:"Yes", ix:"Yes"},
- "yfn":{cs:"In construction; interconnection study completed. No status comment provided.", cod:"Dec 31, 2026", codD:"2026-12-31", codN:"LUMA (October 2026) gives December 2026 with initial synchronisation scheduled for September 2026; PREPA's tracker still shows the lapsed Aug 1, 2026 date", con:"Yes", ix:"Yes"},
- "tetris":{cs:"No on-site construction yet; the project reached Work of Significant Nature off-site before July 4, 2026 through manufacturing of long-lead equipment.", cod:"Dec 31, 2027", codD:"2027-12-31", codN:"Amended following force majeure notices tied to pending permits", con:"No", ix:"Yes"},
- "energiza":{cs:"Not in construction. GE Vernova critical-path turbine secured with $48M paid (30% of contract); interconnection study must be re-performed for the larger turbine output (new study submitted July 2026). About $63M spent to date, with about $117M more expected by year end.", cod:"Oct 26, 2029 (approved); at risk of Oct 30, 2030", codD:"2029-10-26", codN:"Original Jun 30, 2028. Delay in executing the amendment (Oct 2025 to Jan 2026) lost the March 2028 turbine slot; GE Vernova's Feb 2029 slot shifts COD to Oct 30, 2030", con:"No", ix:"Re-study required"},
+ "yep":{codOrig:"2027-12-31", cs:"Interconnection agreement signed; site work (land movement) under way. The tracker lists the project at 100 MW following a capacity increase approved June 2026.", cod:"Dec 31, 2027", codD:"2027-12-31", codN:"Reset with the capacity increase", con:"Yes", ix:"Yes"},
+ "solaner":{codOrig:"2026-10-01", cs:"In construction. Approved and designed capacity is 40 MW. PREPA recommends granting the developer's January 20, 2026 request to extend the guaranteed COD.", cod:"Dec 20, 2027 (extension recommended)", codD:"2027-12-20", codN:"Original Oct 1, 2026", con:"Yes", ix:"Yes"},
+ "yfn":{codOrig:"2024-06-30", cs:"In construction; interconnection study completed. No status comment provided.", cod:"Dec 31, 2026", codD:"2026-12-31", codN:"LUMA (October 2026) gives December 2026 with initial synchronisation scheduled for September 2026; PREPA's tracker still shows the lapsed Aug 1, 2026 date", con:"Yes", ix:"Yes"},
+ "tetris":{codOrig:"2025-11-30", cs:"No on-site construction yet; the project reached Work of Significant Nature off-site before July 4, 2026 through manufacturing of long-lead equipment.", cod:"Dec 31, 2027", codD:"2027-12-31", codN:"Amended following force majeure notices tied to pending permits", con:"No", ix:"Yes"},
+ "energiza":{codOrig:"2028-06-30", cs:"Not in construction. GE Vernova critical-path turbine secured with $48M paid (30% of contract); interconnection study must be re-performed for the larger turbine output (new study submitted July 2026). About $63M spent to date, with about $117M more expected by year end.", cod:"Oct 26, 2029 (approved); at risk of Oct 30, 2030", codD:"2029-10-26", codN:"Original Jun 30, 2028. Delay in executing the amendment (Oct 2025 to Jan 2026) lost the March 2028 turbine slot; GE Vernova's Feb 2029 slot shifts COD to Oct 30, 2030", con:"No", ix:"Re-study required"},
  "t2-sj":{cs:"No status reported in the tracker.", cod:"Not reported", codD:null},
  "t2-marisol":{cs:"Closing has not occurred. No on-site construction; the project reached Work of Significant Nature off-site before July 4, 2026 through manufacturing of long-lead equipment.", cod:"2 years after closing (closing pending)", codD:null, con:"No", ix:"Yes"},
- "t2-vb":{cs:"Not in construction; interconnection study completed. No status comment provided.", cod:"Sep 30, 2027", codD:"2027-09-30", codN:"Original COD; no amendment recorded", con:"No", ix:"Yes"},
+ "t2-vb":{codOrig:"2027-09-30", cs:"Not in construction; interconnection study completed. No status comment provided.", cod:"Sep 30, 2027", codD:"2027-09-30", codN:"Original COD; no amendment recorded", con:"No", ix:"Yes"},
  "asap-solaner":{cs:"LUMA ASAP Q1 FY2027 report (Oct 30, 2026): SO approved by the Energy Bureau, PREPA and the Board; resource provider signing conditions still in progress, so the SO has not been executed. EPC not started. Phase 2 system impact study awaits updated models from participants.", cod:"Dec 31, 2027 (LUMA estimate)", codD:"2027-12-31", codN:"Initial synchronization estimated Dec 1, 2027; SO long-stop date Jan 1, 2028. LUMA notes estimates are preliminary", con:"No (EPC not started)", ix:"Phase 2 study pending"},
  "asap-xzerta":{cs:"LUMA ASAP Q1 FY2027 report (Oct 30, 2026): SO executed June 8, 2026; conditions precedent and closing due December 8, 2026. EPC not started. Phase 2 system impact study awaits updated models from participants.", cod:"Dec 31, 2027 (LUMA estimate)", codD:"2027-12-31", codN:"Initial synchronization estimated Dec 1, 2027; SO long-stop date Jan 1, 2028. LUMA notes estimates are preliminary", con:"No (EPC not started)", ix:"Phase 2 study pending"},
  "asap-polaris":{cs:"LUMA ASAP Q1 FY2027 report (Oct 30, 2026): SO executed June 5, 2026; conditions precedent and closing due December 2, 2026. EPC not started. Phase 1 facility and system impact studies completed.", cod:"Dec 31, 2027 (LUMA estimate)", codD:"2027-12-31", codN:"Initial synchronization estimated Dec 1, 2027; SO long-stop date Jan 1, 2028. LUMA notes estimates are preliminary. In July 2026 the developer requested extending the long-stop date to Jan 1, 2029", con:"No (EPC not started)", ix:"Yes (Phase 1)"},
@@ -1597,7 +1620,120 @@ function scaleMarks(){
   gLabels.selectAll("text").style("font-size",(9/K)+"px").attr("y",f=>centroid[f.properties.n][1]+3/K).style("stroke-width",(2.5/K)+"px");
 }
 let lastMuni;
-const TABS = {projects:"tab-projects", procurement:"tab-procurement", "data-checks":"tab-checks"};
+// ---------- capacity arrival model ----------
+// Slippage observed on this portfolio: original COD (PREPA tracker) vs the date now reported.
+const MONTH = 1000*60*60*24*30.4375;
+const asD = d => new Date(d+"T12:00:00");
+const monthsBetween = (a,b) => (asD(b)-asD(a))/MONTH;
+const addMonths = (d,m) => { const x=asD(d); x.setMonth(x.getMonth()+Math.round(m)); return x; };
+const SLIP = (()=>{
+  const obs = PROJECTS.filter(p=>p.codOrig && p.codD)
+    .map(p=>({name:p.name, stage:p.stage, from:p.codOrig, to:p.codD, slip:monthsBetween(p.codOrig,p.codD)}))
+    .sort((a,b)=>a.slip-b.slip);
+  const v = obs.map(o=>o.slip);
+  const q = f => { if(!v.length) return 0; const i=(v.length-1)*f, lo=Math.floor(i), hi=Math.ceil(i); return v[lo]+(v[hi]-v[lo])*(i-lo); };
+  return {obs, n:v.length, p50:q(.5), p90:q(.9), mean:d3.mean(v)||0, max:v[v.length-1]||0};
+})();
+const SCEN = {
+  reported:{l:"Developer dates", m:()=>0,  x:"Every reported date taken at face value"},
+  p50:{l:"Median slip",  m:()=>SLIP.p50, x:"Each date pushed by the portfolio's median realised slip"},
+  p90:{l:"P90 slip",     m:()=>SLIP.p90, x:"Each date pushed by the portfolio's 90th-percentile slip"},
+  custom:{l:"Custom",    m:()=>mstate.custom, x:"Months added by hand"}
+};
+const mstate = {scen:"reported", custom:18, review:false};
+const modelSet = () => PROJECTS.filter(p => p.status!=="revoked" && (mstate.review || p.status!=="review"));
+function modelled(p, months){
+  if(!p.codD) return null;
+  return addMonths(p.codD, months);
+}
+const YEARS = d3.range(2026, 2033);
+function arrivalByYear(list, months){
+  const dated = list.filter(p=>p.codD), undated = list.filter(p=>!p.codD);
+  return {
+    rows: YEARS.map(y=>{
+      const cut = new Date(y,11,31,12);
+      const on = dated.filter(p=>modelled(p,months) <= cut);
+      const by = {}; on.forEach(p=>p.comps.forEach(c=>by[c.f]=(by[c.f]||0)+c.mw));
+      return {y, by, tot:d3.sum(on,p=>p.mw), n:on.length};
+    }),
+    undatedMW: d3.sum(undated,p=>p.mw), undatedN: undated.length,
+    totalMW: d3.sum(list,p=>p.mw)
+  };
+}
+function renderModel(){
+  const months = SCEN[mstate.scen].m();
+  const list = modelSet();
+  const A = arrivalByYear(list, months);
+  const end2028 = y => { const r = arrivalByYear(list, SCEN[y].m()).rows.find(r=>r.y===2028); return r?r.tot:0; };
+
+  // --- scenario comparison at end-2028 ---
+  const lapsedList = list.filter(p=>p.codD && p.codD < TODAY && p.stage!=="test");
+  const lapsed = {n:lapsedList.length, mw:d3.sum(lapsedList,p=>p.mw)};
+  const cmp = ["reported","p50","p90"].map(k=>({k, l:SCEN[k].l, mw:end2028(k), mo:SCEN[k].m()}));
+  if(mstate.scen==="custom") cmp.push({k:"custom", l:"Custom", mw:end2028("custom"), mo:mstate.custom});
+  const cmax = d3.max(cmp,c=>c.mw)||1;
+  document.getElementById("scenCompare").innerHTML = `
+    <div class="codchart" style="margin:22px 0 4px">
+      <h3>Capacity in service by the end of 2028</h3>
+      <p class="sub">Of the ${fmt(A.totalMW)} MW in scope, how much is online by December 2028 under each scenario. ${A.undatedN} projects totalling ${fmt(A.undatedMW)} MW carry no firm date and cannot be placed on a timeline at all.</p>
+      ${lapsed.n?`<p class="sub" style="color:var(--warn)">${lapsed.n} of those projects, ${fmt(lapsed.mw)} MW, carry a reported date that has already passed without commercial operation. The developer-dates case counts them as in service regardless.</p>`:""}
+      <div class="codrows">${cmp.map(c=>`<span class="yl">${c.l}${c.mo?` <span style="color:var(--ink-3)">+${Math.round(c.mo)} mo</span>`:""}</span>
+        <span class="track"><span style="display:flex;gap:2px;width:${c.mw/cmax*100}%;background:${c.k===mstate.scen?"var(--fomb)":"var(--ink-3)"};border-radius:4px"></span></span>
+        <span class="v"><b>${fmt(c.mw)} MW</b> · ${Math.round(c.mw/A.totalMW*100)}% of scope</span>`).join("")}</div>
+    </div>`;
+
+  // --- cumulative arrival curve ---
+  const amax = d3.max(A.rows,r=>r.tot)||1;
+  document.getElementById("arrivalChart").innerHTML = `
+    <div class="codchart" style="margin:26px 0 4px">
+      <h3>Cumulative capacity in service — ${SCEN[mstate.scen].l}</h3>
+      <p class="sub">${SCEN[mstate.scen].x}${months?`, which adds ${Math.round(months)} months to every outstanding date`:""}. Bars are cumulative: each year shows everything online by December of that year.</p>
+      <div class="yearbars" id="arrivalBars" style="height:196px">${A.rows.map(r=>`<div class="yb" style="cursor:default" data-ay="${r.y}">
+        <span class="yv">${r.tot?fmt(r.tot):"—"}</span>
+        <span class="col" style="height:${r.tot/amax*150}px">${["solar","bess","gas"].map(f=>r.by[f]?`<i style="height:${r.by[f]/r.tot*100}%;background:var(${FUEL[f].v})"></i>`:"").join("")}</span>
+        <span class="yl">${r.y}</span></div>`).join("")}</div>
+      <p class="tlabel" style="margin:26px 0 0">${fmt(A.undatedMW)} MW across ${A.undatedN} projects has no firm commercial operation date and is excluded from these bars.</p>
+    </div>`;
+  const byY = Object.fromEntries(A.rows.map(r=>[r.y,r]));
+  document.querySelectorAll("#arrivalBars .yb").forEach(el=>{
+    const r = byY[+el.dataset.ay];
+    el.addEventListener("mousemove",ev=>{
+      if(!r.tot){ showTip(ev,`<b>${r.y}</b><br>Nothing in service yet under this scenario`); return; }
+      const lines = ["solar","bess","gas"].filter(f=>r.by[f]).map(f=>`<span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:var(${FUEL[f].v});margin-right:5px"></span>${FUEL[f].label}: ${fmt(r.by[f])} MW`).join("<br>");
+      showTip(ev,`<b>By end ${r.y} — ${fmt(r.tot)} MW</b><br>${r.n} projects in service<br>${lines}`);
+    });
+    el.addEventListener("mouseleave",hideTip);
+  });
+
+  // --- per-project dates ---
+  const dated = list.filter(p=>p.codD).slice().sort((a,b)=>a.codD.localeCompare(b.codD));
+  const fmtDate = d => d.toLocaleDateString("en-US",{year:"numeric",month:"short"});
+  document.getElementById("modelTable").innerHTML = `
+    <div class="codchart" style="margin:30px 0 4px"><h3>Modelled dates by project</h3>
+    <p class="sub">P50 applies the median realised slip, P90 the ninetieth percentile. Both are applied to the date reported today, so a project that has already been amended several times carries that history in its reported date and the model's addition on top.</p></div>
+    <div class="tablewrap"><table class="pt" style="min-width:820px"><thead><tr>
+      <th>Project</th><th>Stage</th><th class="num">MW</th><th>Reported COD</th><th>P50</th><th>P90</th><th class="num">Slip so far</th>
+    </tr></thead><tbody>${dated.map(p=>{
+      const slip = p.codOrig ? monthsBetween(p.codOrig,p.codD) : null;
+      return `<tr class="main"><td class="nm">${esc(p.name)}</td><td>${stagePill(p)}</td><td class="num">${fmt(p.mw)}</td>
+        <td>${fmtDate(asD(p.codD))}${p.codD<TODAY&&p.stage!=="test"?'<div class="codx" style="color:var(--warn)">already lapsed</div>':""}</td>
+        <td>${fmtDate(addMonths(p.codD,SLIP.p50))}</td>
+        <td>${fmtDate(addMonths(p.codD,SLIP.p90))}</td>
+        <td class="num">${slip==null?'<span style="color:var(--ink-3)">no original date</span>':(slip>0.5?"+"+Math.round(slip)+" mo":'<span style="color:var(--ink-3)">never amended</span>')}</td></tr>`;
+    }).join("")}</tbody></table></div>`;
+
+  // --- evidence ---
+  document.getElementById("slipEvidence").innerHTML = `
+    <div class="checks" style="margin-top:28px"><div class="chk warn"><h3>What the model rests on</h3>
+      <p class="cnote" style="margin:0 0 10px">PREPA's tracker records an original and an amended commercial operation date for ${SLIP.n} of these contracts. Comparing the two gives the slippage already recorded on this portfolio — a median of <b>${SLIP.p50.toFixed(0)} months</b>, a mean of ${SLIP.mean.toFixed(0)}, and a worst case of ${SLIP.max.toFixed(0)}. The model adds that same movement to the dates reported today.</p>
+      <div class="ctabw"><table class="ctab"><thead><tr><th>Project</th><th>Original COD</th><th>Reported now</th><th>Slip</th></tr></thead><tbody>
+        ${SLIP.obs.slice().reverse().map(o=>`<tr><td>${esc(o.name)}</td><td>${fmtD(o.from)}</td><td>${fmtD(o.to)}</td><td>${o.slip>0?"+"+o.slip.toFixed(0)+" months":"unchanged"}</td></tr>`).join("")}
+      </tbody></table></div>
+      <p class="cnote">Three limits worth holding onto. The sample is ${SLIP.n} contracts, small enough that one Xzerta at ${SLIP.max.toFixed(0)} months moves the tail on its own. Slippage already recorded is not evidence that the same amount remains ahead, so the median case should be read as "the next amendment resembles the last one", not as a forecast. And projects with no firm date — ${A.undatedN} of them, ${fmt(A.undatedMW)} MW — are left out entirely rather than given an assumed date, so every bar here understates the pipeline.</p>
+    </div></div>`;
+}
+
+const TABS = {projects:"tab-projects", procurement:"tab-procurement", model:"tab-model", "data-checks":"tab-checks"};
 function showTab(name, push){
   if(!TABS[name]) name="projects";
   document.querySelectorAll(".tabs button").forEach(b=>b.setAttribute("aria-selected", b.dataset.tab===name));
@@ -1605,8 +1741,21 @@ function showTab(name, push){
   if(push){ try{ history.replaceState(null,"","#"+name); }catch(e){} }
 }
 document.querySelectorAll(".tabs button").forEach(b=>b.onclick=()=>showTab(b.dataset.tab,true));
+// arrival-model controls
+document.querySelectorAll("#scenSeg button").forEach(b=>b.onclick=()=>{
+  mstate.scen = b.dataset.v;
+  document.querySelectorAll("#scenSeg button").forEach(x=>x.setAttribute("aria-pressed", x.dataset.v===mstate.scen));
+  document.getElementById("slipWrap").hidden = mstate.scen!=="custom";
+  renderModel();
+});
+document.getElementById("slipRange").addEventListener("input",e=>{
+  mstate.custom = +e.target.value;
+  document.getElementById("slipVal").textContent = mstate.custom+" month"+(mstate.custom===1?"":"s");
+  if(mstate.scen==="custom") renderModel();
+});
+document.getElementById("inclReview").addEventListener("change",e=>{ mstate.review=e.target.checked; renderModel(); });
 window.addEventListener("hashchange",()=>{ const h=location.hash.slice(1); if(TABS[h]) showTab(h); });
-function render(){ drawShade(); drawMarkers(); renderPanel(); renderChartKey(); renderYears(); renderCodChart(); renderProcSum(); renderTable(); if(lastMuni!==state.muni){ lastMuni=state.muni; zoomTo(); } }
+function render(){ drawShade(); drawMarkers(); renderPanel(); renderChartKey(); renderYears(); renderCodChart(); renderProcSum(); renderTable(); renderModel(); if(lastMuni!==state.muni){ lastMuni=state.muni; zoomTo(); } }
 
 const sel = document.getElementById("muniSelect");
 muniNames.forEach(n=>{ const o=document.createElement("option"); o.value=n; o.textContent=n; sel.appendChild(o); });
