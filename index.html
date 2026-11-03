@@ -1,0 +1,1243 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Puerto Rico generation map and FOMB-approved projects (Copy)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Public+Sans:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.8.5/d3.min.js"></script>
+<style>
+:root{
+  --paper:#F1F4F2; --panel:#FFFFFF; --ink:#1C2A31; --ink-2:#4A5A62; --ink-3:#7A888F;
+  --rule:#C9D3D6; --rule-2:#E3E9EA;
+  --sea:#D3E2E8; --land:#FAFBF9; --border:#9EADB3;
+  --shade-0:#F4F7F7; --shade-1:#D6E4EA; --shade-2:#9FC1CF; --shade-3:#5B8FA8; --shade-4:#2C5A72;
+  --fomb:#A8285F; --fomb-soft:#F6E3EC; --revoked:#8A9499; --focus:#1F6FEB;
+  --f-bunker:#6B3E23; --f-diesel:#C07A2F; --f-gas:#2E78A3; --f-coal:#3A3A3A; --f-solar:#D9A300;
+  --f-wind:#3F9C84; --f-hydro:#1D4E9A; --f-bess:#7D52A8; --f-lfg:#6E8B2A;
+  --st-test:#1F7A55; --st-build:#2C6E9C; --st-pre:#8A6A12; --st-pause:#B4532A; --st-none:#7A888F; --warn:#9A5B00; --warn-soft:#FBEBD2;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --paper:#10181C; --panel:#172228; --ink:#E4ECEE; --ink-2:#AEBCC2; --ink-3:#7F8F96;
+    --rule:#33434B; --rule-2:#24323A; --sea:#0C2230; --land:#1D2A31; --border:#4E6069;
+    --shade-0:#1D2A31; --shade-1:#1F3B4A; --shade-2:#2A5A72; --shade-3:#3F7F9E; --shade-4:#79B4CF;
+    --fomb:#E5689E; --fomb-soft:#3A2230; --revoked:#6F7B80; --focus:#6AA7FF;
+    --f-bunker:#B07A55; --f-coal:#9A9A9A; --f-hydro:#5B8FE0; --f-gas:#4FA0CF;
+    --st-test:#5CC795; --st-build:#6FB0E0; --st-pre:#D9B455; --st-pause:#EB8A5E; --st-none:#8D9CA3; --warn:#F0B35A; --warn-soft:#3A2C17;
+  }
+}
+:root[data-theme="dark"]{
+  --paper:#10181C; --panel:#172228; --ink:#E4ECEE; --ink-2:#AEBCC2; --ink-3:#7F8F96;
+  --rule:#33434B; --rule-2:#24323A; --sea:#0C2230; --land:#1D2A31; --border:#4E6069;
+  --shade-0:#1D2A31; --shade-1:#1F3B4A; --shade-2:#2A5A72; --shade-3:#3F7F9E; --shade-4:#79B4CF;
+  --fomb:#E5689E; --fomb-soft:#3A2230; --revoked:#6F7B80; --focus:#6AA7FF;
+  --f-bunker:#B07A55; --f-coal:#9A9A9A; --f-hydro:#5B8FE0; --f-gas:#4FA0CF;
+    --st-test:#5CC795; --st-build:#6FB0E0; --st-pre:#D9B455; --st-pause:#EB8A5E; --st-none:#8D9CA3; --warn:#F0B35A; --warn-soft:#3A2C17;
+}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{background:var(--paper);color:var(--ink);font-family:"Public Sans",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;font-size:15px;line-height:1.5;font-variant-numeric:tabular-nums}
+a{color:inherit;text-decoration-color:var(--rule);text-underline-offset:2px}
+a:hover{text-decoration-color:currentColor}
+button,select{font:inherit;color:inherit}
+:focus-visible{outline:2px solid var(--focus);outline-offset:2px}
+.wrap{max-width:1360px;margin:0 auto;padding:28px 24px 64px}
+header{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:8px 32px;align-items:end;padding-bottom:20px;border-bottom:1px solid var(--rule)}
+h1{font-size:clamp(24px,3.2vw,36px);line-height:1.12;font-weight:700;letter-spacing:-.015em;margin:0;max-width:28ch}
+.dek{color:var(--ink-2);margin:10px 0 0;max-width:64ch}
+.asof{color:var(--ink-3);font-size:13px;text-align:right;white-space:nowrap}
+.figures{display:flex;flex-wrap:wrap;gap:6px 28px;margin:18px 0 0;padding:0;list-style:none;grid-column:1/-1}
+.figures li{font-size:14px;color:var(--ink-2)}
+.figures b{color:var(--ink);font-weight:600;font-size:17px;margin-right:4px}
+.figures .fomb b{color:var(--fomb)}
+
+.toolbar{display:flex;flex-wrap:wrap;gap:10px 22px;align-items:center;padding:14px 0}
+.seg{display:inline-flex;border:1px solid var(--rule);border-radius:6px;overflow:hidden;background:var(--panel)}
+.seg button{border:0;background:none;padding:6px 12px;cursor:pointer;font-size:13.5px;color:var(--ink-2)}
+.seg button+button{border-left:1px solid var(--rule)}
+.seg button[aria-pressed="true"]{background:var(--ink);color:var(--paper)}
+.tlabel{font-size:13px;color:var(--ink-3);margin-right:6px}
+.check{display:inline-flex;align-items:center;gap:6px;font-size:13.5px;cursor:pointer;color:var(--ink-2)}
+.check input{accent-color:var(--ink);width:15px;height:15px}
+select.muni{padding:6px 8px;border:1px solid var(--rule);border-radius:6px;background:var(--panel);min-width:190px}
+
+.layout>*{min-width:0}
+.layout{display:grid;grid-template-columns:minmax(0,1.9fr) minmax(320px,1fr);gap:20px;align-items:start}
+.mapcard{background:var(--sea);border:1px solid var(--rule);border-radius:10px;position:relative;overflow:hidden}
+#map{display:block;width:100%;height:auto}
+.muni-path,.asset,.proj{vector-effect:non-scaling-stroke}
+.muni-path{fill:var(--land);stroke:var(--border);stroke-width:.6;cursor:pointer;transition:fill .15s}
+.muni-path:hover{stroke:var(--ink);stroke-width:1.2}
+.muni-path.sel{stroke:var(--ink);stroke-width:2}
+.muni-label{font-size:9px;fill:var(--ink-3);pointer-events:none;text-anchor:middle;paint-order:stroke;stroke:var(--land);stroke-width:2.5px}
+.asset{stroke:var(--panel);stroke-width:1;cursor:pointer;fill-opacity:.88}
+.asset:hover,.asset.hl{stroke:var(--ink);stroke-width:2}
+.proj{fill:var(--fomb-soft);stroke:var(--fomb);stroke-width:1.6;cursor:pointer}
+.proj.revoked{stroke:var(--revoked);stroke-dasharray:2 2;fill:none}
+.proj:hover,.proj.hl{stroke-width:2.8}
+.dim{opacity:.18}
+.legend{background:var(--panel);border-top:1px solid var(--rule);padding:10px 12px;font-size:12px}
+.legend .row{display:flex;flex-wrap:wrap;gap:4px 6px;align-items:center}
+.chip{display:inline-flex;align-items:center;gap:5px;border:1px solid var(--rule-2);background:none;border-radius:999px;padding:2px 8px 2px 5px;cursor:pointer;font-size:12px;color:var(--ink-2)}
+.chip[aria-pressed="false"]{opacity:.4;text-decoration:line-through}
+.sw{width:10px;height:10px;border-radius:50%;display:inline-block;flex:none}
+.ramp{display:flex;align-items:center;gap:6px;margin-top:6px;color:var(--ink-3)}
+.ramp span.b{width:22px;height:9px;display:inline-block}
+.dia{width:9px;height:9px;transform:rotate(45deg);border:1.6px solid var(--fomb);background:var(--fomb-soft);display:inline-block;margin:0 3px}
+.tip{position:fixed;pointer-events:none;background:var(--ink);color:var(--paper);padding:7px 10px;border-radius:6px;font-size:12.5px;line-height:1.35;max-width:260px;z-index:10;opacity:0;transition:opacity .1s}
+.tip b{font-weight:600}
+.hint{position:absolute;right:12px;top:10px;font-size:12px;color:var(--ink-2)}
+
+aside.panel{background:var(--panel);border:1px solid var(--rule);border-radius:10px;padding:18px 18px 8px;max-height:calc(100vh - 40px);overflow:auto;position:sticky;top:20px}
+.panel h2{font-size:20px;margin:0;line-height:1.2;letter-spacing:-.01em}
+.panel .sub{color:var(--ink-3);font-size:13px;margin:2px 0 14px}
+.panel h3{font-size:14px;font-weight:600;margin:18px 0 8px;padding-top:12px;border-top:1px solid var(--rule-2)}
+.back{border:0;background:none;padding:0;color:var(--ink-3);cursor:pointer;font-size:13px;margin-bottom:8px}
+.back:hover{color:var(--ink)}
+.stack{display:flex;height:14px;border-radius:3px;overflow:hidden;background:var(--rule-2)}
+.stack i{display:block;height:100%}
+.kv{display:grid;grid-template-columns:auto 1fr auto;gap:3px 8px;font-size:13px;margin-top:8px;align-items:center}
+.kv .v{text-align:right;font-weight:500}
+.kv .l{color:var(--ink-2)}
+.empty{color:var(--ink-3);font-size:13.5px;margin:4px 0 10px}
+
+details.item{border:1px solid var(--rule-2);border-radius:8px;margin:0 0 8px;background:var(--panel)}
+details.item[open]{border-color:var(--rule)}
+details.item>summary{list-style:none;cursor:pointer;padding:9px 11px;display:grid;grid-template-columns:auto 1fr auto;gap:2px 9px;align-items:center}
+details.item>summary::-webkit-details-marker{display:none}
+details.item>summary .nm{font-weight:600;font-size:14px;line-height:1.25}
+details.item>summary .mw{font-weight:600;font-size:14px;white-space:nowrap}
+details.item>summary .meta{grid-column:2/-1;color:var(--ink-3);font-size:12.5px}
+details.item>summary .tw{transition:transform .15s;color:var(--ink-3);font-size:11px}
+details.item[open]>summary .tw{transform:rotate(90deg)}
+.body{padding:2px 11px 11px;font-size:13px}
+.units{width:100%;border-collapse:collapse;margin:4px 0 6px}
+.units td{padding:4px 0;border-top:1px solid var(--rule-2);vertical-align:middle}
+.units td.mwc{text-align:right;white-space:nowrap;font-weight:500;width:70px}
+.units .bar{height:6px;border-radius:3px;margin-top:3px}
+.note{color:var(--ink-2);margin:6px 0 0}
+.src{color:var(--ink-3);font-size:12px;margin-top:6px}
+.tag{display:inline-block;font-size:11.5px;padding:1px 7px;border-radius:999px;border:1px solid var(--rule);color:var(--ink-2);white-space:nowrap}
+.tag.fomb{border-color:var(--fomb);color:var(--fomb)}
+.tag.rev{border-color:var(--revoked);color:var(--revoked);text-decoration:line-through}
+.tag.cond{border-style:dashed;border-color:var(--fomb);color:var(--fomb)}
+.tag.gen{border-color:var(--ink-3);color:var(--ink-2);background:var(--rule-2)}
+.tag.op{background:var(--ink);color:var(--paper);border-color:var(--ink)}
+.appr{list-style:none;padding:0;margin:6px 0 0;border-left:2px solid var(--fomb);padding-left:10px}
+.appr li{margin:0 0 5px}
+.appr time{font-weight:600;margin-right:4px}
+.fl{display:grid;grid-template-columns:110px 1fr;gap:3px 10px;margin:6px 0}
+.fl dt{color:var(--ink-3)}
+.fl dd{margin:0}
+
+section.pipeline{margin-top:36px}
+section.pipeline h2{font-size:24px;letter-spacing:-.01em;margin:0}
+section.pipeline .dek{margin-top:6px}
+.yearbars{display:flex;gap:8px;align-items:flex-end;height:120px;margin:18px 0 6px;padding-bottom:22px;border-bottom:1px solid var(--rule);position:relative}
+.yb{flex:1;display:flex;flex-direction:column;justify-content:flex-end;align-items:stretch;height:100%;cursor:pointer;border:0;background:none;padding:0;position:relative}
+.yb .col{display:flex;flex-direction:column-reverse;border-radius:3px 3px 0 0;overflow:hidden}
+.yb .col i{display:block}
+.yb .yl{position:absolute;bottom:-21px;left:0;right:0;text-align:center;font-size:12.5px;color:var(--ink-2)}
+.yb .yv{font-size:12px;color:var(--ink-2);text-align:center;margin-bottom:3px}
+.yb[aria-pressed="true"] .yl{color:var(--fomb);font-weight:700}
+.yb[aria-pressed="false"].anysel{opacity:.35}
+.filters{display:flex;flex-wrap:wrap;gap:10px 20px;align-items:center;margin:26px 0 10px}
+.tablewrap{overflow-x:auto;border:1px solid var(--rule);border-radius:10px;background:var(--panel)}
+table.pt{width:100%;border-collapse:collapse;font-size:13.5px;min-width:1280px}
+.proc{display:inline-block;font-size:12px;font-weight:600;color:var(--ink-2);border:1px solid var(--rule);border-radius:4px;padding:1px 6px;white-space:nowrap}
+.procx{color:var(--ink-3);font-size:11.5px;margin-top:3px;line-height:1.3}
+.tabs{display:flex;gap:2px;margin:22px 0 4px;border-bottom:1px solid var(--rule);overflow-x:auto}
+.tabs button{border:0;background:none;padding:9px 14px;cursor:pointer;font-size:14px;font-weight:600;color:var(--ink-3);border-bottom:2px solid transparent;margin-bottom:-1px;white-space:nowrap}
+.tabs button:hover{color:var(--ink)}
+.tabs button[aria-selected="true"]{color:var(--ink);border-bottom-color:var(--fomb)}
+.checks{display:grid;gap:14px;margin-top:18px}
+.chk{background:var(--panel);border:1px solid var(--rule);border-radius:10px;padding:14px 18px;font-size:13.5px}
+.chk h3{font-size:15px;margin:0 0 8px;display:flex;align-items:center;gap:8px}
+.chk h3::before{content:"";width:9px;height:9px;border-radius:50%;background:var(--c)}
+.chk.ok{--c:var(--st-test)} .chk.fix{--c:var(--st-build)} .chk.warn{--c:var(--warn)} .chk.gap{--c:var(--st-none)}
+.chk ul{margin:0;padding-left:18px;color:var(--ink-2);max-width:120ch}
+.chk li{margin-bottom:5px}
+.ctab{width:100%;border-collapse:collapse;font-size:13px}
+.chk .ctabw{overflow-x:auto}
+.ctab th{text-align:left;font-size:12px;color:var(--ink-3);font-weight:600;padding:6px 10px 6px 0;border-bottom:1px solid var(--rule)}
+.ctab td{padding:6px 10px 6px 0;border-top:1px solid var(--rule-2);vertical-align:top;color:var(--ink-2)}
+.ctab td:first-child{color:var(--ink);font-weight:500}
+.cnote{font-size:12.5px;color:var(--ink-3);margin:8px 0 0}
+.psum{margin:20px 0 6px;display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:12px}
+.ptile{background:var(--panel);border:1px solid var(--rule);border-radius:10px;padding:14px 16px}
+.ptile h3{display:flex;align-items:center;gap:7px;font-size:14px;margin:0 0 10px}
+.ptile .figs{display:flex;flex-wrap:wrap;gap:6px 28px}
+.ptile .fig b{display:block;font-size:24px;font-weight:700;letter-spacing:-.01em;line-height:1.1}
+.ptile .fig span{font-size:12.5px;color:var(--ink-3)}
+.ptile .basis{font-size:12px;color:var(--ink-3);margin-top:8px}
+.pmwrap{overflow-x:auto;border:1px solid var(--rule);border-radius:10px;background:var(--panel);margin:12px 0 4px}
+table.pm{width:100%;border-collapse:collapse;font-size:13px;min-width:720px}
+.pm th,.pm td{padding:7px 12px;text-align:right;white-space:nowrap}
+.pm th:first-child,.pm td:first-child{text-align:left}
+.pm thead tr:first-child th{font-size:12.5px;color:var(--ink);font-weight:600;border-bottom:1px solid var(--rule-2)}
+.pm thead tr:last-child th{font-size:11.5px;color:var(--ink-3);font-weight:500;border-bottom:1px solid var(--rule)}
+.pm td{border-top:1px solid var(--rule-2)}
+.pm .grp{border-left:1px solid var(--rule)}
+.pm .na{color:var(--ink-3)}
+.pm tr.tot td{font-weight:600;border-top:1px solid var(--rule)}
+.pmnote{font-size:12px;color:var(--ink-3);margin:6px 0 0;max-width:110ch}
+.pt td.fp{min-width:150px}
+.fpl+.fpl{margin-top:8px}
+.fpv{display:flex;align-items:baseline;gap:4px;white-space:nowrap}
+.fpv b{font-weight:600;font-size:14px}
+.fpv .u{font-size:11.5px;color:var(--ink-3)}
+.fpv .lab{font-size:11.5px;color:var(--ink-3);min-width:44px}
+.fpbar{height:4px;border-radius:2px;background:var(--rule-2);margin:4px 0 3px;width:120px;overflow:hidden}
+.fpbar i{display:block;height:100%;border-radius:2px}
+.fpm{font-size:11.5px;color:var(--ink-3);line-height:1.35}
+.fpm .flag{color:var(--warn)}
+.fpkey{display:flex;flex-wrap:wrap;gap:4px 14px;font-size:12px;color:var(--ink-3);margin:0 0 10px}
+.fpkey i{display:inline-block;width:18px;height:4px;border-radius:2px;vertical-align:middle;margin-right:5px}
+.pt td.cs{min-width:230px;max-width:300px}
+.pt .csx{color:var(--ink-2);font-size:12.5px;margin-top:4px;line-height:1.4}
+.pt td.cod{min-width:140px}
+.pt th{text-align:left;font-weight:600;font-size:12.5px;color:var(--ink-2);padding:10px 9px;border-bottom:1px solid var(--rule);white-space:nowrap}
+.pt th button{border:0;background:none;padding:0;cursor:pointer;font-weight:600;color:inherit}
+.pt td{padding:9px 9px;border-top:1px solid var(--rule-2);vertical-align:top}
+.pt tr.main{cursor:pointer}
+.pt tr.main:hover td{background:color-mix(in srgb,var(--fomb-soft) 55%,var(--panel))}
+.stg{display:inline-flex;align-items:center;gap:6px;font-size:12px;font-weight:600;white-space:nowrap;color:var(--c);padding:2px 8px 2px 7px;border-radius:999px;background:color-mix(in srgb,var(--c) 12%,var(--panel))}
+.stg::before{content:"";width:7px;height:7px;border-radius:50%;background:var(--c)}
+.stg.revoked{text-decoration:line-through}
+.stagerow{display:flex;flex-wrap:wrap;gap:5px;align-items:center}
+.pt .csx.clamp{display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
+.codd{font-weight:600;white-space:nowrap}
+.codx{color:var(--ink-3);font-size:12.5px;margin-top:2px}
+.passed{display:inline-block;margin-top:4px;font-size:11.5px;font-weight:600;color:var(--warn);background:var(--warn-soft);padding:1px 7px;border-radius:999px}
+.stagekey{display:flex;flex-wrap:wrap;gap:6px 10px;margin:4px 0 10px;font-size:12px;color:var(--ink-3);align-items:center}
+.codchart{margin:30px 0 4px}
+.codchart h3{font-size:15px;margin:0 0 2px}
+.codchart .sub{color:var(--ink-3);font-size:13px;margin:0 0 12px;max-width:72ch}
+.codrows{display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:7px 12px;align-items:center;font-size:13px}
+.codrows .yl{color:var(--ink-2);white-space:nowrap}
+.codrows .track{height:16px;border-radius:3px;background:var(--rule-2);display:flex;overflow:hidden}
+.codrows .track i{display:block;height:100%}
+.codrows .v{text-align:right;white-space:nowrap;color:var(--ink-2)}
+.codrows .v b{color:var(--ink);font-weight:600}
+@media (max-width:980px){
+  .pt tr.main td:first-child,.pt thead th:first-child{position:sticky;left:0;z-index:1;background:var(--panel);box-shadow:1px 0 0 var(--rule-2)}
+  .pt tr.main td:first-child{min-width:150px;max-width:170px}
+}
+.pt tr.main.revoked td{color:var(--ink-3)}
+.pt tr.detail td{background:color-mix(in srgb,var(--paper) 60%,var(--panel));padding:12px 16px 16px}
+.pt .num{text-align:right;white-space:nowrap}
+.pt .nm{font-weight:600}
+.dgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:12px 28px}
+.caveats{margin-top:40px;display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:18px 36px;font-size:13.5px;color:var(--ink-2)}
+.caveats h3{font-size:15px;color:var(--ink);margin:0 0 6px}
+.caveats ul{margin:0;padding-left:18px}
+.caveats li{margin-bottom:5px}
+.srcs{font-size:12.5px;columns:2 320px;column-gap:36px;padding-left:18px}
+.srcs li{break-inside:avoid;margin-bottom:4px}
+footer{margin-top:28px;padding-top:14px;border-top:1px solid var(--rule);font-size:12.5px;color:var(--ink-3)}
+@media (max-width:980px){
+  .layout{grid-template-columns:1fr}
+  aside.panel{position:static;max-height:none}
+  header{grid-template-columns:1fr}
+  .asof{text-align:left}
+}
+@media (max-width:600px){.hint{display:none}.wrap{padding:20px 14px 48px}}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+<div class="wrap">
+<header>
+  <div>
+    <h1>Puerto Rico power generation, municipality by municipality</h1>
+    <p class="dek">Every utility-scale generation asset on the grid, public and private, with its fuel and nameplate capacity by unit. Drill into any municipality to see the new generation and storage projects the Financial Oversight and Management Board has approved since 2020.</p>
+  </div>
+  <div class="asof">Compiled September 15, 2026<br>Project status and COD updated November 3, 2026</div>
+  <ul class="figures" id="figures"></ul>
+</header>
+
+<div class="toolbar" role="group" aria-label="Map controls">
+  <div><span class="tlabel">Shade municipalities by</span>
+    <span class="seg" id="shadeSeg">
+      <button data-v="existing" aria-pressed="true">Existing capacity</button>
+      <button data-v="fomb" aria-pressed="false">Approved new capacity</button>
+      <button data-v="none" aria-pressed="false">None</button>
+    </span>
+  </div>
+  <label class="check"><input type="checkbox" id="lyrAssets" checked> Existing assets</label>
+  <label class="check"><input type="checkbox" id="lyrProj" checked> Approved projects</label>
+  <label class="check"><input type="checkbox" id="lyrLabels"> Municipality names</label>
+  <label><span class="tlabel">Go to</span><select class="muni" id="muniSelect" aria-label="Select a municipality"><option value="">All of Puerto Rico</option></select></label>
+</div>
+
+<div class="layout">
+  <div>
+    <div class="mapcard">
+      <svg id="map" viewBox="0 0 960 420" role="img" aria-label="Map of Puerto Rico's 78 municipalities with generation assets and approved projects"></svg>
+      <div class="hint" id="hint">Click a municipality or marker</div>
+      <div class="legend" id="legend"></div>
+    </div>
+  </div>
+  <aside class="panel" id="panel" aria-live="polite"></aside>
+</div>
+
+<section class="pipeline" id="pipeline">
+  <h2>New generation approved by the Oversight Board, 2020 to date</h2>
+  <p class="dek">Contracts reviewed under the Board's Contract Review Policy (PROMESA §204(b)(2)). Bars show active (non-revoked) capacity by the year of first Board approval; select a year to filter the table and map. Open a row for approval history, contract terms, and sources.</p>
+  <div class="tabs" role="tablist" aria-label="Pipeline views">
+    <button role="tab" id="t-projects" data-tab="projects" aria-selected="true" aria-controls="tab-projects">Projects</button>
+    <button role="tab" id="t-procurement" data-tab="procurement" aria-selected="false" aria-controls="tab-procurement">Procurement averages</button>
+    <button role="tab" id="t-checks" data-tab="data-checks" aria-selected="false" aria-controls="tab-checks">Data checks</button>
+  </div>
+  <div class="tabpanel" id="tab-procurement" role="tabpanel" aria-labelledby="t-procurement" hidden><div id="procsum"></div></div>
+  <div class="tabpanel" id="tab-checks" role="tabpanel" aria-labelledby="t-checks" hidden>
+    <div class="checks">
+      <div class="chk ok"><h3>Calculations verified</h3><ul>
+        <li>Every average, total and headline figure was recomputed independently from the project records and matches the page. After the corrections below: solar averages 64.0 MW at $0.1151/kWh across 16 projects; storage averages 65.0 MW at $19,778/MW-month across 26 projects (rate based on the 16 with a $/MW-month price).</li>
+        <li>Genera's six batteries sum to 430 MW, matching the program total the Energy Bureau approved.</li>
+        <li>ASAP now reconciles to LUMA's report: ten Board-approved SO1 agreements totaling 594.4 MW.</li>
+      </ul></div>
+      <div class="chk fix"><h3>Corrected in this audit</h3><ul>
+        <li>Added four Board-approved ASAP batteries that were missing: EcoEléctrica (20 MW), Infinigen Horizon (18 MW), Infinigen Oriana (50 MW) and San Fermín (20 MW). LUMA redacts participant names, so these were matched by capacity and approval and execution dates.</li>
+        <li>Filled the Board approval months for Convergent's Peñuelas, Ponce and Caguas storage (October 2023, amended January 2025) from PREPA's tracker; these were previously shown as "not located" and left off the approvals chart.</li>
+        <li>Added Board actions listed in the tracker: the September 2023 Tranche 1 renegotiations and the 2025 to 2026 amendments for Coamo, Juncos, Yabucoa Energy Park and Pattern.</li>
+        <li>Corrected a note that said the Go Green Yabucoa and JORD Naguabo batteries had not been reviewed by the Board; the tracker lists June 2026 approvals for both.</li>
+      </ul></div>
+      <div class="chk warn"><h3>Source conflicts (Board record kept; other value noted on the row)</h3>
+        <div class="ctabw"><table class="ctab"><thead><tr><th>Project</th><th>Shown</th><th>Other source</th></tr></thead><tbody>
+          <tr><td>Pattern Barceloneta storage</td><td>50 MW (Board, Mar 2025)</td><td>120 MW (tracker, after Mar 2026 amendment)</td></tr>
+          <tr><td>Pattern Santa Isabel storage</td><td>50 MW (Board, Mar 2025)</td><td>100 MW (tracker, after Mar 2026 amendment)</td></tr>
+          <tr><td>Yabucoa Energy Park solar</td><td>38.7 MW</td><td>100 MW (tracker, capacity increase Jun 2026)</td></tr>
+          <tr><td>Solaner San Germán solar</td><td>35 MW</td><td>40 MW approved and designed (tracker)</td></tr>
+          <tr><td>Solar Project San Juan</td><td>20 MW (Board)</td><td>26.07 MW (Energy Bureau list)</td></tr>
+          <tr><td>Infinigen Horizon battery</td><td>18 MW (LUMA, 4-hour basis)</td><td>20 MW (tracker)</td></tr>
+          <tr><td>AES Salinas and Jobos solar rate</td><td>$0.1042 and $0.1038/kWh (tracker)</td><td>$0.10016 and $0.09303/kWh (Board letter, Oct 2024)</td></tr>
+          <tr><td>Aguirre temporary generation rate</td><td>$0.224/kWh, full term (tracker)</td><td>$0.160/kWh excluding fuel (Board)</td></tr>
+          <tr><td>Solaner ASAP battery stage</td><td>EPC not started (LUMA, Sept 2026)</td><td>In construction (tracker, July 2026)</td></tr>
+          <tr><td>Energiza COD</td><td>Oct 26, 2029 (approved)</td><td>Oct 30, 2030 (developer, after losing turbine slot)</td></tr>
+        </tbody></table></div>
+        <p class="cnote">If the Board approved the larger Pattern and Yabucoa Energy Park capacities, approved storage rises by 120 MW and solar by 61.3 MW. Confirm against the March and June 2026 Board letters before citing.</p></div>
+      <div class="chk fix"><h3>Source errors handled</h3><ul>
+        <li>The tracker prints Yabucoa Energy Park's rate as $13.97/kWh; the page reads it as $0.1397/kWh and flags the row.</li>
+        <li>The tracker summary page shows Tetris Power's amended COD as the spreadsheet value 46752; this converts to December 31, 2027, which the Tetris detail page confirms.</li>
+      </ul></div>
+      <div class="chk gap"><h3>Open items</h3><ul>
+        <li>Not yet mapped: Coquí Power's 22 accelerated-procurement contracts (about 1,120 MW), the JORD Naguabo and Go Green Yabucoa batteries (80 MW each) and the Infinigen Isabela battery (50 MW), all listed as Board-approved in the tracker.</li>
+        <li>The Lajas ASAP battery is matched to LUMA's only 80 MW Phase 1 project; the tracker names an 80 MW project "Humacao Storage (Fonroche)" instead.</li>
+        <li>No status or rate reported for Gothams floating generation or Solar Project San Juan.</li>
+        <li>Three expected CODs have passed without commercial operation: CS/UR Juncos (Sep 2025), CFE Jobos (May 2026) and YFN Yabucoa (Aug 2026).</li>
+        <li>Status dates differ by source: PREPA's tracker is as of July 2026; LUMA's ASAP report and Genera's BESS report are as of September 2026.</li>
+      </ul></div>
+    </div>
+  </div>
+  <div class="tabpanel" id="tab-projects" role="tabpanel" aria-labelledby="t-projects">
+  <div class="yearbars" id="yearbars"></div>
+  <p class="tlabel" id="yearnote" style="margin:26px 0 0"></p>
+  <div class="codchart" id="codchart"></div>
+  <div class="filters">
+    <div><span class="tlabel">Technology</span>
+      <span class="seg" id="techSeg">
+        <button data-v="all" aria-pressed="true">All</button>
+        <button data-v="solar" aria-pressed="false">Solar</button>
+        <button data-v="bess" aria-pressed="false">Storage</button>
+        <button data-v="thermal" aria-pressed="false">Thermal</button>
+      </span>
+    </div>
+    <label class="check"><input type="checkbox" id="showRevoked" checked> Include revoked approvals</label>
+    <span class="tlabel" id="tableCount"></span>
+  </div>
+  <div class="stagekey" aria-label="Project stage key">Stage:<span id="stagekey" style="display:contents"></span><span>Status text is truncated in the table; open a row for the full update.</span></div>
+  <div class="fpkey"><span>Fixed payment bars compare like with like:</span><span><i style="background:var(--f-solar)"></i>energy price, scaled to $0.25/kWh</span><span><i style="background:var(--f-bess)"></i>storage capacity price, scaled to $30,000/MW-month</span><span>Year-one rates from the July 2026 tracker; ASAP batteries use the standard-offer rate.</span></div>
+  <div class="tablewrap">
+    <table class="pt" id="ptable">
+      <thead><tr>
+        <th><button data-sort="name">Project</button></th>
+        <th><button data-sort="proc">Procurement</button></th>
+        <th><button data-sort="muni">Municipality</button></th>
+        <th>Technology and fuel</th>
+        <th class="num"><button data-sort="mw">Capacity (MW)</button></th>
+        <th><button data-sort="date">First Board approval</button></th>
+        <th>Current status</th>
+        <th><button data-sort="cod">Expected COD</button></th>
+        <th><button data-sort="fp">Fixed payment</button><div style="font-weight:400;color:var(--ink-3);font-size:11.5px">$/kWh or $/MW-month</div></th>
+      </tr></thead>
+      <tbody></tbody>
+    </table>
+  </div>
+  </div>
+</section>
+
+<section class="caveats">
+  <div>
+    <h3>How to read the numbers</h3>
+    <ul>
+      <li>Capacities are nameplate, not available capacity. Much of the PREPA thermal fleet runs well below nameplate because of forced outages and derates; the Energy Bureau's resource adequacy work puts the current shortfall at roughly 700–850 MW.</li>
+      <li>Thermal units are shown by primary fuel. Costa Sur 5–6 and San Juan 5–6 burn natural gas with oil backup; Cambalache 2–3 and several other units have gas conversions in progress.</li>
+      <li>Current status and expected commercial operation date (COD) come from PREPA's Appendix A, Renewable Generation Projects Tracker (July 2026), which compiles developer-reported updates. The six LUMA ASAP battery projects instead reflect LUMA's ASAP quarterly report for July to September 2026 (Energy Bureau case NEPR-MI-2024-0002, filed October 30, 2026), which redacts participant names; projects were matched by capacity and approval dates. Where the tracker gives an amended COD, that date is shown; the original date and reason appear in the row detail. Capacities in the tracker that differ from Board records are noted in the status, not substituted.</li>
+      <li>Project capacity is the contracted amount in the most recent Board letter or regulatory record found. Storage is shown in MW of power, with MWh where disclosed.</li>
+      <li>Where a project's site is not disclosed in public filings, it appears in the table as "Site not disclosed" and is not drawn on the map. Projects with a known municipality are placed near its center, not at the exact site.</li>
+    </ul>
+  </div>
+  <div>
+    <h3>What is and isn't included</h3>
+    <ul>
+      <li>Included: PREPA-owned plants (thermal operated by Genera PR; hydro retained by PREPA), independent power producers, FEMA-funded temporary units, and utility-scale renewables connected to LUMA's grid.</li>
+      <li>Not included: roughly 1,230 MW of rooftop solar (June 2025), customer-sited generators, and projects approved only by PREPA or the Energy Bureau but not yet reviewed by the Board.</li>
+      <li>Not yet mapped: further Board approvals listed in PREPA's July 2026 tracker, namely Coquí Power's 22 accelerated-procurement solar and storage contracts (about 1,120 MW, July 2026), the JORD Naguabo and Go Green Yabucoa standalone batteries (80 MW each, June 2026), and the Infinigen Isabela battery (50 MW, May 2025).</li>
+      <li>Genera's six battery projects (430 MW) are a Genera PR initiative, not power purchase agreements: PREPA owns the batteries at its existing plants and pays no contracted rate. They are included because PREPA's tracker lists Board approval in January 2025; status comes from Genera's September 2026 progress report, which gives construction milestones but no COD.</li>
+      <li>The Board's November 28, 2025 conditional approval of the Genera–NFE multisite gas supply agreement is a fuel contract, so it is noted here rather than mapped.</li>
+      <li>Genera PR's parent, New Fortress Energy, closed a restructuring on September 11, 2026 that shifts control to creditors; operator labels reflect the contract, not that change.</li>
+    </ul>
+  </div>
+  <div style="grid-column:1/-1">
+    <h3>Sources</h3>
+    <ol class="srcs" id="srcList"></ol>
+  </div>
+</section>
+<footer>Boundaries: U.S. Census Bureau county-equivalent file (Mona, Monito and Desecheo omitted from Mayagüez for legibility). Plant coordinates: WRI Global Power Plant Database and EIA geolocation, adjusted where they fell offshore. This is an analytical compilation from public records; verify figures against the underlying Board letters before citing.</footer>
+</div>
+<div class="tip" id="tip" role="tooltip"></div>
+
+<script>
+const GEO = {"type":"FeatureCollection","features":[{"type":"Feature","id":"72013","properties":{"n":"Arecibo"},"geometry":{"type":"MultiPolygon","coordinates":[[[[-66.5868,18.4849],[-66.5882,18.3894],[-66.5883,18.3741],[-66.5824,18.3742],[-66.583,18.3632],[-66.5908,18.3381],[-66.6002,18.3396],[-66.607,18.3282],[-66.7701,18.325],[-66.7681,18.4777],[-66.7649,18.4841],[-66.7493,18.4767],[-66.7421,18.4747],[-66.734,18.4735],[-66.7107,18.4726],[-66.6837,18.4814],[-66.6799,18.4849],[-66.6644,18.4878],[-66.6458,18.4888],[-66.6246,18.4942],[-66.5868,18.4849]]]]}},{"type":"Feature","id":"72019","properties":{"n":"Barranquitas"},"geometry":{"type":"MultiPolygon","coordinates":[[[[-66.3148,18.1521],[-66.3223,18.1655],[-66.3513,18.1655],[-66.3738,18.1737],[-66.3508,18.2412],[-66.3401,18.2387],[-66.327,18.2442],[-66.3263,18.2479],[-66.3133,18.2493],[-66.3065,18.241],[-66.2932,18.2459],[-66.2665,18.2453],[-66.2405,18.1848],[-66.2426,18.1834],[-66.2427,18.1802],[-66.3148,18.1521]]]]}},{"type":"Feature","id":"72025","properties":{"n":"Caguas"},"geometry":{"type":"MultiPolygon","coordinates":[[[[-66.0661,18.3033],[-66.0527,18.3036],[-66.0453,18.2994],[-66.0478,18.3069],[-66.0415,18.3123],[-66.0316,18.3089],[-66.0271,18.3102],[-66.0217,18.305],[-65.9976,18.207],[-66.0526,18.1131],[-66.0608,18.1163],[-66.0695,18.1424],[-66.066,18.1484],[-66.0803,18.1521],[-66.0951,18.1691],[-66.0968,18.1682],[-66.1006,18.1698],[-66.1022,18.1694],[-66.1051,18.1715],[-66.1017,18.1831],[-66.1094,18.2009],[-66.1178,18.2099],[-66.0661,18.3033]]]]}},{"type":"Feature","id":"72031","properties":{"n":"Carolina"},"geometry":{"type":"MultiPolygon","coordinates":[[[[-66.0366,18.4502],[-66.0365,18.4501],[-66.0232,18.4439],[-66.0065,18.4443],[-65.9972,18.4499],[-65.9929,18.4575],[-65.9928,18.4581],[-65.9193,18.403],[-65.9185,18.2701],[-65.9242,18.2726],[-65.9393,18.2868],[-65.9424,18.2935],[-65.9996,18.3801],[-66.0366,18.4502]]]]}},{"type":"Feature","id":"72045","properties":{"n":"Comerío"},"geometry":{"type":"MultiPolygon","coordinates":[[[[-66.1691,18.2243],[-66.2405,18.1848],[-66.2665,18.2453],[-66.2422,18.2546],[-66.2276,18.2547],[-66.229,18.2628],[-66.2182,18.2747],[-66.2061,18.2767],[-66.2013,18.2763],[-66.2008,18.2715],[-66.1932,18.2681],[-66.1907,18.2588],[-66.1873,18.2538],[-66.1791,18.247],[-66.1789,18.2375],[-66.1749,18.2331],[-66.1764,18.2303],[-66.1691,18.226],[-66.1691,18.2243]]]]}},{"type":"Feature","id":"72054","properties":{"n":"Florida"},"geometry":{"type":"MultiPolygon","coordinates":[[[[-66.5431,18.4054],[-66.5313,18.3822],[-66.5336,18.3513],[-66.5527,18.3404],[-66.5738,18.3425],[-66.5908,18.3381],[-66.583,18.3632],[-66.5824,18.3742],[-66.5883,18.3741],[-66.5882,18.3894],[-66.5643,18.4133],[-66.5431,18.4054]]]]}},{"type":"Feature","id":"72061","properties":{"n":"Guaynabo"},"geometry":{"type":"MultiPolygon","coordinates":[[[[-66.1083,18.4389],[-66.0805,18.2973],[-66.0865,18.2851],[-66.1078,18.2779],[-66.1439,18.2796],[-66.1316,18.4247],[-66.1156,18.44],[-66.1083,18.4389]]]]}},{"type":"Feature","id":"72069","properties":{"n":"Humacao"},"geometry":{"type":"MultiPolygon","coordinates":[[[[-65.7391,18.1735],[-65.7436,18.164],[-65.7587,18.1566],[-65.7669,18.1484],[-65.7776,18.1292],[-65.7967,18.0837],[-65.7963,18.0798],[-65.7947,18.0786],[-65.795,18.0736],[-65.7967,18.0698],[-65.8776,18.1182],[-65.8261,18.2004],[-65.7391,18.1735]]]]}},{"type":"Feature","id":"72083","properties":{"n":"Las Marías"},"geometry":{"type":"MultiPolygon","coordinates":[[[[-66.9072,18.2531],[-66.9129,18.233],[-66.898,18.1877],[-67.0198,18.1955],[-67.082,18.2549],[-67.0618,18.2701],[-67.0402,18.272],[-67.0379,18.2897],[-66.9072,18.2531]]]]}},{"type":"Feature","id":"72093","properties":{"n":"Maricao"},"geometry":{"type":"MultiPolygon","coordinates":[[[[-66.9779,18.1438],[-66.9945,18.1548],[-67.0096,18.1589],[-67.0138,18.1659],[-67.044,18.1692],[-67.0515,18.1741],[-67.0345,18.1855],[-67.0244,18.1847],[-67.0198,18.1955],[-66.898,18.1877],[-66.8638,18.1866],[-66.8628,18.1748],[-66.8508,18.1704],[-66.8368,18.1706],[-66.9265,18.1513],[-66.9391,18.1479],[-66.9436,18.149],[-66.9521,18.1461],[-66.9604,18.1459],[-66.9639,18.1482],[-66.9719,18.1415],[-66.9755,18.1434],[-66.9779,18.1438]]]]}},{"type":"Feature","id":"72105","properties":{"n":"Naranjito"},"geometry":{"type":"MultiPolygon","coordinates":[[[[-66.2047,18.316],[-66.2059,18.3069],[-66.2131,18.307],[-66.2061,18.2767],[-66.2182,18.2747],[-66.229,18.2628],[-66.2276,18.2547],[-66.2422,18.2546],[-66.2665,18.2453],[-66.2932,18.2459],[-66.3065,18.241],[-66.3133,18.2493],[-66.2781,18.33],[-66.2047,18.316]]]]}},{"type":"Feature","id":"72115","properties":{"n":"Quebradillas"},"geometry":{"type":"MultiPolygon","coordinates":[[[[-66.8989,18.3661],[-66.9195,18.3786],[-66.922,18.3932],[-66.9575,18.4892],[-66.9446,18.4917],[-66.9069,18.4836],[-66.9014,18.4846],[-66.8989,18.3661]]]]}},{"type":"Feature","id":"72129","properties":{"n":"San Lorenzo"},"geometry":{"type":"MultiPolygon","coordinates":[[[[-66.0102,18.0756],[-66.0194,18.0837],[-66.0194,18.1026],[-66.0518,18.1099],[-66.0512,18.1111],[-66.0526,18.1131],[-65.9976,18.207],[-65.9888,18.2205],[-65.971,18.2292],[-65.951,18.2293],[-65.9283,18.1428],[-65.9244,18.1357],[-65.9274,18.1218],[-65.9262,18.12],[-66.0102,18.0756]]]]}},{"type":"Feature","id":"72135","properties":{"n":"Toa Alta"},"geometry":{"type":"MultiPolygon","coordinates":[[[[-66.3188,18.3674],[-66.3142,18.3808],[-66.3037,18.3841],[-66.2713,18.3837],[-66.2526,18.3942],[-66.2343,18.4015],[-66.197,18.3893],[-66.1996,18.3696],[-66.1973,18.3602],[-66.2036,18.3367],[-66.2015,18.329],[-66.2047,18.316],[-66.2781,18.33],[-66.289,18.3537],[-66.3062,18.3697],[-66.3188,18.3674]]]]}},{"type":"Feature","id":"72145","properties":{"n":"Vega Baja"},"geometry":{"type":"MultiPolygon","coordinates":[[[[-66.4388,18.4857],[-66.4209,18.4886],[-66.4103,18.4899],[-66.3943,18.4897],[-66.3773,18.488],[-66.3728,18.4877],[-66.3496,18.4863],[-66.3771,18.3442],[-66.4438,18.371],[-66.4388,18.4857]]]]}},{"type":"Feature","id":"72027","properties":{"n":"Camuy"},"geometry":{"type":"MultiPolygon","coordinates":[[[[-66.8989,18.3661],[-66.9014,18.4846],[-66.8674,18.4908],[-66.8497,18.4907],[-66.8369,18.4877],[-66.8366,18.4877],[-66.8242,18.343],[-66.8287,18.3444],[-66.8369,18.3484],[-66.8429,18.3504],[-66.8464,18.3512],[-66.8485,18.3537],[-66.8517,18.3539],[-66.8521,18.3546],[-66.8547,18.3553],[-66.8615,18.356],[-66.8714,18.3561],[-66.8735,18.3569],[-66.877,18.3568],[-66.8778,18.3585],[-66.8791,18.3589],[-66.8809,18.3613],[-66.8807,18.3625],[-66.8822,18.3646],[-66.885,18.3659],[-66.8855,18.3671],[-66.8872,18.367],[-66.8912,18.3682],[-66.8933,18.3671],[-66.8945,18.3662],[-66.8959,18.3664],[-66.8977,18.3657],[-66.8989,18.3661]]]]}},{"type":"Feature","id":"72035","properties":{"n":"Cayey"},"geometry":{"type":"MultiPolygon","coordinates":[[[[-66.0518,18.1099],[-66.0532,18.1095],[-66.0531,18.1073],[-66.1661,18.0501],[-66.2245,18.0953],[-66.2268,18.1164],[-66.2204,18.1208],[-66.2207,18.1317],[-66.2169,18.1432],[-66.1192,18.1379],[-66.0951,18.1691],[-66.0803,18.1521],[-66.066,18.1484],[-66.0695,18.1424],[-66.0608,18.1163],[-66.0526,18.1131],[-66.0512,18.1111],[-66.0518,18.1099]]]]}},{"type":"Feature","id":"72041","properties":{"n":"Cidra"},"geometry":{"type":"MultiPolygon","coordinates":[[[[-66.2169,18.1432],[-66.2287,18.1596],[-66.2236,18.165],[-66.2427,18.1802],[-66.2426,18.1834],[-66.2405,18.1848],[-66.1691,18.2243],[-66.1178,18.2099],[-66.1094,18.2009],[-66.1017,18.1831],[-66.1051,18.1715],[-66.1022,18.1694],[-66.1006,18.1698],[-66.0968,18.1682],[-66.0951,18.1691],[-66.1192,18.1379],[-66.2169,18.1432]]]]}},{"type":"Feature","id":"72043","properties":{"n":"Coamo"},"geometry":{"type":"MultiPolygon","coordinates":[[[[-66.2575,18.0759],[-66.3312,18.0159],[-66.427,18.0426],[-66.4243,18.0529],[-66.4282,18.0549],[-66.4315,18.0635],[-66.4275,18.0717],[-66.4303,18.0771],[-66.4303,18.0821],[-66.4446,18.1767],[-66.4361,18.1755],[-66.428,18.1709],[-66.4236,18.172],[-66.4209,18.1663],[-66.4137,18.1633],[-66.3738,18.1737],[-66.3513,18.1655],[-66.3223,18.1655],[-66.3148,18.1521],[-66.2575,18.0759]]]]}},{"type":"Feature","id":"72053","properties":{"n":"Fajardo"},"geometry":{"type":"MultiPolygon","coordinates":[[[[-65.5715,18.3516],[-65.569,18.3528],[-65.5657,18.3495],[-65.5651,18.3475],[-65.568,18.3433],[-65.5715,18.3516]]],[[[-65.5722,18.3818],[-65.569,18.3821],[-65.5664,18.3782],[-65.5718,18.3764],[-65.5722,18.3818]]],[[[-65.5873,18.382],[-65.5916,18.3863],[-65.5926,18.3908],[-65.5893,18.3905],[-65.5845,18.3869],[-65.5836,18.3838],[-65.5873,18.382]]],[[[-65.7536,18.2968],[-65.6696,18.3621],[-65.6688,18.3619],[-65.6344,18.3698],[-65.6272,18.3764],[-65.6265,18.3817],[-65.625,18.3866],[-65.6228,18.3878],[-65.6182,18.3865],[-65.6149,18.3825],[-65.6191,18.3678],[-65.6282,18.3537],[-65.6342,18.339],[-65.628,18.3283],[-65.6265,18.299],[-65.6344,18.2923],[-65.6358,18.2883],[-65.6349,18.2839],[-65.7175,18.2677],[-65.7536,18.2968]]]]}},{"type":"Feature","id":"72055","properties":{"n":"Guánica"},"geometry":{"type":"MultiPolygon","coordinates":[[[[-66.8847,18.0248],[-66.8632,17.998],[-66.8595,17.9543],[-66.8625,17.952],[-66.8717,17.9527],[-66.8834,17.9525],[-66.8996,17.9483],[-66.9046,17.9505],[-66.9065,17.9554],[-66.9063,17.9634],[-66.9245,17.9728],[-66.9287,17.9702],[-66.9304,17.9631],[-66.9161,17.9591],[-66.9095,17.9526],[-66.9094,17.9499],[-66.9125,17.9474],[-66.9303,17.9434],[-66.9326,17.94],[-66.9316,17.9369],[-66.9193,17.9321],[-66.9238,17.9269],[-66.9273,17.9269],[-66.96,17.9402],[-66.9805,17.9516],[-66.981,17.9525],[-66.9619,17.9916],[-66.9587,18.0325],[-66.9472,18.0334],[-66.9359,18.0293],[-66.9308,18.0306],[-66.9242,18.0274],[-66.9195,18.0277],[-66.9109,18.0239],[-66.9051,18.0265],[-66.895,18.0232],[-66.8847,18.0248]]]]}},{"type":"Feature","id":"72059","properties":{"n":"Guayanilla"},"geometry":{"type":"MultiPolygon","coordinates":[[[[-66.769,18.135],[-66.754,17.9996],[-66.7553,18.0012],[-66.7645,18.0063],[-66.7703,18.006],[-66.7997,17.9925],[-66.8069,17.9838],[-66.8079,17.9796],[-66.8069,17.976],[-66.8057,17.9751],[-66.7951,17.9774],[-66.7893,17.9808],[-66.785,17.9783],[-66.7872,17.9729],[-66.8083,17.9656],[-66.8224,17.9545],[-66.8386,17.9499],[-66.8523,17.955],[-66.7976,18.1334],[-66.7885,18.1344],[-66.7844,18.1387],[-66.7757,18.1338],[-66.769,18.135]]]]}},{"type":"Feature","id":"72067","properties":{"n":"Hormigueros"},"geometry":{"type":"MultiPolygon","coordinates":[[[[-67.1597,18.1532],[-67.0867,18.152],[-67.0842,18.1484],[-67.0878,18.1455],[-67.0925,18.1459],[-67.0933,18.1411],[-67.0928,18.1369],[-67.092,18.1299],[-67.0853,18.1208],[-67.0817,18.1183],[-67.0782,18.115],[-67.0799,18.1107],[-67.0829,18.1068],[-67.0882,18.1061],[-67.0925,18.1061],[-67.1005,18.1064],[-67.1597,18.1532]]]]}},{"type":"Feature","id":"72073","properties":{"n":"Jayuya"},"geometry":{"type":"MultiPolygon","coordinates":[[[[-66.5528,18.1521],[-66.6495,18.1589],[-66.5666,18.2985],[-66.5431,18.1631],[-66.5432,18.1616],[-66.5448,18.1603],[-66.5442,18.1583],[-66.5468,18.155],[-66.5472,18.1531],[-66.5482,18.153],[-66.5492,18.1525],[-66.55,18.1525],[-66.5504,18.1531],[-66.5513,18.1528],[-66.552,18.1522],[-66.5528,18.1521]]]]}},{"type":"Feature","id":"72005","properties":{"n":"Aguadilla"},"geometry":{"type":"MultiPolygon","coordinates":[[[[-67.1035,18.5145],[-67.0771,18.489],[-67.0585,18.48],[-67.0565,18.461],[-67.1322,18.3894],[-67.1507,18.3924],[-67.1601,18.4156],[-67.1596,18.4159],[-67.1566,18.419],[-67.1552,18.4244],[-67.1566,18.4396],[-67.1617,18.4535],[-67.169,18.4664],[-67.169,18.4785],[-67.1641,18.4874],[-67.1428,18.5055],[-67.1382,18.5078],[-67.1257,18.5117],[-67.1035,18.5145]]]]}},{"type":"Feature","id":"72079","properties":{"n":"Lajas"},"geometry":{"type":"MultiPolygon","coordinates":[[[[-67.11,17.9458],[-67.109,18.0561],[-66.9833,18.0525],[-66.9827,18.0412],[-66.9604,18.0365],[-66.9587,18.0325],[-66.9619,17.9916],[-66.981,17.9525],[-66.9827,17.9551],[-66.9822,17.9612],[-66.9873,17.9707],[-66.9967,17.9729],[-67.004,17.9708],[-67.0147,17.9685],[-67.0245,17.9707],[-67.0625,17.9738],[-67.0765,17.9678],[-67.0898,17.9514],[-67.1015,17.9466],[-67.11,17.9458]]]]}},{"type":"Feature","id":"72081","properties":{"n":"Lares"},"geometry":{"type":"MultiPolygon","coordinates":[[[[-66.8261,18.3234],[-66.8173,18.2303],[-66.8273,18.1712],[-66.8283,18.1704],[-66.8308,18.171],[-66.8325,18.1705],[-66.8368,18.1706],[-66.8508,18.1704],[-66.8628,18.1748],[-66.8638,18.1866],[-66.898,18.1877],[-66.9129,18.233],[-66.9072,18.2531],[-66.8933,18.3671],[-66.8912,18.3682],[-66.8872,18.367],[-66.8855,18.3671],[-66.885,18.3659],[-66.8822,18.3646],[-66.8807,18.3625],[-66.8809,18.3613],[-66.8791,18.3589],[-66.8778,18.3585],[-66.877,18.3568],[-66.8735,18.3569],[-66.8714,18.3561],[-66.8615,18.356],[-66.8547,18.3553],[-66.8521,18.3546],[-66.8517,18.3539],[-66.8485,18.3537],[-66.8464,18.3512],[-66.8429,18.3504],[-66.8369,18.3484],[-66.8287,18.3444],[-66.8242,18.343],[-66.8248,18.3375],[-66.8249,18.3331],[-66.8254,18.3277],[-66.8261,18.3234]]]]}},{"type":"Feature","id":"72089","properties":{"n":"Luquillo"},"geometry":{"type":"MultiPolygon","coordinates":[[[[-65.7502,18.3851],[-65.7422,18.3805],[-65.7336,18.3822],[-65.6991,18.3682],[-65.6696,18.3621],[-65.7536,18.2968],[-65.7547,18.2952],[-65.756,18.2945],[-65.7574,18.293],[-65.7577,18.2916],[-65.7589,18.2906],[-65.7502,18.3851]]]]}},{"type":"Feature","id":"72095","properties":{"n":"Maunabo"},"geometry":{"type":"MultiPolygon","coordinates":[[[[-65.9105,17.9819],[-65.9885,18.0589],[-65.8509,18.012],[-65.8703,18.0066],[-65.8751,18.0028],[-65.8849,17.9885],[-65.8961,17.9903],[-65.9053,17.984],[-65.9105,17.9819]]]]}},{"type":"Feature","id":"72101","properties":{"n":"Morovis"},"geometry":{"type":"MultiPolygon","coordinates":[[[[-66.3777,18.294],[-66.4557,18.2577],[-66.4632,18.3715],[-66.459,18.3712],[-66.4516,18.3722],[-66.4438,18.371],[-66.3771,18.3442],[-66.3747,18.3442],[-66.3743,18.3426],[-66.3717,18.3405],[-66.3711,18.3379],[-66.3671,18.3351],[-66.3653,18.3332],[-66.3725,18.3098],[-66.3733,18.3019],[-66.3761,18.2997],[-66.3777,18.294]]]]}},{"type":"Feature","id":"72103","properties":{"n":"Naguabo"},"geometry":{"type":"MultiPolygon","coordinates":[[[[-65.7391,18.1735],[-65.8261,18.2004],[-65.8314,18.2142],[-65.8288,18.2302],[-65.8222,18.2447],[-65.8172,18.2523],[-65.8157,18.2625],[-65.8238,18.2687],[-65.8242,18.2731],[-65.8114,18.2901],[-65.7849,18.294],[-65.7668,18.28],[-65.6622,18.207],[-65.6641,18.2071],[-65.6907,18.195],[-65.6945,18.187],[-65.691,18.179],[-65.6959,18.1793],[-65.7109,18.187],[-65.7125,18.1891],[-65.718,18.1902],[-65.7285,18.1856],[-65.7347,18.1804],[-65.7388,18.1741],[-65.7391,18.1735]]]]}},{"type":"Feature","id":"72109","properties":{"n":"Patillas"},"geometry":{"type":"MultiPolygon","coordinates":[[[[-66.0195,17.9784],[-66.0823,18.033],[-66.0531,18.1073],[-66.0532,18.1095],[-66.0518,18.1099],[-66.0194,18.1026],[-66.0194,18.0837],[-66.0102,18.0756],[-66.0103,18.0674],[-66.0001,18.0603],[-65.9885,18.0589],[-65.9105,17.9819],[-65.9247,17.9761],[-65.9766,17.9677],[-65.9845,17.9694],[-65.9854,17.9719],[-65.9952,17.979],[-66.0077,17.9805],[-66.0173,17.9796],[-66.0195,17.9784]]]]}},{"type":"Feature","id":"72117","properties":{"n":"Rincón"},"geometry":{"type":"MultiPolygon","coordinates":[[[[-67.1829,18.313],[-67.1959,18.3075],[-67.2207,18.3057],[-67.2254,18.2966],[-67.2261,18.2967],[-67.2351,18.2999],[-67.2675,18.3531],[-67.2713,18.3623],[-67.2683,18.367],[-67.2607,18.3702],[-67.2391,18.3753],[-67.1829,18.313]]]]}},{"type":"Feature","id":"72119","properties":{"n":"Río Grande"},"geometry":{"type":"MultiPolygon","coordinates":[[[[-65.8285,18.4235],[-65.8167,18.4107],[-65.7946,18.4028],[-65.7877,18.4025],[-65.7749,18.414],[-65.7705,18.4129],[-65.7697,18.4095],[-65.7717,18.4063],[-65.7505,18.3852],[-65.7502,18.3851],[-65.7589,18.2906],[-65.7618,18.2893],[-65.7668,18.28],[-65.7849,18.294],[-65.8114,18.2901],[-65.8242,18.2731],[-65.8317,18.2717],[-65.8364,18.2752],[-65.8675,18.3781],[-65.8596,18.3819],[-65.8556,18.3958],[-65.8525,18.4017],[-65.8438,18.4057],[-65.8326,18.4207],[-65.8285,18.4235]]]]}},{"type":"Feature","id":"72125","properties":{"n":"San Germán"},"geometry":{"type":"MultiPolygon","coordinates":[[[[-67.0867,18.152],[-67.0859,18.1624],[-67.0722,18.1731],[-67.0515,18.1741],[-67.044,18.1692],[-67.0138,18.1659],[-67.0096,18.1589],[-66.9945,18.1548],[-66.9779,18.1438],[-66.9833,18.0525],[-67.109,18.0561],[-67.1071,18.0618],[-67.0991,18.0674],[-67.1013,18.0742],[-67.1056,18.0739],[-67.1061,18.0797],[-67.104,18.0988],[-67.1005,18.1064],[-67.0925,18.1061],[-67.0882,18.1061],[-67.0829,18.1068],[-67.0799,18.1107],[-67.0782,18.115],[-67.0817,18.1183],[-67.0853,18.1208],[-67.092,18.1299],[-67.0928,18.1369],[-67.0933,18.1411],[-67.0925,18.1459],[-67.0878,18.1455],[-67.0842,18.1484],[-67.0867,18.152]]]]}},{"type":"Feature","id":"72131","properties":{"n":"San Sebastián"},"geometry":{"type":"MultiPolygon","coordinates":[[[[-66.922,18.3932],[-66.9195,18.3786],[-66.8989,18.3661],[-66.8977,18.3657],[-66.8959,18.3664],[-66.8945,18.3662],[-66.8933,18.3671],[-66.9072,18.2531],[-67.0379,18.2897],[-67.0407,18.3003],[-67.0526,18.3067],[-67.0272,18.3934],[-66.922,18.3932]]]]}},{"type":"Feature","id":"72137","properties":{"n":"Toa Baja"},"geometry":{"type":"MultiPolygon","coordinates":[[[[-66.199,18.4662],[-66.1927,18.4662],[-66.1839,18.4605],[-66.1792,18.4553],[-66.1723,18.4515],[-66.1598,18.4517],[-66.153,18.4545],[-66.1439,18.4598],[-66.1483,18.4512],[-66.1547,18.4456],[-66.1638,18.4447],[-66.165,18.4377],[-66.1701,18.4336],[-66.1695,18.431],[-66.1727,18.4211],[-66.198,18.4146],[-66.197,18.3893],[-66.2343,18.4015],[-66.2526,18.3942],[-66.199,18.4662]]]]}},{"type":"Feature","id":"72143","properties":{"n":"Vega Alta"},"geometry":{"type":"MultiPolygon","coordinates":[[[[-66.315,18.4747],[-66.3037,18.3841],[-66.3142,18.3808],[-66.3188,18.3674],[-66.3653,18.3332],[-66.3671,18.3351],[-66.3711,18.3379],[-66.3717,18.3405],[-66.3743,18.3426],[-66.3747,18.3442],[-66.3771,18.3442],[-66.3496,18.4863],[-66.3377,18.4856],[-66.3155,18.4747],[-66.315,18.4747]]]]}},{"type":"Feature","id":"72075","properties":{"n":"Juana Díaz"},"geometry":{"type":"MultiPolygon","coordinates":[[[[-66.4504,17.9832],[-66.4549,17.9868],[-66.4613,17.9903],[-66.4914,17.9903],[-66.5101,17.9856],[-66.5405,17.9755],[-66.5528,18.1521],[-66.552,18.1522],[-66.5513,18.1528],[-66.5504,18.1531],[-66.55,18.1525],[-66.5492,18.1525],[-66.5482,18.153],[-66.5472,18.1531],[-66.5443,18.1476],[-66.5349,18.1523],[-66.5219,18.152],[-66.5287,18.1007],[-66.4303,18.0821],[-66.4303,18.0771],[-66.4275,18.0717],[-66.4315,18.0635],[-66.4282,18.0549],[-66.4243,18.0529],[-66.427,18.0426],[-66.4504,17.9832]]]]}},{"type":"Feature","id":"72147","properties":{"n":"Vieques"},"geometry":{"type":"MultiPolygon","coordinates":[[[[-65.3087,18.1452],[-65.3023,18.1411],[-65.2949,18.1428],[-65.288,18.1481],[-65.2752,18.1344],[-65.2762,18.1319],[-65.2832,18.133],[-65.296,18.128],[-65.3228,18.1266],[-65.3272,18.1241],[-65.3385,18.1124],[-65.342,18.1114],[-65.3505,18.1119],[-65.3647,18.1204],[-65.3978,18.1109],[-65.3998,18.1088],[-65.4118,18.1062],[-65.4238,18.0978],[-65.4263,18.0937],[-65.4514,18.0861],[-65.4568,18.0878],[-65.4658,18.0877],[-65.4688,18.0926],[-65.4798,18.0964],[-65.5073,18.0916],[-65.5242,18.082],[-65.5421,18.0812],[-65.5586,18.0857],[-65.5693,18.0916],[-65.5706,18.0973],[-65.5769,18.1032],[-65.5756,18.1157],[-65.5462,18.1193],[-65.5117,18.1328],[-65.4898,18.1359],[-65.4679,18.1438],[-65.4371,18.1577],[-65.3995,18.1619],[-65.3714,18.1575],[-65.3343,18.1478],[-65.3135,18.1443],[-65.3087,18.1452]]]]}},{"type":"Feature","id":"72151","properties":{"n":"Yabucoa"},"geometry":{"type":"MultiPolygon","coordinates":[[[[-65.9885,18.0589],[-66.0001,18.0603],[-66.0103,18.0674],[-66.0102,18.0756],[-65.9262,18.12],[-65.9009,18.1259],[-65.8776,18.1182],[-65.7967,18.0698],[-65.8018,18.0585],[-65.8092,18.0568],[-65.8171,18.0634],[-65.8258,18.0575],[-65.8311,18.0507],[-65.8343,18.039],[-65.8324,18.0149],[-65.8396,18.0151],[-65.8509,18.012],[-65.9885,18.0589]]]]}},{"type":"Feature","id":"72153","properties":{"n":"Yauco"},"geometry":{"type":"MultiPolygon","coordinates":[[[[-66.8595,17.9543],[-66.8632,17.998],[-66.8847,18.0248],[-66.9265,18.1513],[-66.8368,18.1706],[-66.8325,18.1705],[-66.8308,18.171],[-66.8283,18.1704],[-66.8273,18.1712],[-66.8263,18.1602],[-66.8181,18.1505],[-66.8041,18.1481],[-66.8034,18.1404],[-66.7976,18.1334],[-66.8523,17.955],[-66.8565,17.9566],[-66.8595,17.9543]]]]}},{"type":"Feature","id":"72149","properties":{"n":"Villalba"},"geometry":{"type":"MultiPolygon","coordinates":[[[[-66.5219,18.152],[-66.4446,18.1767],[-66.4303,18.0821],[-66.5287,18.1007],[-66.5219,18.152]]]]}},{"type":"Feature","id":"72017","properties":{"n":"Barceloneta"},"geometry":{"type":"MultiPolygon","coordinates":[[[[-66.5868,18.4849],[-66.5841,18.4843],[-66.5652,18.4855],[-66.5629,18.4885],[-66.5635,18.4905],[-66.5585,18.49],[-66.5348,18.4813],[-66.5335,18.4817],[-66.5431,18.4054],[-66.5643,18.4133],[-66.5882,18.3894],[-66.5868,18.4849]]]]}},{"type":"Feature","id":"72021","properties":{"n":"Bayamón"},"geometry":{"type":"MultiPolygon","coordinates":[[[[-66.1439,18.2796],[-66.1771,18.2762],[-66.1907,18.2588],[-66.1932,18.2681],[-66.2008,18.2715],[-66.2013,18.2763],[-66.2061,18.2767],[-66.2131,18.307],[-66.2059,18.3069],[-66.2047,18.316],[-66.2015,18.329],[-66.2036,18.3367],[-66.1973,18.3602],[-66.1996,18.3696],[-66.197,18.3893],[-66.198,18.4146],[-66.1727,18.4211],[-66.1695,18.431],[-66.1578,18.4208],[-66.1316,18.4247],[-66.1439,18.2796]]]]}},{"type":"Feature","id":"72029","properties":{"n":"Canóvanas"},"geometry":{"type":"MultiPolygon","coordinates":[[[[-65.9193,18.403],[-65.8675,18.3781],[-65.8364,18.2752],[-65.8399,18.2657],[-65.8463,18.2581],[-65.8526,18.255],[-65.8746,18.2531],[-65.8892,18.2618],[-65.9185,18.2701],[-65.9193,18.403]]]]}},{"type":"Feature","id":"72039","properties":{"n":"Ciales"},"geometry":{"type":"MultiPolygon","coordinates":[[[[-66.4632,18.3715],[-66.4557,18.2577],[-66.5008,18.256],[-66.5431,18.1631],[-66.5666,18.2985],[-66.5853,18.3227],[-66.6046,18.3213],[-66.607,18.3282],[-66.6002,18.3396],[-66.5908,18.3381],[-66.5738,18.3425],[-66.5527,18.3404],[-66.5336,18.3513],[-66.5283,18.3506],[-66.5118,18.362],[-66.4948,18.3664],[-66.4733,18.3676],[-66.4632,18.3715]]]]}},{"type":"Feature","id":"72051","properties":{"n":"Dorado"},"geometry":{"type":"MultiPolygon","coordinates":[[[[-66.3037,18.3841],[-66.315,18.4747],[-66.2912,18.4723],[-66.2837,18.4722],[-66.2766,18.4781],[-66.2698,18.4803],[-66.258,18.4769],[-66.2515,18.4725],[-66.2418,18.4687],[-66.2201,18.466],[-66.199,18.4662],[-66.2526,18.3942],[-66.2713,18.3837],[-66.3037,18.3841]]]]}},{"type":"Feature","id":"72063","properties":{"n":"Gurabo"},"geometry":{"type":"MultiPolygon","coordinates":[[[[-66.0217,18.305],[-65.9424,18.2935],[-65.9393,18.2868],[-65.9242,18.2726],[-65.9185,18.2701],[-65.951,18.2293],[-65.971,18.2292],[-65.9888,18.2205],[-65.9976,18.207],[-66.0217,18.305]]]]}},{"type":"Feature","id":"72077","properties":{"n":"Juncos"},"geometry":{"type":"MultiPolygon","coordinates":[[[[-65.9283,18.1428],[-65.951,18.2293],[-65.9185,18.2701],[-65.8892,18.2618],[-65.8746,18.2531],[-65.8526,18.255],[-65.9283,18.1428]]]]}},{"type":"Feature","id":"72085","properties":{"n":"Las Piedras"},"geometry":{"type":"MultiPolygon","coordinates":[[[[-65.8364,18.2752],[-65.8317,18.2717],[-65.8242,18.2731],[-65.8238,18.2687],[-65.8157,18.2625],[-65.8172,18.2523],[-65.8222,18.2447],[-65.8288,18.2302],[-65.8314,18.2142],[-65.8261,18.2004],[-65.8776,18.1182],[-65.9009,18.1259],[-65.9262,18.12],[-65.9274,18.1218],[-65.9244,18.1357],[-65.9283,18.1428],[-65.8526,18.255],[-65.8463,18.2581],[-65.8399,18.2657],[-65.8364,18.2752]]]]}},{"type":"Feature","id":"72099","properties":{"n":"Moca"},"geometry":{"type":"MultiPolygon","coordinates":[[[[-67.0272,18.3934],[-67.0526,18.3067],[-67.1214,18.3239],[-67.1302,18.3179],[-67.1304,18.3251],[-67.1341,18.3305],[-67.131,18.3347],[-67.1345,18.3465],[-67.1281,18.3539],[-67.1286,18.3655],[-67.1264,18.3712],[-67.1322,18.3894],[-67.0565,18.461],[-67.0528,18.4484],[-67.0272,18.3934]]]]}},{"type":"Feature","id":"72111","properties":{"n":"Peñuelas"},"geometry":{"type":"MultiPolygon","coordinates":[[[[-66.6941,18.1305],[-66.6991,17.9776],[-66.7099,17.9821],[-66.7134,17.9878],[-66.717,17.9903],[-66.7311,17.9917],[-66.7462,17.9903],[-66.7504,17.9954],[-66.754,17.9996],[-66.769,18.135],[-66.6941,18.1305]]]]}},{"type":"Feature","id":"72123","properties":{"n":"Salinas"},"geometry":{"type":"MultiPolygon","coordinates":[[[[-66.3382,17.9765],[-66.3425,17.9938],[-66.3312,18.0159],[-66.2575,18.0759],[-66.2422,18.0771],[-66.2429,18.0794],[-66.2409,18.0819],[-66.2398,18.0847],[-66.2401,18.0932],[-66.2349,18.0942],[-66.2309,18.0959],[-66.2295,18.0954],[-66.2245,18.0953],[-66.1661,18.0501],[-66.2062,17.9631],[-66.2068,17.9633],[-66.2154,17.9594],[-66.2181,17.9573],[-66.2315,17.9439],[-66.2292,17.9347],[-66.232,17.9312],[-66.2527,17.9346],[-66.2607,17.9361],[-66.2709,17.9471],[-66.2757,17.9483],[-66.2908,17.9465],[-66.2977,17.9591],[-66.3169,17.9767],[-66.3237,17.9785],[-66.3382,17.9765]]]]}},{"type":"Feature","id":"72139","properties":{"n":"Trujillo Alto"},"geometry":{"type":"MultiPolygon","coordinates":[[[[-65.9996,18.3801],[-65.9424,18.2935],[-66.0217,18.305],[-66.0271,18.3102],[-66.0316,18.3089],[-66.0415,18.3123],[-65.9996,18.3801]]]]}},{"type":"Feature","id":"72001","properties":{"n":"Adjuntas"},"geometry":{"type":"MultiPolygon","coordinates":[[[[-66.6705,18.1528],[-66.677,18.13],[-66.6941,18.1305],[-66.769,18.135],[-66.7757,18.1338],[-66.7844,18.1387],[-66.7885,18.1344],[-66.7976,18.1334],[-66.8034,18.1404],[-66.8041,18.1481],[-66.8181,18.1505],[-66.8263,18.1602],[-66.8273,18.1712],[-66.8173,18.2303],[-66.6937,18.2169],[-66.6705,18.1528]]]]}},{"type":"Feature","id":"72007","properties":{"n":"Aguas Buenas"},"geometry":{"type":"MultiPolygon","coordinates":[[[[-66.1439,18.2796],[-66.1078,18.2779],[-66.0865,18.2851],[-66.0805,18.2973],[-66.0728,18.2978],[-66.0661,18.3033],[-66.1178,18.2099],[-66.1691,18.2243],[-66.1691,18.226],[-66.1764,18.2303],[-66.1749,18.2331],[-66.1789,18.2375],[-66.1791,18.247],[-66.1873,18.2538],[-66.1907,18.2588],[-66.1771,18.2762],[-66.1439,18.2796]]]]}},{"type":"Feature","id":"72011","properties":{"n":"Añasco"},"geometry":{"type":"MultiPolygon","coordinates":[[[[-67.082,18.2549],[-67.1879,18.2669],[-67.19,18.281],[-67.1961,18.2904],[-67.21,18.295],[-67.2254,18.2966],[-67.2207,18.3057],[-67.1959,18.3075],[-67.1829,18.313],[-67.1726,18.3182],[-67.161,18.3161],[-67.1487,18.3222],[-67.1302,18.3179],[-67.1214,18.3239],[-67.0526,18.3067],[-67.0407,18.3003],[-67.0379,18.2897],[-67.0402,18.272],[-67.0618,18.2701],[-67.082,18.2549]]]]}},{"type":"Feature","id":"72023","properties":{"n":"Cabo Rojo"},"geometry":{"type":"MultiPolygon","coordinates":[[[[-67.1005,18.1064],[-67.104,18.0988],[-67.1061,18.0797],[-67.1056,18.0739],[-67.1013,18.0742],[-67.0991,18.0674],[-67.1071,18.0618],[-67.109,18.0561],[-67.11,17.9458],[-67.1283,17.9482],[-67.1337,17.9519],[-67.167,17.9631],[-67.1786,17.9648],[-67.1835,17.9627],[-67.1887,17.951],[-67.1875,17.9463],[-67.1837,17.938],[-67.1835,17.9311],[-67.1948,17.9328],[-67.1969,17.9357],[-67.1973,17.9375],[-67.1975,17.9415],[-67.1977,17.9435],[-67.199,17.9478],[-67.201,17.9499],[-67.21,17.9536],[-67.2121,17.956],[-67.2143,17.9624],[-67.2153,17.9835],[-67.212,17.993],[-67.2077,17.998],[-67.1779,18.0089],[-67.1743,18.0111],[-67.1724,18.0149],[-67.1721,18.0214],[-67.1738,18.0245],[-67.1933,18.0319],[-67.2099,18.0354],[-67.1967,18.0665],[-67.1907,18.0643],[-67.1846,18.0678],[-67.1839,18.0699],[-67.1865,18.0742],[-67.193,18.0769],[-67.1982,18.0768],[-67.1993,18.0911],[-67.1953,18.0961],[-67.1839,18.1037],[-67.1822,18.1085],[-67.1766,18.151],[-67.1786,18.1593],[-67.1808,18.1681],[-67.1807,18.1682],[-67.173,18.1625],[-67.1713,18.1593],[-67.1662,18.1584],[-67.1667,18.1555],[-67.1622,18.1525],[-67.1597,18.1532],[-67.1005,18.1064]]]]}},{"type":"Feature","id":"72033","properties":{"n":"Cataño"},"geometry":{"type":"MultiPolygon","coordinates":[[[[-66.1695,18.431],[-66.1701,18.4336],[-66.165,18.4377],[-66.1638,18.4447],[-66.1547,18.4456],[-66.1483,18.4512],[-66.1439,18.4598],[-66.1396,18.4623],[-66.1395,18.4624],[-66.1394,18.4623],[-66.1385,18.4533],[-66.1331,18.4459],[-66.1279,18.4446],[-66.1252,18.4512],[-66.1243,18.4563],[-66.1232,18.4594],[-66.1233,18.4604],[-66.1097,18.4472],[-66.1083,18.4389],[-66.1156,18.44],[-66.1316,18.4247],[-66.1578,18.4208],[-66.1695,18.431]]]]}},{"type":"Feature","id":"72037","properties":{"n":"Ceiba"},"geometry":{"type":"MultiPolygon","coordinates":[[[[-65.583,18.2467],[-65.592,18.2487],[-65.5949,18.2487],[-65.5959,18.2478],[-65.5982,18.2476],[-65.5996,18.2557],[-65.5849,18.2564],[-65.583,18.2467]]],[[[-65.6349,18.2839],[-65.6308,18.265],[-65.6231,18.248],[-65.5976,18.2343],[-65.5899,18.2282],[-65.5938,18.2241],[-65.616,18.2274],[-65.6267,18.2355],[-65.6382,18.2291],[-65.6376,18.2244],[-65.6284,18.2051],[-65.6353,18.2],[-65.6397,18.2057],[-65.6622,18.207],[-65.7668,18.28],[-65.7618,18.2893],[-65.7589,18.2906],[-65.7577,18.2916],[-65.7574,18.293],[-65.756,18.2945],[-65.7547,18.2952],[-65.7536,18.2968],[-65.7175,18.2677],[-65.6349,18.2839]]]]}},{"type":"Feature","id":"72047","properties":{"n":"Corozal"},"geometry":{"type":"MultiPolygon","coordinates":[[[[-66.3777,18.294],[-66.3761,18.2997],[-66.3733,18.3019],[-66.3725,18.3098],[-66.3653,18.3332],[-66.3188,18.3674],[-66.3062,18.3697],[-66.289,18.3537],[-66.2781,18.33],[-66.3133,18.2493],[-66.3263,18.2479],[-66.327,18.2442],[-66.3401,18.2387],[-66.3508,18.2412],[-66.3825,18.2792],[-66.3777,18.294]]]]}},{"type":"Feature","id":"72049","properties":{"n":"Culebra"},"geometry":{"type":"MultiPolygon","coordinates":[[[[-65.2808,18.2883],[-65.2833,18.2802],[-65.2873,18.2777],[-65.3002,18.2944],[-65.3017,18.3001],[-65.2997,18.3022],[-65.2965,18.3023],[-65.2889,18.3],[-65.2808,18.2883]]],[[[-65.3164,18.3097],[-65.3169,18.314],[-65.3228,18.3212],[-65.3273,18.3237],[-65.3421,18.3453],[-65.3357,18.3495],[-65.3293,18.342],[-65.3218,18.3383],[-65.3098,18.338],[-65.3044,18.3321],[-65.2983,18.3305],[-65.2817,18.3294],[-65.2773,18.3326],[-65.2532,18.3185],[-65.2451,18.3097],[-65.2444,18.3035],[-65.2499,18.2967],[-65.2603,18.2908],[-65.2639,18.2907],[-65.276,18.2961],[-65.2771,18.299],[-65.276,18.3026],[-65.2805,18.3062],[-65.3025,18.3105],[-65.3022,18.3054],[-65.3024,18.3031],[-65.307,18.3016],[-65.3164,18.3097]]],[[[-65.3277,18.2958],[-65.3314,18.2961],[-65.3375,18.3083],[-65.3302,18.316],[-65.3278,18.309],[-65.3277,18.2958]]],[[[-65.2285,18.323],[-65.2216,18.321],[-65.2211,18.312],[-65.2229,18.3105],[-65.23,18.3113],[-65.2319,18.3203],[-65.2285,18.323]]],[[[-65.2662,18.3418],[-65.2559,18.3421],[-65.2458,18.3347],[-65.2472,18.3333],[-65.2596,18.3341],[-65.2656,18.3394],[-65.2662,18.3418]]]]}},{"type":"Feature","id":"72057","properties":{"n":"Guayama"},"geometry":{"type":"MultiPolygon","coordinates":[[[[-66.2062,17.9631],[-66.1661,18.0501],[-66.0531,18.1073],[-66.0823,18.033],[-66.0952,18.0222],[-66.082,18.0103],[-66.0716,17.9937],[-66.07,17.9664],[-66.0814,17.9666],[-66.1162,17.9491],[-66.127,17.947],[-66.1407,17.941],[-66.1479,17.934],[-66.1554,17.9294],[-66.1597,17.9286],[-66.1612,17.9317],[-66.1756,17.9336],[-66.1869,17.9354],[-66.1897,17.9339],[-66.2002,17.9295],[-66.207,17.9323],[-66.2134,17.9446],[-66.2027,17.9448],[-66.1856,17.941],[-66.1795,17.9437],[-66.1748,17.9482],[-66.1768,17.9504],[-66.2062,17.9631]]]]}},{"type":"Feature","id":"72065","properties":{"n":"Hatillo"},"geometry":{"type":"MultiPolygon","coordinates":[[[[-66.7649,18.4841],[-66.7681,18.4777],[-66.7701,18.325],[-66.7705,18.3206],[-66.8261,18.3234],[-66.8254,18.3277],[-66.8249,18.3331],[-66.8248,18.3375],[-66.8242,18.343],[-66.8366,18.4877],[-66.7993,18.4928],[-66.7803,18.4914],[-66.7649,18.4841]]]]}},{"type":"Feature","id":"72087","properties":{"n":"Loíza"},"geometry":{"type":"MultiPolygon","coordinates":[[[[-65.9928,18.4581],[-65.9923,18.46],[-65.9908,18.4604],[-65.9585,18.4514],[-65.9257,18.4449],[-65.9168,18.4446],[-65.9078,18.4469],[-65.905,18.4509],[-65.8787,18.4383],[-65.8388,18.4319],[-65.8315,18.4268],[-65.8285,18.4235],[-65.8326,18.4207],[-65.8438,18.4057],[-65.8525,18.4017],[-65.8556,18.3958],[-65.8596,18.3819],[-65.8675,18.3781],[-65.9193,18.403],[-65.9928,18.4581]]]]}},{"type":"Feature","id":"72091","properties":{"n":"Manatí"},"geometry":{"type":"MultiPolygon","coordinates":[[[[-66.4632,18.3715],[-66.4733,18.3676],[-66.4948,18.3664],[-66.5118,18.362],[-66.5283,18.3506],[-66.5336,18.3513],[-66.5313,18.3822],[-66.5431,18.4054],[-66.5335,18.4817],[-66.5295,18.4829],[-66.5116,18.4768],[-66.4703,18.4691],[-66.4565,18.4689],[-66.4492,18.471],[-66.4419,18.4798],[-66.44,18.4855],[-66.4388,18.4857],[-66.4438,18.371],[-66.4516,18.3722],[-66.459,18.3712],[-66.4632,18.3715]]]]}},{"type":"Feature","id":"72097","properties":{"n":"Mayagüez"},"geometry":{"type":"MultiPolygon","coordinates":[[[[-67.1879,18.2669],[-67.082,18.2549],[-67.0198,18.1955],[-67.0244,18.1847],[-67.0345,18.1855],[-67.0515,18.1741],[-67.0722,18.1731],[-67.0859,18.1624],[-67.0867,18.152],[-67.1597,18.1532],[-67.1622,18.1525],[-67.1667,18.1555],[-67.1662,18.1584],[-67.1713,18.1593],[-67.173,18.1625],[-67.1807,18.1682],[-67.1552,18.195],[-67.1527,18.2035],[-67.158,18.2167],[-67.173,18.2307],[-67.1754,18.248],[-67.1878,18.2667],[-67.1879,18.2669]]]]}},{"type":"Feature","id":"72107","properties":{"n":"Orocovis"},"geometry":{"type":"MultiPolygon","coordinates":[[[[-66.3777,18.294],[-66.3825,18.2792],[-66.3508,18.2412],[-66.3738,18.1737],[-66.4137,18.1633],[-66.4209,18.1663],[-66.4236,18.172],[-66.428,18.1709],[-66.4361,18.1755],[-66.4446,18.1767],[-66.5219,18.152],[-66.5349,18.1523],[-66.5443,18.1476],[-66.5472,18.1531],[-66.5468,18.155],[-66.5442,18.1583],[-66.5448,18.1603],[-66.5432,18.1616],[-66.5431,18.1631],[-66.5008,18.256],[-66.4557,18.2577],[-66.3777,18.294]]]]}},{"type":"Feature","id":"72113","properties":{"n":"Ponce"},"geometry":{"type":"MultiPolygon","coordinates":[[[[-66.6991,17.9776],[-66.6941,18.1305],[-66.677,18.13],[-66.6705,18.1528],[-66.6696,18.1523],[-66.6642,18.1536],[-66.6629,18.1554],[-66.6603,18.1569],[-66.6567,18.1566],[-66.6535,18.1591],[-66.6506,18.1585],[-66.6495,18.1589],[-66.5528,18.1521],[-66.5405,17.9755],[-66.5832,17.9612],[-66.5897,17.9694],[-66.5944,17.9707],[-66.605,17.969],[-66.6238,17.9811],[-66.6319,17.9827],[-66.6457,17.9803],[-66.6578,17.9746],[-66.6644,17.9683],[-66.6728,17.9665],[-66.6991,17.9776]]],[[[-66.5235,17.8962],[-66.5135,17.9029],[-66.5098,17.9005],[-66.5095,17.8986],[-66.5153,17.8927],[-66.5286,17.8848],[-66.5261,17.8929],[-66.5235,17.8962]]]]}},{"type":"Feature","id":"72121","properties":{"n":"Sabana Grande"},"geometry":{"type":"MultiPolygon","coordinates":[[[[-66.9587,18.0325],[-66.9604,18.0365],[-66.9827,18.0412],[-66.9833,18.0525],[-66.9779,18.1438],[-66.9755,18.1434],[-66.9719,18.1415],[-66.9639,18.1482],[-66.9604,18.1459],[-66.9521,18.1461],[-66.9436,18.149],[-66.9391,18.1479],[-66.9265,18.1513],[-66.8847,18.0248],[-66.895,18.0232],[-66.9051,18.0265],[-66.9109,18.0239],[-66.9195,18.0277],[-66.9242,18.0274],[-66.9308,18.0306],[-66.9359,18.0293],[-66.9472,18.0334],[-66.9587,18.0325]]]]}},{"type":"Feature","id":"72127","properties":{"n":"San Juan"},"geometry":{"type":"MultiPolygon","coordinates":[[[[-66.0366,18.4502],[-65.9996,18.3801],[-66.0415,18.3123],[-66.0478,18.3069],[-66.0453,18.2994],[-66.0527,18.3036],[-66.0661,18.3033],[-66.0728,18.2978],[-66.0805,18.2973],[-66.1083,18.4389],[-66.1097,18.4472],[-66.1233,18.4604],[-66.125,18.4704],[-66.1183,18.4696],[-66.0921,18.4665],[-66.0833,18.462],[-66.074,18.4581],[-66.0433,18.4537],[-66.0394,18.4544],[-66.0366,18.4502]]]]}},{"type":"Feature","id":"72133","properties":{"n":"Santa Isabel"},"geometry":{"type":"MultiPolygon","coordinates":[[[[-66.3312,18.0159],[-66.3425,17.9938],[-66.3382,17.9765],[-66.3384,17.9765],[-66.3625,17.9682],[-66.3651,17.9648],[-66.3688,17.9577],[-66.3716,17.9515],[-66.3851,17.939],[-66.3912,17.9458],[-66.3989,17.9509],[-66.4121,17.9573],[-66.4455,17.9794],[-66.4504,17.9832],[-66.427,18.0426],[-66.3312,18.0159]]]]}},{"type":"Feature","id":"72141","properties":{"n":"Utuado"},"geometry":{"type":"MultiPolygon","coordinates":[[[[-66.6705,18.1528],[-66.6937,18.2169],[-66.8173,18.2303],[-66.8261,18.3234],[-66.7705,18.3206],[-66.7701,18.325],[-66.607,18.3282],[-66.6046,18.3213],[-66.5853,18.3227],[-66.5666,18.2985],[-66.6495,18.1589],[-66.6506,18.1585],[-66.6535,18.1591],[-66.6567,18.1566],[-66.6603,18.1569],[-66.6629,18.1554],[-66.6642,18.1536],[-66.6696,18.1523],[-66.6705,18.1528]]]]}},{"type":"Feature","id":"72071","properties":{"n":"Isabela"},"geometry":{"type":"MultiPolygon","coordinates":[[[[-66.9575,18.4892],[-66.922,18.3932],[-67.0272,18.3934],[-67.0528,18.4484],[-67.0565,18.461],[-67.0585,18.48],[-67.0771,18.489],[-67.1035,18.5145],[-67.0938,18.5158],[-67.0793,18.5133],[-67.0203,18.5106],[-66.989,18.4977],[-66.9595,18.4899],[-66.9577,18.4891],[-66.9575,18.4892]]]]}},{"type":"Feature","id":"72003","properties":{"n":"Aguada"},"geometry":{"type":"MultiPolygon","coordinates":[[[[-67.1829,18.313],[-67.2391,18.3753],[-67.2267,18.3782],[-67.217,18.3821],[-67.2022,18.3899],[-67.1601,18.4156],[-67.1507,18.3924],[-67.1322,18.3894],[-67.1264,18.3712],[-67.1286,18.3655],[-67.1281,18.3539],[-67.1345,18.3465],[-67.131,18.3347],[-67.1341,18.3305],[-67.1304,18.3251],[-67.1302,18.3179],[-67.1487,18.3222],[-67.161,18.3161],[-67.1726,18.3182],[-67.1829,18.313]]]]}},{"type":"Feature","id":"72009","properties":{"n":"Aibonito"},"geometry":{"type":"MultiPolygon","coordinates":[[[[-66.2245,18.0953],[-66.2295,18.0954],[-66.2309,18.0959],[-66.2349,18.0942],[-66.2401,18.0932],[-66.2398,18.0847],[-66.2409,18.0819],[-66.2429,18.0794],[-66.2422,18.0771],[-66.2575,18.0759],[-66.3148,18.1521],[-66.2427,18.1802],[-66.2236,18.165],[-66.2287,18.1596],[-66.2169,18.1432],[-66.2207,18.1317],[-66.2204,18.1208],[-66.2268,18.1164],[-66.2245,18.0953]]]]}},{"type":"Feature","id":"72015","properties":{"n":"Arroyo"},"geometry":{"type":"MultiPolygon","coordinates":[[[[-66.0823,18.033],[-66.0195,17.9784],[-66.024,17.9759],[-66.0466,17.9549],[-66.049,17.9546],[-66.0582,17.9592],[-66.0687,17.9663],[-66.07,17.9664],[-66.0716,17.9937],[-66.082,18.0103],[-66.0952,18.0222],[-66.0823,18.033]]]]}}]};
+
+const FUEL = {
+  bunker:{label:"Fuel oil No. 6 (bunker)", v:"--f-bunker", group:"Oil"},
+  diesel:{label:"Diesel (No. 2)", v:"--f-diesel", group:"Oil"},
+  gas:{label:"Natural gas / LNG", v:"--f-gas", group:"Gas"},
+  coal:{label:"Coal", v:"--f-coal", group:"Coal"},
+  solar:{label:"Solar PV", v:"--f-solar", group:"Renewable"},
+  wind:{label:"Wind", v:"--f-wind", group:"Renewable"},
+  hydro:{label:"Hydro", v:"--f-hydro", group:"Renewable"},
+  lfg:{label:"Landfill gas", v:"--f-lfg", group:"Renewable"},
+  bess:{label:"Battery storage", v:"--f-bess", group:"Storage"}
+};
+const css = v => getComputedStyle(document.documentElement).getPropertyValue(v).trim();
+const fc = f => css(FUEL[f].v);
+
+const SRC = {
+  eia:{t:"EIA plant inventory as summarized by Mapscaping, May 2026", u:"https://mapscaping.com/puerto-rico-power-plants/"},
+  crs:{t:"Congressional Research Service, R45023, Repair or Rebuild: Options for Electric Power in Puerto Rico", u:"https://www.congress.gov/crs-product/R45023"},
+  wri:{t:"WRI Global Power Plant Database (coordinates, hydro unit sizes)", u:"https://github.com/wri/global-power-plant-database"},
+  prfaa:{t:"PRFAA, generation restoration update, October 2025", u:"https://www.prfaa.pr.gov/recent-press-releases/government-of-puerto-rico-continues-increasing-puerto-ricos-power-generation-capacity"},
+  nfe:{t:"New Fortress Energy, San Juan and Palo Seco temporary units in service, September 2023", u:"https://www.businesswire.com/news/home/20230929813418/en"},
+  luma24:{t:"LUMA daily availability report, December 1, 2024", u:"https://lumapr.com/wp-content/uploads/2024/12/20241201-Daily-Availability-Report.pdf"},
+  ruta:{t:"Ruta Energética (Oversight Board portal), Generation page", u:"https://rutaenergeticapr.org/en/generation-additions-shutdowns/"},
+  vocero:{t:"El Vocero, New Fortress pide dragar la Bahía de San Juan, June 2026", u:"https://www.elvocero.com/noticia_rotary/article_c47551b8-65ac-4af2-b4e2-186388a0cf23.html"},
+  luma26:{t:"LUMA, CIRO 1 Salinas interconnection, January 8, 2026", u:"https://lumapr.com/news/luma-connects-new-solar-farm-in-salinas-marking-the-start-of-a-strategic-collaboration-with-the-private-sector-to-transform-puerto-ricos-energy/?lang=en"},
+  pvtech:{t:"PV Tech, Luma connects 90 MW CIRO 1 (51.5 MW/206 MWh BESS), January 2026", u:"https://www.pv-tech.org/luma-energy-connects-90mw-solar-pv-plant-in-puerto-rico/"},
+  fombCiro:{t:"Oversight Board letter, PREPA–CIRO One Salinas, January 18, 2024", u:"https://docs.oversightboard.pr.gov/n/id6ek3qs8yrm/b/CR_PUBLIC/o/4544_CRLetterPREPACIRO_One_Salinas.pdf"},
+  fombCFE:{t:"Oversight Board letter, Clean Flexible Energy (Salinas and Jobos), May 29, 2026", u:"https://docs.oversightboard.pr.gov/n/id6ek3qs8yrm/b/CR_PUBLIC/o/7342_PREPAandCleanFlexibleEnergy,LLC(PPOAsandESSAsforSalinasandJobosProjects)(May2026).pdf"},
+  fombYFN:{t:"Oversight Board letter, YFN Yabucoa Solar fifth amendment, December 17, 2025", u:"https://docs.oversightboard.pr.gov/n/id6ek3qs8yrm/b/CR_PUBLIC/o/6936_PREPAandYFNYabucoaSolar,LLC(FifthAmendment)(December2025).pdf"},
+  fombEnergiza:{t:"Oversight Board letter, Energiza first amendment to PPOA, January 16, 2026", u:"https://docs.oversightboard.pr.gov/n/id6ek3qs8yrm/b/CR_PUBLIC/o/6957_PREPAandEnergiza,LLC(FirstAmendmenttoPPOA)(January2026).pdf"},
+  fombT2:{t:"Oversight Board letter, Tranche 2 resource providers, May 7, 2025", u:"https://docs.oversightboard.pr.gov/n/id6ek3qs8yrm/b/CR_PUBLIC/o/6157_PREPAandTranche2ResourceProviders(May2025).pdf"},
+  fombPattern:{t:"Oversight Board letter, Pattern Barceloneta and Santa Isabel ESSAs, March 21, 2025", u:"https://docs.oversightboard.pr.gov/n/id6ek3qs8yrm/b/CR_PUBLIC/o/6045_PREPAandPatternBarcelonetaySantaIsabel.pdf"},
+  fombPE:{t:"Oversight Board final determination, Power Expectations et al., June 2, 2026", u:"https://docs.oversightboard.pr.gov/n/id6ek3qs8yrm/b/CR_PUBLIC/o/7355_PREPAandPowerExpectations,LLC(FinalDetermination)(June2026).pdf"},
+  fombGoth:{t:"Oversight Board request for information, Gothams Energy, March 11, 2026", u:"https://docs.oversightboard.pr.gov/n/id6ek3qs8yrm/b/CR_PUBLIC/o/7099_RequestforInformation-PREPAandGothamsEnergy,LLC(March11,2026).pdf"},
+  bond:{t:"Bond Buyer, Oversight Board conditionally approves 18 Tranche 1 PPOAs (844 MW), March 2022", u:"https://www.bondbuyer.com/news/puerto-rico-oversight-board-inks-renewable-energy-deals-for-prepa"},
+  metroMay:{t:"Metro Puerto Rico, Board approves ASAP batteries and conditions temporary generation, May 14, 2026", u:"https://www.metro.pr/negocios/2026/05/14/la-junta-fiscal-avala-baterias-para-proyectos-solares-y-condiciona-contratos-de-generacion-temporal-de-la-aee"},
+  noticelRev:{t:"NotiCel, Board revokes approval of temporary generation contract, August 14, 2026", u:"https://noticel.com/ultima-hora/20260814/junta-de-supervision-fiscal-revoca-aprobacion-del-contrato-de-generacion-temporada/"},
+  senado:{t:"Senate of Puerto Rico, petition on Power Expectations contract (revoked August 14)", u:"https://www.senado.pr.gov/presidente-del-senado-requiere-informacin-sobre-contratos-autorizados-desde-la-gobernacin-acuerdo-de-generacin-temporera-y-cumplimiento-de-la-ley-de-permisos"},
+  ck1:{t:"Caribbean Business, Board approves 25 MW Juana Díaz solar contract, July 2, 2026", u:"https://caribbean.business/oversight-board-approves-25-mw-juana-diaz-solar-contract/"},
+  prebList:{t:"PREB docket NEPR-MI-2020-0012, Exhibit B: projects in development, June 19, 2025", u:"https://energia.pr.gov/wp-content/uploads/sites/7/2025/07/20250722-MI20200012-Exhibit-B-Motion-in-Compl-with-Resol-June-30-2025.pdf"},
+  prebApr:{t:"PREB Resolution and Order, April 24, 2026 (CIRO portfolio; Go Green and Jord ESSAs)", u:"https://energia.pr.gov/wp-content/uploads/sites/7/2026/04/20260424-MI20200012-Resolution-and-Order.pdf"},
+  lpo:{t:"DOE Loan Programs Office deal digest, January 17, 2025 (project municipalities)", u:"https://www.energy.gov/edf/articles/deal-digest-lpo-announces-financing-enhance-grid-reliability-and-expand-access"},
+  doeCFE:{t:"DOE EA-2256, Clean Flexible Energy Jobos (Guayama) and Salinas", u:"https://www.energy.gov/node/4841796"},
+  cbEnergiza:{t:"Caribbean Business, Energiza plant has not broken ground as $168 million dispute simmers, September 9, 2026", u:"https://caribbean.business/energiza-plant-has-not-broken-ground-as-168-million-dispute-simmers/"},
+  cbNFE:{t:"Caribbean Business, Who controls Puerto Rico's power now?, September 11, 2026", u:"https://caribbean.business/who-controls-puerto-ricos-power-now/"},
+  metroJul:{t:"Metro Puerto Rico, Board demands progress on Aguirre temporary generation, July 24, 2026", u:"https://www.metro.pr/noticias/2026/07/24/junta-fiscal-exige-cuentas-sobre-contrato-de-energia-temporera-en-aguirre-y-pide-evidencia-del-avance-del-proyecto/"},
+  trk:{t:"PREPA, Appendix A: Renewable Generation Projects Tracker, July 2026 (document provided)"},
+  asapQ1:{t:"LUMA, ASAP Quarterly Report for Q1 FY2027, Energy Bureau case NEPR-MI-2024-0002, filed October 30, 2026 (document provided)"},
+  generaBess:{t:"Genera PR, Monthly BESS Progress Report for September 2026, Energy Bureau case NEPR-MI-2021-0002, filed October 13, 2026 (document provided)"}
+};
+
+const PREPA_T = {owner:"PREPA", operator:"Genera PR (O&M agreement)", sector:"public"};
+const PREPA_H = {owner:"PREPA", operator:"PREPA", sector:"public"};
+const IPP = o => ({owner:o, operator:o, sector:"private"});
+
+const ASSETS = [
+ {id:"aguirre", name:"Aguirre Power Complex", muni:"Salinas", lat:17.9519, lon:-66.2308, ...PREPA_T, units:[
+   {u:"Steam unit 1", f:"bunker", mw:450}, {u:"Steam unit 2", f:"bunker", mw:450},
+   {u:"Combined cycle (2 blocks)", f:"diesel", mw:592}, {u:"Peaking turbines (2 × 21 MW)", f:"diesel", mw:42}],
+   note:"Largest plant on the island. Steam unit 2 was restored mid-2025 and three combined-cycle units were reactivated in August 2025.", src:["crs","eia","prfaa"]},
+ {id:"costasur", name:"Costa Sur Power Plant", muni:"Guayanilla", lat:18.008, lon:-66.768, ...PREPA_T, units:[
+   {u:"Steam unit 5", f:"gas", mw:410, n:"dual-fuel, oil backup"}, {u:"Steam unit 6", f:"gas", mw:410, n:"dual-fuel, oil backup"},
+   {u:"Peaking turbines (2 × 21 MW)", f:"diesel", mw:42}],
+   note:"Units 3–4 are retired. A 410 MW unit returned from repair in May 2025. EIA reports 966 MW for the full site.", src:["eia","prfaa","wri"]},
+ {id:"sanjuan", name:"San Juan Power Plant", muni:"San Juan", lat:18.427, lon:-66.1045, ...PREPA_T, units:[
+   {u:"Steam units 7–10 (4 × 100 MW)", f:"bunker", mw:400}, {u:"Combined cycle unit 5", f:"gas", mw:220, n:"diesel backup"},
+   {u:"Combined cycle unit 6", f:"gas", mw:220, n:"diesel backup"}, {u:"Temporary TM2500 units (FEMA-funded)", f:"gas", mw:200, n:"placed in service Sept 2023"}],
+   note:"Temporary units were installed by NFE under a federally funded program. EIA reports 784 MW for the permanent plant.", src:["eia","nfe","luma24"]},
+ {id:"paloseco", name:"Palo Seco Power Plant", muni:"Toa Baja", lat:18.4553, lon:-66.1486, ...PREPA_T, units:[
+   {u:"Steam unit 3", f:"bunker", mw:216}, {u:"Steam unit 4", f:"bunker", mw:216, n:"back in service 2025 after stator fire"},
+   {u:"Temporary TM units (FEMA-funded)", f:"gas", mw:150, n:"in service June 2023"}],
+   note:"Units 1–2 are retired. Gas conversion of units 3–4 was reported as under way in June 2026.", src:["prfaa","nfe","vocero"]},
+ {id:"cambalache", name:"Cambalache Power Plant", muni:"Arecibo", lat:18.4691, lon:-66.6968, ...PREPA_T, units:[
+   {u:"Combustion turbines 1–3 (3 × 82.5 MW)", f:"diesel", mw:247.5}],
+   note:"Peaking plant. Natural gas conversion of units 2–3 was reported as under way in June 2026.", src:["wri","eia","vocero"]},
+ {id:"mayaguez", name:"Mayagüez Power Plant", muni:"Mayagüez", lat:18.2194, lon:-67.16, ...PREPA_T, units:[
+   {u:"Combustion turbines (4 × 55 MW)", f:"diesel", mw:220}], note:"Peaking plant serving the west.", src:["eia"]},
+ {id:"daguao", name:"Daguao peakers", muni:"Ceiba", lat:18.2325, lon:-65.6677, ...PREPA_T, units:[{u:"Gas turbines (2 × 21 MW)", f:"diesel", mw:42}], note:"Slated for replacement under Genera's peaker program.", src:["eia","prebList"]},
+ {id:"jobos", name:"Jobos peakers", muni:"Guayama", lat:17.9615, lon:-66.1402, ...PREPA_T, units:[{u:"Gas turbines (2 × 21 MW)", f:"diesel", mw:42}], note:"Slated for replacement under Genera's peaker program.", src:["eia","prebList"]},
+ {id:"vegabaja", name:"Vega Baja peakers", muni:"Vega Baja", lat:18.4458, lon:-66.3914, ...PREPA_T, units:[{u:"Gas turbines (2 × 21 MW)", f:"diesel", mw:42}], src:["eia"]},
+ {id:"yabucoa", name:"Yabucoa peakers", muni:"Yabucoa", lat:18.06, lon:-65.86, ...PREPA_T, units:[{u:"Gas turbines (2 × 21 MW)", f:"diesel", mw:42}], note:"EIA geocodes this plant to Humacao; Genera and PREB list it as Yabucoa.", src:["eia","prebList"]},
+ {id:"vieques", name:"Vieques emergency plant", muni:"Vieques", lat:18.1429, lon:-65.444, ...PREPA_T, units:[{u:"Diesel generators", f:"diesel", mw:6}], note:"Backup for the island municipality.", src:["wri"]},
+ {id:"dosbocas", name:"Dos Bocas hydro", muni:"Utuado", lat:18.30, lon:-66.67, ...PREPA_H, units:[{u:"Hydro units", f:"hydro", mw:15}], note:"PREPA retained the hydro fleet; several units are out of service.", src:["wri","eia"]},
+ {id:"caonillas", name:"Caonillas hydro 1–2", muni:"Utuado", lat:18.2961, lon:-66.6432, ...PREPA_H, units:[{u:"Caonillas 1", f:"hydro", mw:18},{u:"Caonillas 2", f:"hydro", mw:3.6}], src:["wri"]},
+ {id:"yauco", name:"Yauco hydro 1–2", muni:"Yauco", lat:18.08, lon:-66.87, ...PREPA_H, units:[{u:"Yauco 1", f:"hydro", mw:25},{u:"Yauco 2", f:"hydro", mw:9}], note:"EIA lists Yauco at 34 MW.", src:["eia","wri"]},
+ {id:"toronegro1", name:"Toro Negro hydro 1", muni:"Villalba", lat:18.1318, lon:-66.4879, ...PREPA_H, units:[{u:"Toro Negro 1", f:"hydro", mw:8.64}], src:["wri"]},
+ {id:"toronegro2", name:"Toro Negro hydro 2", muni:"Orocovis", lat:18.1664, lon:-66.5116, ...PREPA_H, units:[{u:"Toro Negro 2", f:"hydro", mw:1.92}], src:["wri"]},
+ {id:"garzas", name:"Garzas hydro 1–2", muni:"Peñuelas", lat:18.09, lon:-66.733, ...PREPA_H, units:[{u:"Garzas 1", f:"hydro", mw:7.2},{u:"Garzas 2", f:"hydro", mw:5.04}], src:["wri"]},
+ {id:"rioblanco", name:"Río Blanco hydro", muni:"Naguabo", lat:18.2436, lon:-65.7852, ...PREPA_H, units:[{u:"Hydro unit", f:"hydro", mw:5}], src:["wri"]},
+ {id:"carite", name:"Carite hydro 1", muni:"Guayama", lat:18.0447, lon:-66.106, ...PREPA_H, units:[{u:"Hydro unit", f:"hydro", mw:10}], src:["wri"]},
+ {id:"eco", name:"EcoEléctrica", muni:"Peñuelas", lat:18.0, lon:-66.742, ...IPP("EcoEléctrica, L.P."), units:[{u:"Combined cycle (2 CTs + steam turbine)", f:"gas", mw:507, n:"with LNG terminal and desalination"}], note:"Private cogenerator under a PPOA with PREPA. EIA reports 580 MW.", src:["wri","eia"]},
+ {id:"aes", name:"AES Puerto Rico", muni:"Guayama", lat:17.9474, lon:-66.1494, ...IPP("AES Puerto Rico, L.P."), units:[{u:"Fluidized-bed units 1–2 (2 × 227 MW)", f:"coal", mw:454}], note:"Only coal plant on the island. Act 1-2025 requires coal to end by December 31, 2032. PREB's 2025 list shows a proposed 700 MW AES Guayama replacement, not yet Board-reviewed.", src:["eia","ruta","prebList"]},
+ {id:"ilumina", name:"AES Ilumina", muni:"Guayama", lat:17.9468, lon:-66.1591, ...IPP("AES"), units:[{u:"Solar PV", f:"solar", mw:20}], src:["crs","wri"]},
+ {id:"patternwind", name:"Pattern Santa Isabel wind", muni:"Santa Isabel", lat:17.9853, lon:-66.398, ...IPP("Pattern Energy"), units:[{u:"Wind turbines", f:"wind", mw:75}], src:["eia"]},
+ {id:"puntalima", name:"Punta Lima wind", muni:"Naguabo", lat:18.1868, lon:-65.6948, ...IPP("Punta Lima Wind Farm"), units:[{u:"Wind turbines", f:"wind", mw:26}], note:"Heavily damaged in 2017; listed in LUMA's storage addition program as an existing IPP. Confirm current output before citing.", src:["wri","prebList"]},
+ {id:"oriana", name:"Oriana Solar", muni:"Isabela", lat:18.4729, lon:-67.0443, ...IPP("Oriana Energy (Sonnedix)"), units:[{u:"Solar PV (AC)", f:"solar", mw:45}], note:"EIA lists the hybrid site at 67 MW; 57.7 MW DC.", src:["eia","wri"]},
+ {id:"humacao", name:"Humacao Solar", muni:"Humacao", lat:18.135, lon:-65.817, ...IPP("Humacao Solar Project"), units:[{u:"Solar PV (AC)", f:"solar", mw:40}], note:"About 46.7 MW DC.", src:["wri"]},
+ {id:"sanfermin", name:"San Fermín Solar", muni:"Loíza", lat:18.4055, lon:-65.9077, ...IPP("San Fermín Solar Farm"), units:[{u:"Solar PV (AC)", f:"solar", mw:20}], note:"About 27 MW DC.", src:["wri","prebList"]},
+ {id:"horizon", name:"Horizon Energy solar", muni:"Salinas", lat:17.9786, lon:-66.2205, ...IPP("Horizon Energy (Sonnedix)"), units:[{u:"Solar PV (AC)", f:"solar", mw:10}], note:"About 15.5 MW DC.", src:["wri","prebList"]},
+ {id:"lajas", name:"Lajas Solar (Fonroche)", muni:"Lajas", lat:18.02, lon:-67.06, ...IPP("Fonroche / Lajas Solar Project"), units:[{u:"Solar PV (approx.)", f:"solar", mw:20}], note:"Capacity approximate; site is the host for an 80 MW ASAP battery the Board approved in May 2026.", src:["prebList","metroMay"]},
+ {id:"windmar", name:"Windmar Cantera Martinó", muni:"Ponce", lat:18.0623, lon:-66.5485, ...IPP("Windmar Renewable Energy"), units:[{u:"Solar PV", f:"solar", mw:2.1}], src:["crs","wri"]},
+ {id:"fajlfg", name:"Fajardo landfill gas", muni:"Fajardo", lat:18.31, lon:-65.67, ...IPP("Landfill Gas Technologies of Fajardo"), units:[{u:"Engine generators (approx.)", f:"lfg", mw:2.4}], note:"EIA reports about 5 MW for the two landfill gas sites combined.", src:["eia","prebList"]},
+ {id:"tblfg", name:"Toa Baja landfill gas", muni:"Toa Baja", lat:18.43, lon:-66.22, ...IPP("Landfill Gas Technologies"), units:[{u:"Engine generators (approx.)", f:"lfg", mw:2.4}], src:["eia","prebList"]},
+ {id:"ciro1", name:"CIRO One Salinas (phase 1)", muni:"Salinas", lat:17.99, lon:-66.27, ...IPP("CIRO Energy Group"), isNew:true, units:[{u:"Solar PV", f:"solar", mw:90}, {u:"Co-located battery (206 MWh)", f:"bess", mw:51.5}], note:"First utility-scale solar connected in nearly a decade (January 2026). Also listed in the approved-projects drilldown.", src:["luma26","pvtech","fombCiro"]}
+];
+
+// ---- Board-approved projects (2020 onward) ----
+// status: operating | approved | conditional | revoked
+const PROJECTS = [
+ {id:"ciro1p", name:"CIRO One Salinas", dev:"CIRO Energy Group", muni:"Salinas", program:"Legacy PPOA (renegotiated)",
+  comps:[{f:"solar",mw:140, n:"90 MW phase 1 + 50 MW phase 2"}], status:"operating", statusText:"Phase 1 (90 MW + 51.5 MW battery) interconnected January 2026; phase 2 targeted 2026",
+  appr:[{d:"2021-03-01", a:"Approved", w:"Amended and restated PPOA (Board allowed up to 150 MW of legacy PPOAs: CIRO One 90 MW, Xzerta 60 MW)"}, {d:"2024-01-18", a:"Approved", w:"PPOA amendment"}],
+  terms:"25-year term", src:["fombCiro","luma26","pvtech","prebList"]},
+ {id:"xzerta", name:"Xzerta-Tec Solar I", dev:"Xzerta-Tec Solar I, LLC", muni:"Hatillo", program:"Legacy PPOA (renegotiated)",
+  comps:[{f:"solar",mw:60}], status:"approved", statusText:"In development; COD listed as October 2027",
+  appr:[{d:"2021-03-01", a:"Approved", w:"Selected with CIRO One under the Board's 150 MW legacy-PPOA allowance (exact approval date for this PPOA not stated in the letter reviewed)", approx:true}],
+  terms:"25-year term", src:["fombCiro","prebList"]},
+ {id:"cfe-salinas", name:"CFE Salinas solar + storage", dev:"Clean Flexible Energy (AES)", muni:"Salinas", program:"Tranche 1",
+  comps:[{f:"solar",mw:120},{f:"bess",mw:175}], status:"approved", statusText:"Guaranteed COD extended to May 29, 2026 (PV) and Feb 26, 2027 (storage phase 2)",
+  appr:[{d:"2022-03-25", a:"Approved with conditions", w:"PPOA, part of the 18-PPOA Tranche 1 batch"},{d:"2022-12-15", a:"Approved with conditions", w:"ESSA"},{d:"2023-10-16", a:"Approved with conditions", w:"ESSA amendments tied to DOE LPO financing"},{d:"2024-10-09", a:"Approved with observations", w:"Base rate cut to $0.10016/kWh; storage raised to 175 MW"},{d:"2026-05-29", a:"Approved with observations", w:"COD extensions (8th amendment)"}],
+  terms:"PPOA max payable $835.3M; ESSA $1,658.1M; 25 years; 2% escalator", src:["fombCFE","doeCFE"]},
+ {id:"cfe-jobos", name:"CFE Jobos solar + storage", dev:"Clean Flexible Energy (AES)", muni:"Guayama", program:"Tranche 1",
+  comps:[{f:"solar",mw:80},{f:"bess",mw:110}], status:"approved", statusText:"Guaranteed COD extended to May 29, 2026 (PV) and Feb 26, 2027 (storage phase 2)",
+  appr:[{d:"2022-03-25", a:"Approved with conditions", w:"PPOA, part of the 18-PPOA Tranche 1 batch"},{d:"2022-12-15", a:"Approved with conditions", w:"ESSA"},{d:"2023-10-16", a:"Approved with conditions", w:"ESSA amendments tied to DOE LPO financing"},{d:"2024-10-09", a:"Approved with observations", w:"Base rate cut to $0.09303/kWh; storage raised to 110 MW"},{d:"2026-05-29", a:"Approved with observations", w:"COD extensions (7th amendment)"}],
+  terms:"PPOA max payable $562.8M; ESSA $1,053.5M; 25 years; 2% escalator", src:["fombCFE","doeCFE"]},
+ {id:"coamo", name:"Coamo Solar", dev:"Convergent Energy", muni:"Coamo", program:"Tranche 1",
+  comps:[{f:"solar",mw:100},{f:"bess",mw:55,mwh:55}], status:"approved", statusText:"DOE loan guarantee closed January 2025; COD listed as March 2027",
+  appr:[{d:"2022-03-25", a:"Approved with conditions", w:"PPOA, part of the 18-PPOA Tranche 1 batch"}], src:["bond","lpo","prebList"]},
+ {id:"penuelas-bess", name:"Peñuelas Energy Storage", dev:"Convergent Energy", muni:"Peñuelas", program:"Tranche 1",
+  comps:[{f:"bess",mw:100,mwh:400}], status:"approved", statusText:"DOE-financed; COD listed as March 2027",
+  dateUnknown:true, appr:[{d:"2023-06-30", a:"Tranche 1 ESSA", w:"Energy Bureau cleared Tranche 1 ESSAs on June 30, 2023; the Board letter for this contract was not located"}], src:["lpo","prebList"], conf:"inferred"},
+ {id:"ponce-bess", name:"Ponce Energy Storage", dev:"Convergent Energy", muni:"Ponce", program:"Tranche 1",
+  comps:[{f:"bess",mw:25,mwh:100, n:"DOE financing covers up to 100 MW"}], status:"approved", statusText:"DOE-financed; COD listed as March 2027",
+  dateUnknown:true, appr:[{d:"2023-06-30", a:"Tranche 1 ESSA", w:"Energy Bureau cleared Tranche 1 ESSAs on June 30, 2023; the Board letter for this contract was not located"}], src:["lpo","prebList"], conf:"inferred"},
+ {id:"caguas-bess", name:"Caguas Energy Storage", dev:"Convergent Energy", muni:"Caguas", program:"Tranche 1",
+  comps:[{f:"bess",mw:25,mwh:100}], status:"approved", statusText:"DOE-financed; COD listed as March 2027",
+  dateUnknown:true, appr:[{d:"2023-06-30", a:"Tranche 1 ESSA", w:"Energy Bureau cleared Tranche 1 ESSAs on June 30, 2023; the Board letter for this contract was not located"}], src:["lpo","prebList"], conf:"inferred"},
+ {id:"juncos", name:"CS/UR Juncos Solar", dev:"CS-UR Juncos PV", muni:"Juncos", program:"Tranche 1",
+  comps:[{f:"solar",mw:125}], status:"approved", statusText:"COD listed as October 2027",
+  appr:[{d:"2022-03-25", a:"Approved with conditions", w:"PPOA, part of the 18-PPOA Tranche 1 batch"}], src:["bond","prebList"]},
+ {id:"pattern-pv", name:"Pattern Barceloneta Solar", dev:"Pattern Energy", muni:"Arecibo", program:"Tranche 1",
+  comps:[{f:"solar",mw:70}], status:"approved", statusText:"COD listed as February 2027; DOE conditional commitment",
+  appr:[{d:"2022-03-25", a:"Approved with conditions", w:"PPOA, part of the 18-PPOA Tranche 1 batch"}], note:"Named for Barceloneta; DOE places the site in Arecibo.", src:["bond","lpo","prebList"]},
+ {id:"pattern-bar-bess", name:"Pattern Barceloneta Storage", dev:"Pattern Energy", muni:"Arecibo", program:"Tranche 1",
+  comps:[{f:"bess",mw:50,mwh:200}], status:"approved", statusText:"COD listed as February 2027",
+  appr:[{d:"2025-03-21", a:"Approved with conditions", w:"ESSA; must pursue DOE LPO financing and pass savings to ratepayers"}], src:["fombPattern","lpo"]},
+ {id:"pattern-si-bess", name:"Pattern Santa Isabel Storage", dev:"Pattern Energy", muni:"Santa Isabel", program:"Tranche 1",
+  comps:[{f:"bess",mw:50,mwh:200}], status:"approved", statusText:"COD listed as April 2027",
+  appr:[{d:"2025-03-21", a:"Approved with conditions", w:"ESSA; must pursue DOE LPO financing"}], src:["fombPattern","lpo"]},
+ {id:"ciro2", name:"CIRO Two Salinas", dev:"CIRO Energy Group", muni:"Salinas", program:"Tranche 1",
+  comps:[{f:"solar",mw:68}], status:"approved", statusText:"Planned for the third LUMA integration phase",
+  appr:[{d:"2022-03-25", a:"Approved with conditions", w:"PPOA, part of the 18-PPOA Tranche 1 batch (initially 33 MW)"}], src:["bond","prebApr","prebList","luma26"]},
+ {id:"guayama-solar", name:"Guayama Solar Energy", dev:"CIRO Energy Group", muni:"Guayama", program:"Tranche 1",
+  comps:[{f:"solar",mw:50}], status:"approved", statusText:"Planned for the third LUMA integration phase",
+  appr:[{d:"2022-03-25", a:"Approved with conditions", w:"PPOA, part of the 18-PPOA Tranche 1 batch (initially 25 MW)"}], src:["bond","prebApr","prebList"]},
+ {id:"yep", name:"Yabucoa Energy Park solar", dev:"Go Green USA America", muni:"Yabucoa", program:"Tranche 1",
+  comps:[{f:"solar",mw:38.7}], status:"approved", statusText:"COD listed as December 2026; standalone battery still in regulatory review",
+  appr:[{d:"2022-03-25", a:"Approved with conditions", w:"PPOA, part of the 18-PPOA Tranche 1 batch"}], src:["bond","prebList","prebApr"]},
+ {id:"solaner", name:"Solaner San Germán", dev:"Solaner Puerto Rico One", muni:"San Germán", program:"Tranche 1",
+  comps:[{f:"solar",mw:35}], status:"approved", statusText:"COD listed as October 2026",
+  appr:[{d:"2022-03-25", a:"Approved with conditions", w:"PPOA, part of the 18-PPOA Tranche 1 batch"}], src:["bond","prebList"]},
+ {id:"yfn", name:"YFN Yabucoa Solar", dev:"Infinigen", muni:"Yabucoa", program:"Tranche 1",
+  comps:[{f:"solar",mw:32.1},{f:"bess",mw:14.45, n:"integrated"}], status:"approved", statusText:"DOE conditional commitment January 2025; COD listed as April 2026",
+  appr:[{d:"2022-03-25", a:"Approved with conditions", w:"PPOA 2022-P00119"},{d:"2023-09-14", a:"Approved with conditions", w:"3rd amendment: repricing after Tranche 1 renegotiation"},{d:"2025-06-17", a:"Approved with observations", w:"4th amendment"},{d:"2025-12-17", a:"Approved with observations", w:"5th amendment"}],
+  terms:"Max payable $226.4M; 25 years", src:["fombYFN","lpo"]},
+ {id:"tetris", name:"Tetris Power", dev:"Tetris Power", muni:"Arecibo", program:"Tranche 1",
+  comps:[{f:"solar",mw:20}], status:"approved", statusText:"COD listed as March 2027",
+  appr:[{d:"2022-03-25", a:"Approved with conditions", w:"PPOA, part of the 18-PPOA Tranche 1 batch"}], src:["bond","prebList"]},
+ {id:"energiza", name:"Energiza combined cycle", dev:"Energiza (with Mitsubishi and NAES)", muni:"San Juan", program:"P3 Authority RFP 2023-01",
+  comps:[{f:"gas",mw:528, n:"≈450 MW on diesel backup"}], status:"approved", statusText:"Pre-construction as of September 2026 amid a $168M grid-upgrade dispute; COD moved to October 26, 2029",
+  appr:[{d:"2024-12-19", a:"Approved with observations", w:"30-year PPOA 2025-P00065, ≈478 MW on gas, est. max payable $16.68B"},{d:"2026-01-16", a:"Approved with observations", w:"1st amendment: ≈528 MW on gas, new turbine supplier, est. max payable ≈$18.92B"}],
+  terms:"Capacity payment $/kW-month plus pass-through fuel and O&M; gas supply from NFE under a 20-year GSA; hydrogen-capable design", src:["fombEnergiza","ruta","cbEnergiza"]},
+ {id:"t2-sj", name:"Solar Project San Juan", dev:"Solar Project San Juan, LLC", muni:"San Lorenzo", program:"Tranche 2",
+  comps:[{f:"solar",mw:20, n:"PREB lists 26.07 MW"}], status:"approved", statusText:"Conditioned on applying for DOE LPO financing",
+  appr:[{d:"2025-05-07", a:"Approved with conditions", w:"PPOA"}], terms:"Max payable $110.4M; 20 years", src:["fombT2","prebList"]},
+ {id:"t2-marisol", name:"Marisol Power", dev:"Marisol Power, LLC", muni:"Ponce", program:"Tranche 2",
+  comps:[{f:"solar",mw:40}], status:"approved", statusText:"Conditioned on applying for DOE LPO financing",
+  appr:[{d:"2025-05-07", a:"Approved with conditions", w:"PPOA"}], terms:"Max payable $257.0M; 25 years", src:["fombT2","prebList"]},
+ {id:"t2-vb", name:"CS-UR Vega Baja storage", dev:"CS-UR Vega Baja ST, LLC", muni:"Vega Baja", program:"Tranche 2",
+  comps:[{f:"bess",mw:60,mwh:240}], status:"approved", statusText:"Conditioned on applying for DOE LPO financing",
+  appr:[{d:"2025-05-07", a:"Approved with conditions", w:"ESSA"}], terms:"Max payable $387.4M; 20 years", src:["fombT2","prebList"]},
+ {id:"asap-solaner", name:"Solaner PR One battery (ASAP)", dev:"Solaner Puerto Rico One", muni:"San Germán", program:"LUMA ASAP standard offer",
+  comps:[{f:"bess",mw:40}], status:"approved", statusText:"Approved; ITC eligibility reporting required",
+  appr:[{d:"2026-05-08", a:"Approved with conditions", w:"Standard-offer amendment"}], terms:"$16,000/MW-month, no escalator ($20,600 if tax credits are lost); 20 years", src:["metroMay"]},
+ {id:"asap-xzerta", name:"Xzerta-Tec Solar I battery (ASAP)", dev:"Xzerta-Tec Solar I", muni:"Hatillo", program:"LUMA ASAP standard offer",
+  comps:[{f:"bess",mw:120}], status:"approved", statusText:"Approved; ITC eligibility reporting required",
+  appr:[{d:"2026-05-08", a:"Approved with conditions", w:"Standard-offer amendment"}], terms:"$16,000/MW-month; 20 years", src:["metroMay"]},
+ {id:"asap-polaris", name:"Polaris Power battery (ASAP)", dev:"Polaris Power US", muni:"Naguabo", program:"LUMA ASAP standard offer",
+  comps:[{f:"bess",mw:71.4}], status:"approved", statusText:"Approved; ITC eligibility reporting required",
+  appr:[{d:"2026-05-08", a:"Approved with conditions", w:"Standard-offer amendment"}], terms:"$16,000/MW-month; 20 years", src:["metroMay"]},
+ {id:"asap-lajas", name:"Lajas Solar battery (ASAP)", dev:"Lajas Solar Project", muni:"Lajas", program:"LUMA ASAP standard offer",
+  comps:[{f:"bess",mw:80}], status:"approved", statusText:"Approved; ITC eligibility reporting required",
+  appr:[{d:"2026-05-08", a:"Approved with conditions", w:"Standard-offer amendment"}], terms:"$16,000/MW-month; 20 years", src:["metroMay"]},
+ {id:"asap-juncos", name:"CS-UR Juncos battery (ASAP)", dev:"CS-UR Juncos PV", muni:"Juncos", program:"LUMA ASAP standard offer",
+  comps:[{f:"bess",mw:125}], status:"approved", statusText:"Approved; ITC eligibility reporting required",
+  appr:[{d:"2026-05-08", a:"Approved with conditions", w:"Standard-offer amendment"}], terms:"$16,000/MW-month; 20 years", src:["metroMay"]},
+ {id:"asap-yab", name:"Infinigen Yabucoa battery (ASAP)", dev:"Infinigen", muni:"Yabucoa", program:"LUMA ASAP standard offer",
+  comps:[{f:"bess",mw:50,mwh:200}], status:"approved", statusText:"Approved; DOE conditional commitment covers the 50 MW expansion",
+  appr:[{d:"2026-05-08", a:"Approved with conditions", w:"Standard-offer amendment"}], terms:"$16,000/MW-month; 20 years", src:["metroMay","lpo"]},
+ {id:"gothams", name:"Gothams floating generation", dev:"Gothams Energy with Americas Power Solutions", muni:"San Juan", program:"3PPO emergency RFP TPG2",
+  comps:[{f:"gas",mw:200, n:"LNG-fired powership"}], status:"conditional", statusText:"Execution barred until the Board confirms its conditions are met; Board asked PREPA to reassess the site, naming Costa Sur as a likely better fit",
+  appr:[{d:"2026-05-08", a:"Approved with conditions", w:"10-year temporary generation contract, ≈$2.4B"}], terms:"Board flagged a European gas-price index, no interconnection studies, and no binding gas supply", src:["metroMay","fombGoth"]},
+ {id:"powerexp", name:"Aguirre temporary generation", dev:"Power Expectations, Enchanted Rock, Reyes Contractor", muni:"Salinas", program:"3PPO emergency RFP TPG2",
+  comps:[{f:"gas",mw:400, n:"LNG primary, diesel only in defined contingencies"}], status:"revoked", statusText:"Approval revoked August 14, 2026 after Enchanted Rock's parent said it was not part of the project; litigation under way",
+  appr:[{d:"2026-05-08", a:"Approved with conditions", w:"10-year contract, ≈$5.8B"},{d:"2026-06-02", a:"Final approval", w:"Conditions deemed met; $0.160/kWh operating rate excluding fuel; signed June 10"},{d:"2026-08-14", a:"Revoked", w:"Board found the contract no longer conforms to its review policy"}],
+  terms:"COD had been projected for November 7, 2026", src:["fombPE","metroJul","noticelRev","senado"]},
+ {id:"ck1", name:"CK1 Juana Díaz Solar", dev:"CK1, LLC", muni:"Juana Díaz", program:"Accelerated procurement (EO 2025-047)",
+  comps:[{f:"solar",mw:25}], status:"conditional", statusText:"Interconnection studies pending; must start construction by July 4, 2026 and be in service by Dec 31, 2027 to keep tax credits",
+  appr:[{d:"2026-06-30", a:"Approved with conditions", w:"25-year PPOA"}], terms:"$121/MWh flat; est. value $85.4M; excess interconnection costs above $20M fall to developer or allow termination", src:["ck1"]},
+ {id:"asap-ecoe", name:"EcoEléctrica battery (ASAP)", dev:"EcoEléctrica", muni:"Peñuelas", program:"LUMA ASAP standard offer", own:true,
+  comps:[{f:"bess",mw:20}], status:"approved", statusText:"Board-approved SO1 agreement under LUMA's Accelerated Storage Addition Program",
+  appr:[{d:"2026-01-28", a:"Approved with conditions", w:"SO1 agreement"}], note:"Matched to LUMA's 20 MW SO1 column executed April 7, 2026 (participant names are redacted); site placed in Peñuelas, where the EcoEléctrica plant is located.", src:["asapQ1","trk"],
+  cs:"LUMA ASAP Q1 FY2027 report (Oct 30, 2026): SO executed April 7, 2026; closing date October 2, 2026. EPC not started. Phase 1 facility and system impact studies completed. July tracker: EPC contract and interconnection agreement under negotiation.", cod:"Dec 31, 2027 (LUMA estimate)", codD:"2027-12-31", codN:"Initial synchronization estimated Dec 1, 2027; SO long-stop date Jan 1, 2028. LUMA notes estimates are preliminary", con:"No (EPC not started)", ix:"Yes (Phase 1)", fpOwn:[{v:20600,u:"MWmo",esc:"No escalator",n:"Tracker lists the non-ITC standard-offer rate"}]},
+ {id:"asap-horizon", name:"Infinigen Horizon battery (ASAP)", dev:"Infinigen", muni:"Salinas", program:"LUMA ASAP standard offer", own:true,
+  comps:[{f:"bess",mw:18}], status:"approved", statusText:"Board-approved SO1 agreement under LUMA's Accelerated Storage Addition Program",
+  appr:[{d:"2025-03-24", a:"Approved", w:"SO1 agreement"}], note:"LUMA reports 18 MW on a 4-hour equivalent basis; PREPA's tracker lists 20 MW. Matched to LUMA's 18 MW column, which shares submission and execution dates with Infinigen Oriana.", src:["asapQ1","trk"],
+  cs:"LUMA ASAP Q1 FY2027 report (Oct 30, 2026): SO executed July 31, 2026; conditions precedent and closing due January 27, 2027. EPC not started. Phase 1 facility and system impact studies completed.", cod:"Dec 31, 2027 (LUMA estimate)", codD:"2027-12-31", codN:"Initial synchronization estimated Dec 1, 2027; SO long-stop date Jan 1, 2028. LUMA notes estimates are preliminary", con:"No (EPC not started)", ix:"Yes (Phase 1)"},
+ {id:"asap-oriana", name:"Infinigen Oriana battery (ASAP)", dev:"Infinigen", muni:"Isabela", program:"LUMA ASAP standard offer", own:true,
+  comps:[{f:"bess",mw:50}], status:"approved", statusText:"Board-approved SO1 agreement under LUMA's Accelerated Storage Addition Program",
+  appr:[{d:"2025-03-24", a:"Approved", w:"SO1 agreement"}], note:"Matched to LUMA's 50 MW Phase 1 column (participant names are redacted).", src:["asapQ1","trk"],
+  cs:"LUMA ASAP Q1 FY2027 report (Oct 30, 2026): SO executed July 31, 2026; conditions precedent and closing due January 27, 2027. EPC not started. Phase 1 facility and system impact studies completed.", cod:"Dec 31, 2027 (LUMA estimate)", codD:"2027-12-31", codN:"Initial synchronization estimated Dec 1, 2027; SO long-stop date Jan 1, 2028. LUMA notes estimates are preliminary", con:"No (EPC not started)", ix:"Yes (Phase 1)"},
+ {id:"asap-sanfermin", name:"San Fermín battery (ASAP)", dev:"San Fermín Battery Project", muni:null, program:"LUMA ASAP standard offer", own:true,
+  comps:[{f:"bess",mw:20}], status:"approved", statusText:"Board-approved SO1 agreement under LUMA's Accelerated Storage Addition Program",
+  appr:[{d:"2025-03-24", a:"Approved", w:"SO1 agreement"}], note:"Matched by elimination to LUMA's remaining 20 MW Phase 1 column; site not disclosed.", src:["asapQ1","trk"],
+  cs:"LUMA ASAP Q1 FY2027 report (Oct 30, 2026): Signing conditions still in progress, so the SO has not been executed. EPC not started. Phase 1 facility and system impact studies completed. July tracker: construction expected to begin Q3 2026.", cod:"Dec 31, 2027 (LUMA estimate)", codD:"2027-12-31", codN:"Initial synchronization estimated Dec 1, 2027; SO long-stop date Jan 1, 2028. LUMA notes estimates are preliminary", con:"No (EPC not started)", ix:"Yes (Phase 1)"},
+ {id:"gen-cambalache", name:"Cambalache BESS", dev:"Genera PR (operator for PREPA)", muni:"Arecibo", program:"Genera BESS initiative (not a PPA)", genera:true,
+  comps:[{f:"bess",mw:80}], status:"approved", statusText:"Genera-led PREPA asset funded through FEMA and COR3; no PPA or fixed payment",
+  appr:[{d:"2025-01-01", mo:true, a:"Approved", w:"Board approval listed in PREPA's July 2026 tracker as January 2025 (Board letter not located)"}],
+  terms:"Genera PR initiative, not a power purchase agreement: PREPA-owned batteries at existing PREPA plants, developed by Genera PR under its operation and maintenance agreement for PREPA's legacy generation and presented to FEMA and COR3 for federal funding. Part of the 430 MW program approved by the Energy Bureau on February 1, 2024.", src:["generaBess","trk"],
+  cs:"Update of Oct 28, 2026: structural steel platform supporting the BESS equipment is being installed; 20 of 68 Megapack units are in place. Electrical work is being prepared to begin conduit and cabling installation. Earlier (Genera Sept 2026 report): contractor submitted 90% design to LUMA; permit issued Oct 27, 2025; all Megapacks delivered.", cod:"Not stated by Genera", codD:null, codN:"Megapack installation under way (20 of 68 as of Oct 28, 2026); conduit and cabling to follow", con:"Yes", ix:"In progress (LUMA)"},
+ {id:"gen-costasur", name:"Costa Sur BESS", dev:"Genera PR (operator for PREPA)", muni:"Guayanilla", program:"Genera BESS initiative (not a PPA)", genera:true,
+  comps:[{f:"bess",mw:40}], status:"approved", statusText:"Genera-led PREPA asset funded through FEMA and COR3; no PPA or fixed payment",
+  appr:[{d:"2025-01-01", mo:true, a:"Approved", w:"Board approval listed in PREPA's July 2026 tracker as January 2025 (Board letter not located)"}],
+  terms:"Genera PR initiative, not a power purchase agreement: PREPA-owned batteries at existing PREPA plants, developed by Genera PR under its operation and maintenance agreement for PREPA's legacy generation and presented to FEMA and COR3 for federal funding. Part of the 430 MW program approved by the Energy Bureau on February 1, 2024.", src:["generaBess","trk"],
+  cs:"Genera Sept 2026 report: GSU transformer installed Sept 19; two of five south equipment slabs poured; retaining walls, drainage and duct banks under way. Civil work must finish by end of 2026. Interconnection contractor RFP to be issued Q4 2026; permit issued Apr 20, 2026; Megapacks 100% delivered.", cod:"Not stated by Genera", codD:null, codN:"Civil work to be completed by end of 2026", con:"Yes", ix:"In progress (LUMA)"},
+ {id:"gen-paloseco", name:"Palo Seco BESS", dev:"Genera PR (operator for PREPA)", muni:"Toa Baja", program:"Genera BESS initiative (not a PPA)", genera:true,
+  comps:[{f:"bess",mw:76}], status:"approved", statusText:"Genera-led PREPA asset funded through FEMA and COR3; no PPA or fixed payment",
+  appr:[{d:"2025-01-01", mo:true, a:"Approved", w:"Board approval listed in PREPA's July 2026 tracker as January 2025 (Board letter not located)"}],
+  terms:"Genera PR initiative, not a power purchase agreement: PREPA-owned batteries at existing PREPA plants, developed by Genera PR under its operation and maintenance agreement for PREPA's legacy generation and presented to FEMA and COR3 for federal funding. Part of the 430 MW program approved by the Energy Bureau on February 1, 2024.", src:["generaBess","trk"],
+  cs:"Genera Sept 2026 report: still in design. Demolition RFP expected Q4 2026; preliminary layout received for 30% design; warehouse relocation by end of October. Interconnection scope finalized with RFP in Q4 2026. Batteries not yet delivered (due Q4 2026).", cod:"Not stated by Genera", codD:null, codN:"Batteries due Q4 2026; demolition and interconnection RFPs in Q4 2026", con:"No", ix:"In progress (LUMA)"},
+ {id:"gen-vegabaja", name:"Vega Baja BESS", dev:"Genera PR (operator for PREPA)", muni:"Vega Baja", program:"Genera BESS initiative (not a PPA)", genera:true,
+  comps:[{f:"bess",mw:52}], status:"approved", statusText:"Genera-led PREPA asset funded through FEMA and COR3; no PPA or fixed payment",
+  appr:[{d:"2025-01-01", mo:true, a:"Approved", w:"Board approval listed in PREPA's July 2026 tracker as January 2025 (Board letter not located)"}],
+  terms:"Genera PR initiative, not a power purchase agreement: PREPA-owned batteries at existing PREPA plants, developed by Genera PR under its operation and maintenance agreement for PREPA's legacy generation and presented to FEMA and COR3 for federal funding. Part of the 430 MW program approved by the Energy Bureau on February 1, 2024.", src:["generaBess","trk"],
+  cs:"Genera Sept 2026 report: 1,172.5 cubic yards of concrete poured in September across module foundations, slabs and walls. Battery pack installation to finish by end of Q4 2026. Contractor working on 60% interconnection design; permit issued Mar 4, 2026; Megapacks 100% delivered.", cod:"Q1 2027 (electrical completion)", codD:null, codN:"Electrical installation scheduled for completion in Q1 2027; no COD stated", con:"Yes", ix:"In progress (LUMA)"},
+ {id:"gen-aguirre", name:"Aguirre BESS", dev:"Genera PR (operator for PREPA)", muni:"Salinas", program:"Genera BESS initiative (not a PPA)", genera:true,
+  comps:[{f:"bess",mw:142}], status:"approved", statusText:"Genera-led PREPA asset funded through FEMA and COR3; no PPA or fixed payment",
+  appr:[{d:"2025-01-01", mo:true, a:"Approved", w:"Board approval listed in PREPA's July 2026 tracker as January 2025 (Board letter not located)"}],
+  terms:"Genera PR initiative, not a power purchase agreement: PREPA-owned batteries at existing PREPA plants, developed by Genera PR under its operation and maintenance agreement for PREPA's legacy generation and presented to FEMA and COR3 for federal funding. Part of the 430 MW program approved by the Energy Bureau on February 1, 2024.", src:["generaBess","trk"],
+  cs:"Genera Sept 2026 report: excavation for slab foundations started; drainage, grounding, duct bank and fire-protection work ongoing. Tesla GSU assembly and testing rescheduled to October 2026 over oil availability. Interconnection contractor RFP Q4 2026; permit issued Feb 26, 2026; Megapacks 100% delivered.", cod:"Not stated by Genera", codD:null, con:"Yes", ix:"In progress (LUMA)"},
+ {id:"gen-yabucoa", name:"Yabucoa BESS", dev:"Genera PR (operator for PREPA)", muni:"Yabucoa", program:"Genera BESS initiative (not a PPA)", genera:true,
+  comps:[{f:"bess",mw:40}], status:"approved", statusText:"Genera-led PREPA asset funded through FEMA and COR3; no PPA or fixed payment",
+  appr:[{d:"2025-01-01", mo:true, a:"Approved", w:"Board approval listed in PREPA's July 2026 tracker as January 2025 (Board letter not located)"}],
+  terms:"Genera PR initiative, not a power purchase agreement: PREPA-owned batteries at existing PREPA plants, developed by Genera PR under its operation and maintenance agreement for PREPA's legacy generation and presented to FEMA and COR3 for federal funding. Part of the 430 MW program approved by the Energy Bureau on February 1, 2024.", src:["generaBess","trk"],
+  cs:"Genera Sept 2026 report: about 26,500 cubic yards excavated and 1,100 cubic yards of fill placed; stormwater swale pours ongoing; communications room relocation under approval. Interconnection contractor RFP Q4 2026; permit issued Apr 21, 2026; Megapacks 100% delivered.", cod:"Not stated by Genera", codD:null, con:"Yes", ix:"In progress (LUMA)"}
+];
+
+// ---- Current status and expected COD: PREPA Appendix A, Renewable Generation Projects Tracker (July 2026) ----
+// cs: current status; cod: expected COD as displayed; codD: ISO date used for sorting (latest component); codN: amendment note; con: in construction; ix: interconnection study completed
+const TRACKER = {
+ "ciro1p":{cs:"Phase 1 achieved Initial Synchronization on November 26, 2025 and is undergoing testing to reach commercial operation. Companion 90 MW and 25 MW battery contracts remain under Board review.", cod:"24 months after FNTP", codD:null, codN:"No fixed date stated in the tracker", con:"Yes", ix:"Yes"},
+ "xzerta":{cs:"Design is being finalized and construction has started to preserve ITC eligibility. Notice to proceed for CDBG construction disbursement received April 2026.", cod:"Nov 30, 2027", codD:"2027-11-30", codN:"Amended from Mar 30, 2024 owing to third-party delays and disputes", con:"Yes", ix:"Yes"},
+ "cfe-salinas":{cs:"Under construction; back-feed power expected by the end of July 2026.", cod:"PV May 29, 2026; storage phase 1 May 29, 2026; phase 2 Feb 26, 2027", codD:"2027-02-26", codN:"Amended from Nov 30, 2025 (phase 2: Aug 30, 2026) owing to permitting delays", con:"Yes", ix:"Yes"},
+ "cfe-jobos":{cs:"Under construction; back-feed power expected by the end of July 2026.", cod:"May 29, 2026 (PV and storage)", codD:"2026-05-29", codN:"Amended from Nov 30, 2025 owing to permitting delays", con:"Yes", ix:"Yes"},
+ "coamo":{cs:"Development of the PV and storage project is paused at DOE's request, as a condition to advancing financing of the Convergent storage projects. Not in construction.", cod:"Apr 30, 2028", codD:"2028-04-30", codN:"Amended from Dec 31, 2026", con:"No", ix:"Yes"},
+ "penuelas-bess":{cs:"Resource provider is working to satisfy DOE funding conditions precedent before construction can start.", cod:"Apr 30, 2028", codD:"2028-04-30", codN:"Amended from Dec 31, 2026 to accommodate DOE financing requirements", con:"No", ix:"Yes"},
+ "ponce-bess":{cs:"Resource provider is working to satisfy DOE funding conditions precedent before construction can start.", cod:"Apr 30, 2028", codD:"2028-04-30", codN:"Amended from Dec 31, 2026 to accommodate DOE financing requirements", con:"No", ix:"Yes"},
+ "caguas-bess":{cs:"Resource provider is working to satisfy DOE funding conditions precedent before construction can start.", cod:"Apr 30, 2028", codD:"2028-04-30", codN:"Amended from Dec 31, 2026 to accommodate DOE financing requirements", con:"No", ix:"Yes"},
+ "juncos":{cs:"Not in construction; interconnection study completed. No status comment provided.", cod:"Sep 30, 2025 (lapsed)", codD:"2025-09-30", codN:"Original COD; no amendment recorded in the tracker", con:"No", ix:"Yes"},
+ "pattern-pv":{cs:"DOE declined in December 2025 to proceed with financing despite its conditional commitment and asked Pattern to redirect the funds to a thermal facility (offer submitted to P3 RFP 001-2026). Pattern is pursuing alternate financing.", cod:"Mar 31, 2028", codD:"2028-03-31", codN:"Amended from Nov 30, 2025 (DOE domestic-content conditions, capacity increase, lower price)", con:"No", ix:"Yes"},
+ "pattern-bar-bess":{cs:"Financial close and construction notice to proceed scheduled for July 2026. The tracker lists this contract at 120 MW.", cod:"May 22, 2028", codD:"2028-05-22", codN:"Amended from Mar 31, 2028 (force majeure: equipment supply delay)", con:"No", ix:"Yes"},
+ "pattern-si-bess":{cs:"Financial close and construction notice to proceed scheduled for July 2026. The tracker lists this contract at 100 MW.", cod:"May 22, 2028", codD:"2028-05-22", codN:"Amended from Mar 31, 2028 (force majeure: equipment supply delay)", con:"No", ix:"Yes"},
+ "ciro2":{cs:"Construction commenced ahead of July 4, 2026 to secure the ITC safe harbor. A companion 35 MW battery remains under Board review.", cod:"Second anniversary of satisfaction of conditions subsequent", codD:null, codN:"No fixed date stated in the tracker", con:"Yes", ix:"Yes"},
+ "guayama-solar":{cs:"Construction commenced ahead of July 4, 2026 to secure the ITC safe harbor. A companion 25 MW battery remains under Board review.", cod:"Second anniversary of satisfaction of conditions subsequent", codD:null, codN:"No fixed date stated in the tracker", con:"Yes", ix:"Yes"},
+ "yep":{cs:"Interconnection agreement signed; site work (land movement) under way. The tracker lists the project at 100 MW following a capacity increase approved June 2026.", cod:"Dec 31, 2027", codD:"2027-12-31", codN:"Reset with the capacity increase", con:"Yes", ix:"Yes"},
+ "solaner":{cs:"In construction. Approved and designed capacity is 40 MW. PREPA recommends granting the developer's January 20, 2026 request to extend the guaranteed COD.", cod:"Dec 20, 2027 (extension recommended)", codD:"2027-12-20", codN:"Original Oct 1, 2026", con:"Yes", ix:"Yes"},
+ "yfn":{cs:"In construction; interconnection study completed. No status comment provided.", cod:"Aug 1, 2026", codD:"2026-08-01", codN:"Amended from two years after closing owing to delays in seeking DOE and other funding", con:"Yes", ix:"Yes"},
+ "tetris":{cs:"No on-site construction yet; the project reached Work of Significant Nature off-site before July 4, 2026 through manufacturing of long-lead equipment.", cod:"Dec 31, 2027", codD:"2027-12-31", codN:"Amended following force majeure notices tied to pending permits", con:"No", ix:"Yes"},
+ "energiza":{cs:"Not in construction. GE Vernova critical-path turbine secured with $48M paid (30% of contract); interconnection study must be re-performed for the larger turbine output (new study submitted July 2026). About $63M spent to date, with about $117M more expected by year end.", cod:"Oct 26, 2029 (approved); at risk of Oct 30, 2030", codD:"2029-10-26", codN:"Original Jun 30, 2028. Delay in executing the amendment (Oct 2025 to Jan 2026) lost the March 2028 turbine slot; GE Vernova's Feb 2029 slot shifts COD to Oct 30, 2030", con:"No", ix:"Re-study required"},
+ "t2-sj":{cs:"No status reported in the tracker.", cod:"Not reported", codD:null},
+ "t2-marisol":{cs:"Closing has not occurred. No on-site construction; the project reached Work of Significant Nature off-site before July 4, 2026 through manufacturing of long-lead equipment.", cod:"2 years after closing (closing pending)", codD:null, con:"No", ix:"Yes"},
+ "t2-vb":{cs:"Not in construction; interconnection study completed. No status comment provided.", cod:"Sep 30, 2027", codD:"2027-09-30", codN:"Original COD; no amendment recorded", con:"No", ix:"Yes"},
+ "asap-solaner":{cs:"LUMA ASAP Q1 FY2027 report (Oct 30, 2026): SO approved by the Energy Bureau, PREPA and the Board; resource provider signing conditions still in progress, so the SO has not been executed. EPC not started. Phase 2 system impact study awaits updated models from participants.", cod:"Dec 31, 2027 (LUMA estimate)", codD:"2027-12-31", codN:"Initial synchronization estimated Dec 1, 2027; SO long-stop date Jan 1, 2028. LUMA notes estimates are preliminary", con:"No (EPC not started)", ix:"Phase 2 study pending"},
+ "asap-xzerta":{cs:"LUMA ASAP Q1 FY2027 report (Oct 30, 2026): SO executed June 8, 2026; conditions precedent and closing due December 8, 2026. EPC not started. Phase 2 system impact study awaits updated models from participants.", cod:"Dec 31, 2027 (LUMA estimate)", codD:"2027-12-31", codN:"Initial synchronization estimated Dec 1, 2027; SO long-stop date Jan 1, 2028. LUMA notes estimates are preliminary", con:"No (EPC not started)", ix:"Phase 2 study pending"},
+ "asap-polaris":{cs:"LUMA ASAP Q1 FY2027 report (Oct 30, 2026): SO executed June 5, 2026; conditions precedent and closing due December 2, 2026. EPC not started. Phase 1 facility and system impact studies completed.", cod:"Dec 31, 2027 (LUMA estimate)", codD:"2027-12-31", codN:"Initial synchronization estimated Dec 1, 2027; SO long-stop date Jan 1, 2028. LUMA notes estimates are preliminary. In July 2026 the developer requested extending the long-stop date to Jan 1, 2029", con:"No (EPC not started)", ix:"Yes (Phase 1)"},
+ "asap-lajas":{cs:"LUMA ASAP Q1 FY2027 report (Oct 30, 2026): Board conditional approval May 8, 2026; resource provider signing conditions still in progress, so the SO has not been executed. EPC not started. Phase 1 facility and system impact studies completed. Matched to the report's only 80 MW SO1 project; participant names are redacted.", cod:"Dec 31, 2027 (LUMA estimate)", codD:"2027-12-31", codN:"Initial synchronization estimated Dec 1, 2027; SO long-stop date Jan 1, 2028. LUMA notes estimates are preliminary", con:"No (EPC not started)", ix:"Yes (Phase 1)"},
+ "asap-juncos":{cs:"LUMA ASAP Q1 FY2027 report (Oct 30, 2026): SO approved by the Energy Bureau, PREPA and the Board; resource provider signing conditions still in progress, so the SO has not been executed. EPC not started. Phase 2 system impact study awaits updated models from participants.", cod:"Dec 31, 2027 (LUMA estimate)", codD:"2027-12-31", codN:"Initial synchronization estimated Dec 1, 2027; SO long-stop date Jan 1, 2028. LUMA notes estimates are preliminary", con:"No (EPC not started)", ix:"Phase 2 study pending"},
+ "asap-yab":{cs:"LUMA ASAP Q1 FY2027 report (Oct 30, 2026): SO executed July 2, 2026; conditions precedent and closing due December 29, 2026. EPC not started. Phase 2 system impact study awaits updated models from participants.", cod:"Dec 31, 2027 (LUMA estimate)", codD:"2027-12-31", codN:"Initial synchronization estimated Dec 1, 2027; SO long-stop date Jan 1, 2028. LUMA notes estimates are preliminary", con:"No (EPC not started)", ix:"Phase 2 study pending"},
+ "gothams":{cs:"Not listed in the tracker.", cod:"Not reported", codD:null},
+ "powerexp":{cs:"As of the tracker (before the August 14 revocation), mobilization had not commenced pending required studies, approval of the site demarcation, and designation of LUMA, Genera PR and PREPA points of contact.", cod:"TBD (150 days under contract); approval revoked", codD:null, con:"No", ix:"No"},
+ "ck1":{cs:"LUMA interconnection study and permitting will occur during the 210-day conditions-precedent period before the PPOA becomes effective; execution targeted July 8, 2026.", cod:"Dec 31, 2027", codD:"2027-12-31", con:"No", ix:"No"}
+};
+PROJECTS.forEach(p=>{ if(!p.genera && !p.own) Object.assign(p, TRACKER[p.id]||{cs:"Not listed in the tracker.", cod:"Not reported", codD:null}); });
+
+// ---- Fixed payment: PREPA Appendix A tracker (July 2026); ASAP standard offer terms for ASAP batteries ----
+// u: "kWh" energy price in $/kWh, "MWmo" storage capacity price in $/MW-month. esc: escalator; cap: price cap; n: note
+const ASAP_FP = [{v:16000,u:"MWmo",esc:"No escalator",n:"$20,600 if tax credits are not available"}];
+const FP = {
+ "ciro1p":[{v:0.0989,u:"kWh",esc:"+2%/yr",cap:"0.141"}],
+ "xzerta":[{v:0.099,u:"kWh",esc:"+1%/yr"}],
+ "cfe-salinas":[{v:0.1042,u:"kWh",l:"PV",esc:"+2%/yr"},{v:0.2418,u:"kWh",l:"Storage",esc:"+2%/yr"}],
+ "cfe-jobos":[{v:0.1038,u:"kWh",l:"PV",esc:"+2%/yr"},{v:0.242,u:"kWh",l:"Storage",esc:"+2%/yr"}],
+ "coamo":[{v:0.10003,u:"kWh",esc:"+2%/yr",cap:"0.15",n:"Covers PV and storage"}],
+ "penuelas-bess":[{v:28669.75,u:"MWmo",esc:"+2%/yr"}],
+ "ponce-bess":[{v:27236.95,u:"MWmo",esc:"+2%/yr"}],
+ "caguas-bess":[{v:28524.36,u:"MWmo",esc:"+2%/yr"}],
+ "juncos":[{v:0.136,u:"kWh"}],
+ "pattern-pv":[{v:0.14611,u:"kWh"}],
+ "pattern-bar-bess":[{v:23546,u:"MWmo",esc:"+2%/yr"}],
+ "pattern-si-bess":[{v:24646,u:"MWmo",esc:"+2%/yr"}],
+ "ciro2":[{v:0.0955,u:"kWh",esc:"+2%/yr",cap:"0.128",n:"$0.0848 base plus $0.0107 interconnection cost recovery"}],
+ "guayama-solar":[{v:0.1005,u:"kWh",esc:"+2%/yr",cap:"0.1338",n:"$0.0869 base plus $0.0136 interconnection cost recovery"}],
+ "yep":[{v:0.1397,u:"kWh",n:"Tracker prints $13.97/kWh; read as 13.97¢",flag:true}],
+ "solaner":[{v:0.12,u:"kWh",esc:"+2%/yr"}],
+ "yfn":[{v:0.1469,u:"kWh",esc:"+2%/yr",cap:"0.157"}],
+ "tetris":[{v:0.1385,u:"kWh",esc:"+1%/yr"}],
+ "energiza":[{v:0.12,u:"kWh",approx:true,n:"Approximate all-in; capacity payment plus pass-through fuel and O&M"}],
+ "t2-marisol":[{v:0.153,u:"kWh"}],
+ "t2-vb":[{v:26900,u:"MWmo"}],
+ "asap-solaner":ASAP_FP, "asap-xzerta":ASAP_FP, "asap-polaris":ASAP_FP, "asap-lajas":ASAP_FP, "asap-juncos":ASAP_FP, "asap-yab":ASAP_FP, "asap-horizon":ASAP_FP, "asap-oriana":ASAP_FP, "asap-sanfermin":ASAP_FP,
+ "powerexp":[{v:0.224,u:"kWh",n:"Entire 10-year term; Board letter cites $0.160/kWh excluding fuel"}],
+ "ck1":[{v:0.121,u:"kWh",esc:"Flat",n:"$121/MWh"}]
+};
+PROJECTS.forEach(p=>{ p.fp = p.fpOwn || FP[p.id] || null; });
+const PROC = {
+  "Legacy PPOA (renegotiated)":{l:"Legacy PPOA", o:1},
+  "Tranche 1":{l:"Tranche 1", o:2}, "Tranche 2":{l:"Tranche 2", o:3},
+  "LUMA ASAP standard offer":{l:"ASAP", o:4, x:"LUMA standard offer"},
+  "Accelerated procurement (EO 2025-047)":{l:"Accelerated", o:5, x:"EO 2025-047"},
+  "Genera BESS initiative (not a PPA)":{l:"Genera BESS", o:6, x:"Not a PPA"},
+  "P3 Authority RFP 2023-01":{l:"P3 RFP 2023-01", o:7, x:"New generation"},
+  "3PPO emergency RFP TPG2":{l:"Temporary generation", o:8, x:"3PPO emergency RFP"}
+};
+PROJECTS.forEach(p=>{ const q=PROC[p.program]||{l:p.program,o:9}; p.proc=q.l; p.procO=q.o; p.procX=q.x||""; });
+
+
+// ---- Additional Board actions listed in PREPA's July 2026 tracker (month precision; letters not reviewed) ----
+const TW = "Listed in PREPA's July 2026 tracker";
+const EXTRA_APPR = {
+ "coamo":[["2023-09","Renegotiated PPOA (Tranche 1 repricing)"],["2025-01","Amendment"]],
+ "juncos":[["2023-09","Renegotiated PPOA (Tranche 1 repricing)"],["2026-05","Amendment"]],
+ "ciro2":[["2023-09","Renegotiated PPOA (Tranche 1 repricing)"]],
+ "guayama-solar":[["2023-09","Renegotiated PPOA (Tranche 1 repricing)"]],
+ "yep":[["2023-09","Renegotiated PPOA (Tranche 1 repricing)"],["2026-06","Capacity increase to 100 MW"]],
+ "solaner":[["2023-09","Renegotiated PPOA (Tranche 1 repricing)"]],
+ "tetris":[["2023-09","Renegotiated PPOA (Tranche 1 repricing)"]],
+ "pattern-pv":[["2026-03","Amendment (COD to Mar 31, 2028)"]],
+ "pattern-bar-bess":[["2026-03","Amendment (tracker lists 120 MW)"]],
+ "pattern-si-bess":[["2026-03","Amendment (tracker lists 100 MW)"]]
+};
+Object.entries(EXTRA_APPR).forEach(([id,list])=>{ const p=PROJECTS.find(q=>q.id===id); list.forEach(([m,w])=>p.appr.push({d:m+"-01", mo:true, a:"Approved", w:w+" ("+TW+")"})); p.appr.sort((a,b)=>a.d.localeCompare(b.d)); });
+// Convergent storage: tracker supplies the Board approval months that had not been located
+["penuelas-bess","ponce-bess","caguas-bess"].forEach(id=>{ const p=PROJECTS.find(q=>q.id===id);
+  p.dateUnknown=false; p.conf=null;
+  p.appr=[{d:"2023-10-01", mo:true, a:"Approved", w:"ESSA ("+TW+")"},{d:"2025-01-01", mo:true, a:"Approved", w:"Amendment for DOE financing ("+TW+")"}];
+  p.src=[...new Set([...p.src,"trk"])]; });
+
+// ---------- derived ----------
+PROJECTS.forEach(p=>{
+  p.mw = d3.sum(p.comps,c=>c.mw);
+  p.first = p.appr[0].d;
+  p.year = p.dateUnknown ? null : +p.first.slice(0,4);
+  const fs = new Set(p.comps.map(c=>c.f));
+  p.tech = fs.has("gas") ? "thermal" : (fs.has("solar") ? "solar" : "bess");
+});
+ASSETS.forEach(a=>{
+  a.mw = d3.sum(a.units,u=>u.mw);
+  const byF = d3.rollups(a.units,v=>d3.sum(v,u=>u.mw),u=>u.f).sort((x,y)=>y[1]-x[1]);
+  a.primary = byF[0][0];
+});
+const live = p => p.status!=="revoked";
+const fmt = n => (Math.round(n*10)/10).toLocaleString("en-US");
+const fmtM = s => new Date(s+"T12:00:00").toLocaleDateString("en-US",{year:"numeric",month:"short"});
+const fmtD = s => new Date(s+"T12:00:00").toLocaleDateString("en-US",{year:"numeric",month:"short",day:"numeric"});
+const esc = s => String(s??"").replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+
+const state = {muni:null, shade:"existing", showAssets:true, showProj:true, labels:false, fuels:new Set(Object.keys(FUEL)), year:null, tech:"all", showRevoked:true, sort:{k:"date",dir:1}, openRow:null, openAsset:null};
+
+// ---------- header figures ----------
+function renderFigures(){
+  const ex = d3.sum(ASSETS,a=>a.mw);
+  const priv = d3.sum(ASSETS.filter(a=>a.sector==="private"),a=>a.mw);
+  const ap = PROJECTS.filter(live);
+  const gen = d3.sum(ap.flatMap(p=>p.comps).filter(c=>c.f!=="bess"),c=>c.mw);
+  const sto = d3.sum(ap.flatMap(p=>p.comps).filter(c=>c.f==="bess"),c=>c.mw);
+  document.getElementById("figures").innerHTML = `
+    <li><b>${fmt(ex)} MW</b>nameplate across ${ASSETS.length} mapped assets</li>
+    <li><b>${Math.round(priv/ex*100)}%</b>privately owned</li>
+    <li class="fomb"><b>${fmt(gen)} MW</b>new generation approved by the Board since 2021</li>
+    <li class="fomb"><b>${fmt(sto)} MW</b>new battery storage approved</li>
+    <li><b>${ap.length}</b>active approvals, plus ${PROJECTS.length-ap.length} revoked</li>`;
+}
+
+// ---------- map ----------
+const svg = d3.select("#map");
+const W=960,H=420;
+const projection = d3.geoMercator().fitExtent([[14,18],[W-14,H-18]], GEO);
+const path = d3.geoPath(projection);
+const gZoom = svg.append("g");
+const gMuni = gZoom.append("g");
+const gLabels = gZoom.append("g").attr("aria-hidden","true");
+const gAssets = gZoom.append("g");
+const gProj = gZoom.append("g");
+let K = 1;
+const tip = document.getElementById("tip");
+const centroid = {};
+GEO.features.forEach(f=>{
+  // use centroid of largest polygon
+  const polys = f.geometry.coordinates.map(c=>({type:"Polygon",coordinates:c}));
+  const big = polys.sort((a,b)=>d3.geoArea(b)-d3.geoArea(a))[0];
+  centroid[f.properties.n] = projection(d3.geoCentroid(big));
+});
+const muniNames = GEO.features.map(f=>f.properties.n).sort((a,b)=>a.localeCompare(b,"es"));
+
+function muniStats(){
+  const m = {};
+  muniNames.forEach(n=>m[n]={ex:0,ap:0});
+  ASSETS.forEach(a=>{ if(state.fuels.has(a.primary)||a.units.some(u=>state.fuels.has(u.f))) m[a.muni].ex += d3.sum(a.units.filter(u=>state.fuels.has(u.f)),u=>u.mw); });
+  PROJECTS.filter(live).forEach(p=>{ if(p.muni) m[p.muni].ap += p.mw; });
+  return m;
+}
+function shadeColor(v, max){
+  if(!v) return css("--shade-0");
+  const steps = [css("--shade-1"),css("--shade-2"),css("--shade-3"),css("--shade-4")];
+  const t = Math.log10(v+1)/Math.log10(max+1);
+  return steps[Math.min(3,Math.floor(t*3.999))];
+}
+function breaks(max){ return [0.25,0.5,0.75,1].map(t=>Math.round(Math.pow(10,t*Math.log10(max+1))-1)); }
+
+function showTip(ev, html){ tip.innerHTML=html; tip.style.opacity=1; moveTip(ev); }
+function moveTip(ev){ const x=Math.min(ev.clientX+14, window.innerWidth-270); tip.style.left=x+"px"; tip.style.top=(ev.clientY+14)+"px"; }
+function hideTip(){ tip.style.opacity=0; }
+
+gMuni.selectAll("path").data(GEO.features).join("path")
+  .attr("class","muni-path").attr("d",path)
+  .on("mousemove",(ev,f)=>{ const s=muniStats()[f.properties.n];
+     showTip(ev,`<b>${esc(f.properties.n)}</b><br>Existing: ${fmt(s.ex)} MW<br>Approved new: ${fmt(s.ap)} MW`); })
+  .on("mouseleave",hideTip)
+  .on("click",(ev,f)=>selectMuni(f.properties.n));
+
+gLabels.selectAll("text").data(GEO.features).join("text").attr("class","muni-label")
+  .attr("x",f=>centroid[f.properties.n][0]).attr("y",f=>centroid[f.properties.n][1]+3).text(f=>f.properties.n);
+
+const rA = d3.scaleSqrt().domain([0,1500]).range([2.5,24]);
+// asset positions with small offset for exact overlaps
+ASSETS.forEach(a=>{ const p=projection([a.lon,a.lat]); a.x=p[0]; a.y=p[1]; });
+// project positions: ring around municipal centroid
+d3.groups(PROJECTS.filter(p=>p.muni),p=>p.muni).forEach(([m,list])=>{
+  const c = centroid[m];
+  list.sort((a,b)=>b.mw-a.mw).forEach((p,i)=>{
+    const ang = -Math.PI/2 + i*(2*Math.PI/Math.max(list.length,1)) + 0.4;
+    const rad = list.length===1 ? 0 : 9 + list.length*1.6;
+    p.cx = c[0]; p.cy = c[1]; p.ox = Math.cos(ang)*rad; p.oy = Math.sin(ang)*rad*0.8;
+  });
+});
+const rP = d3.scaleSqrt().domain([0,550]).range([3.2,16]);
+const diamond = s => `M0,${-s}L${s},0L0,${s}L${-s},0Z`;
+
+function drawMarkers(){
+  const assets = state.showAssets ? ASSETS.filter(a=>a.units.some(u=>state.fuels.has(u.f))) : [];
+  gAssets.selectAll("circle").data(assets.sort((a,b)=>b.mw-a.mw), d=>d.id).join("circle")
+    .attr("class",a=>"asset"+(state.openAsset===a.id?" hl":""))
+    .attr("cx",a=>a.x).attr("cy",a=>a.y)
+    .attr("r",a=>rA(d3.sum(a.units.filter(u=>state.fuels.has(u.f)),u=>u.mw))/K)
+    .attr("fill",a=>fc(a.primary))
+    .classed("dim",a=>state.muni && a.muni!==state.muni)
+    .on("mousemove",(ev,a)=>showTip(ev,`<b>${esc(a.name)}</b><br>${esc(a.muni)} · ${esc(a.owner)}<br>${fmt(a.mw)} MW, mainly ${FUEL[a.primary].label.toLowerCase()}`))
+    .on("mouseleave",hideTip)
+    .on("click",(ev,a)=>{ ev.stopPropagation(); state.openAsset=a.id; selectMuni(a.muni,true); });
+
+  const projs = state.showProj ? PROJECTS.filter(p=>p.muni && (state.showRevoked||live(p)) && (state.year==null||p.year===state.year) && (state.tech==="all"||p.tech===state.tech)) : [];
+  gProj.selectAll("path").data(projs, d=>d.id).join("path")
+    .attr("class",p=>"proj"+(p.status==="revoked"?" revoked":"")+(state.openRow===p.id?" hl":""))
+    .attr("transform",p=>`translate(${p.cx+p.ox/Math.sqrt(K)},${p.cy+p.oy/Math.sqrt(K)}) scale(${1/K})`)
+    .attr("d",p=>diamond(rP(p.mw)))
+    .classed("dim",p=>state.muni && p.muni!==state.muni)
+    .on("mousemove",(ev,p)=>showTip(ev,`<b>${esc(p.name)}</b><br>${esc(p.muni)} · ${esc(p.program)}<br>${fmt(p.mw)} MW · ${p.status==="revoked"?"approval revoked":p.dateUnknown?"Board letter not located":"Board approval "+fmtD(p.first)}`))
+    .on("mouseleave",hideTip)
+    .on("click",(ev,p)=>{ ev.stopPropagation(); state.openRow=p.id; selectMuni(p.muni,true); });
+}
+
+function drawShade(){
+  const s = muniStats();
+  const key = state.shade==="fomb"?"ap":"ex";
+  const max = d3.max(Object.values(s),d=>d[key])||1;
+  gMuni.selectAll("path")
+    .style("fill",f=> state.shade==="none" ? css("--land") : shadeColor(s[f.properties.n][key],max))
+    .classed("sel",f=>f.properties.n===state.muni);
+  gMuni.selectAll("path.sel").raise();
+  document.getElementById("hint").textContent = state.muni ? "Click the sea or press Esc to zoom out" : "Click a municipality or marker";
+  gLabels.style("display",state.labels?null:"none");
+  // legend
+  const chips = Object.entries(FUEL).map(([k,v])=>`<button class="chip" data-f="${k}" aria-pressed="${state.fuels.has(k)}"><span class="sw" style="background:var(${v.v})"></span>${v.label}</button>`).join("");
+  let ramp = "";
+  if(state.shade!=="none"){
+    const b = breaks(max);
+    ramp = `<div class="ramp">${state.shade==="fomb"?"Approved new MW":"Existing MW"}: <span class="b" style="background:var(--shade-0);border:1px solid var(--rule)"></span>0 <span class="b" style="background:var(--shade-1)"></span>≤${b[0]} <span class="b" style="background:var(--shade-2)"></span>≤${b[1]} <span class="b" style="background:var(--shade-3)"></span>≤${b[2]} <span class="b" style="background:var(--shade-4)"></span>≤${fmt(max)}</div>`;
+  }
+  document.getElementById("legend").innerHTML = `<div class="row">${chips}</div><div class="ramp">Circles: existing assets by main fuel, sized by MW. <span class="dia"></span> Board-approved projects, near municipal center.</div>${ramp}`;
+  document.querySelectorAll("#legend .chip").forEach(b=>b.onclick=()=>{
+    const f=b.dataset.f;
+    if(state.fuels.has(f)&&state.fuels.size===Object.keys(FUEL).length){ state.fuels=new Set([f]); }
+    else if(state.fuels.has(f)){ state.fuels.delete(f); if(!state.fuels.size) state.fuels=new Set(Object.keys(FUEL)); }
+    else state.fuels.add(f);
+    render();
+  });
+}
+
+// ---------- panel ----------
+function stackBar(parts,total){
+  return `<div class="stack" role="img" aria-label="Capacity by fuel">${parts.map(([f,v])=>`<i style="width:${v/total*100}%;background:var(${FUEL[f].v})" title="${FUEL[f].label}: ${fmt(v)} MW"></i>`).join("")}</div>`;
+}
+function fuelKV(parts){
+  return `<div class="kv">${parts.map(([f,v])=>`<span class="sw" style="background:var(${FUEL[f].v})"></span><span class="l">${FUEL[f].label}</span><span class="v">${fmt(v)} MW</span>`).join("")}</div>`;
+}
+const srcItem = s => s.u ? `<a href="${s.u}" target="_blank" rel="noopener">${esc(s.t)}</a>` : esc(s.t);
+function srcLinks(keys){ return `<div class="src">Sources: ${keys.map(k=>srcItem(SRC[k])).join("; ")}</div>`; }
+function statusTag(p){
+  if(p.status==="revoked") return `<span class="tag rev">Revoked</span>`;
+  if(p.status==="conditional") return `<span class="tag cond">Conditional</span>`;
+  if(p.status==="operating") return `<span class="tag op">Partly operating</span>`;
+  return `<span class="tag fomb">Approved</span>`;
+}
+function compText(p){ return p.comps.map(c=>`${FUEL[c.f].label} ${fmt(c.mw)} MW${c.mwh?` / ${fmt(c.mwh)} MWh`:""}`).join(" + "); }
+
+function assetCard(a){
+  const max = d3.max(a.units,u=>u.mw);
+  return `<details class="item" data-asset="${a.id}" ${state.openAsset===a.id?"open":""}>
+   <summary><span class="sw" style="background:var(${FUEL[a.primary].v})"></span><span class="nm">${esc(a.name)}${a.isNew?' <span class="tag op">New 2026</span>':""}</span><span class="mw">${fmt(a.mw)} MW</span>
+   <span class="meta"><span class="tw">▶</span> ${a.sector==="private"?"Private":"Public"}; owner ${esc(a.owner)}${a.operator!==a.owner?`; operated by ${esc(a.operator)}`:""}</span></summary>
+   <div class="body">
+    <table class="units"><tbody>${a.units.map(u=>`<tr><td>${esc(u.u)}<div style="color:var(--ink-3);font-size:12px">${FUEL[u.f].label}${u.n?`; ${esc(u.n)}`:""}</div><div class="bar" style="width:${u.mw/max*100}%;background:var(${FUEL[u.f].v})"></div></td><td class="mwc">${fmt(u.mw)} MW</td></tr>`).join("")}</tbody></table>
+    ${a.note?`<p class="note">${esc(a.note)}</p>`:""}
+    ${srcLinks(a.src)}
+   </div></details>`;
+}
+function projCard(p){
+  return `<details class="item" data-proj="${p.id}" ${state.openRow===p.id?"open":""}>
+   <summary><span class="dia" style="${p.status==='revoked'?'border-color:var(--revoked);background:none':''}"></span><span class="nm">${esc(p.name)}</span><span class="mw">${fmt(p.mw)} MW</span>
+   <span class="meta"><span class="tw">▶</span> ${esc(p.program)} ${p.genera?`<span class="tag gen">Not a PPA</span>`:statusTag(p)}</span></summary>
+   <div class="body">${projDetail(p)}</div></details>`;
+}
+function projDetail(p){
+  return `<dl class="fl"><dt>Procurement</dt><dd>${esc(p.program)}</dd>
+    <dt>Developer</dt><dd>${esc(p.dev)}</dd>
+    <dt>Capacity</dt><dd>${compText(p)}${p.comps.some(c=>c.n)?`<br><span style="color:var(--ink-3)">${p.comps.filter(c=>c.n).map(c=>esc(c.n)).join("; ")}</span>`:""}</dd>
+    <dt>Current status</dt><dd>${esc(p.cs)}${p.con||p.ix?`<br><span style="color:var(--ink-3)">${p.con?`In construction: ${esc(p.con)}`:""}${p.con&&p.ix?"; ":""}${p.ix?`Interconnection study complete: ${esc(p.ix)}`:""}</span>`:""}</dd>
+    <dt>Fixed payment</dt><dd>${p.genera?"Not applicable: Genera initiative for PREPA, not a PPA":p.fp?p.fp.map(f=>`${f.l?esc(f.l)+": ":""}${fpFmt(f)}${f.esc?", "+esc(f.esc.toLowerCase()):""}${f.cap?`, capped at $${f.cap}/kWh`:""}${f.n?` <span style="color:var(--ink-3)">(${esc(f.n)})</span>`:""}`).join("<br>"):"Not reported"}</dd>
+    <dt>Expected COD</dt><dd>${esc(p.cod)}${p.codN?`<br><span style="color:var(--ink-3)">${esc(p.codN)}</span>`:""}</dd>
+    <dt>Regulatory note</dt><dd>${esc(p.statusText)}</dd>
+    ${p.terms?`<dt>Terms</dt><dd>${esc(p.terms)}</dd>`:""}
+    ${p.note?`<dt>Note</dt><dd>${esc(p.note)}</dd>`:""}</dl>
+    <div style="font-weight:600;margin-top:8px">Board actions</div>
+    <ul class="appr">${p.appr.map(x=>`<li><time datetime="${x.d}">${p.dateUnknown?"Date not located":(x.mo?fmtM(x.d):(x.approx?"c. ":"")+fmtD(x.d))}</time>${esc(x.a)}. <span style="color:var(--ink-2)">${esc(x.w)}</span></li>`).join("")}</ul>
+    ${p.conf==="inferred"?`<p class="note" style="color:var(--fomb)">Board approval inferred: the executed contract and DOE closing require it under the Contract Review Policy, but the specific letter was not located.</p>`:""}
+    ${srcLinks(p.src)}`;
+}
+
+function renderPanel(){
+  const el = document.getElementById("panel");
+  if(!state.muni){
+    const all = ASSETS;
+    const tot = d3.sum(all,a=>a.mw);
+    const parts = d3.rollups(all.flatMap(a=>a.units),v=>d3.sum(v,u=>u.mw),u=>u.f).sort((a,b)=>b[1]-a[1]);
+    const pub = d3.sum(all.filter(a=>a.sector==="public"),a=>a.mw);
+    const top = d3.rollups(all,v=>d3.sum(v,a=>a.mw),a=>a.muni).sort((a,b)=>b[1]-a[1]).slice(0,6);
+    const ap = PROJECTS.filter(live);
+    const apParts = d3.rollups(ap.flatMap(p=>p.comps),v=>d3.sum(v,c=>c.mw),c=>c.f).sort((a,b)=>b[1]-a[1]);
+    const topAp = d3.rollups(ap.filter(p=>p.muni),v=>d3.sum(v,p=>p.mw),p=>p.muni).sort((a,b)=>b[1]-a[1]).slice(0,6);
+    el.innerHTML = `<h2>All of Puerto Rico</h2><p class="sub">Select a municipality on the map to drill in.</p>
+      <div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:5px"><span>Existing nameplate by fuel</span><b>${fmt(tot)} MW</b></div>
+      ${stackBar(parts,tot)}${fuelKV(parts)}
+      <h3>Ownership</h3>
+      <div class="kv"><span class="sw" style="background:var(--ink)"></span><span class="l">Public (PREPA; thermal run by Genera PR)</span><span class="v">${fmt(pub)} MW</span>
+      <span class="sw" style="background:var(--ink-3)"></span><span class="l">Private independent producers</span><span class="v">${fmt(tot-pub)} MW</span></div>
+      <h3>Municipalities with the most existing capacity</h3>
+      <div class="kv">${top.map(([m,v])=>`<span></span><a class="l" href="#" data-goto="${esc(m)}">${esc(m)}</a><span class="v">${fmt(v)} MW</span>`).join("")}</div>
+      <h3>Approved by the Board since 2021 (active)</h3>
+      ${stackBar(apParts,d3.sum(apParts,d=>d[1]))}${fuelKV(apParts)}
+      <div style="font-size:13px;margin:12px 0 4px;color:var(--ink-2)">Leading municipalities for approved capacity</div>
+      <div class="kv">${topAp.map(([m,v])=>`<span></span><a class="l" href="#" data-goto="${esc(m)}">${esc(m)}</a><span class="v">${fmt(v)} MW</span>`).join("")}</div>
+      <p class="note" style="margin:12px 0">${PROJECTS.filter(p=>!p.muni).length} approved projects have no disclosed site and appear only in the table below.</p>`;
+  } else {
+    const m = state.muni;
+    const as = ASSETS.filter(a=>a.muni===m).sort((a,b)=>b.mw-a.mw);
+    const ps = PROJECTS.filter(p=>p.muni===m).sort((a,b)=>a.first.localeCompare(b.first));
+    const tot = d3.sum(as,a=>a.mw);
+    const parts = d3.rollups(as.flatMap(a=>a.units),v=>d3.sum(v,u=>u.mw),u=>u.f).sort((a,b)=>b[1]-a[1]);
+    const apLive = d3.sum(ps.filter(live),p=>p.mw);
+    el.innerHTML = `<button class="back" id="backBtn">← All of Puerto Rico</button>
+      <h2>${esc(m)}</h2>
+      <p class="sub">${fmt(tot)} MW existing across ${as.length} asset${as.length===1?"":"s"}; ${fmt(apLive)} MW approved new</p>
+      ${as.length?`${stackBar(parts,tot)}${fuelKV(parts)}`:""}
+      <h3>Existing generation assets</h3>
+      ${as.length? as.map(assetCard).join("") : `<p class="empty">No utility-scale generation is sited here. Load is served from the island grid.</p>`}
+      <h3>Board-approved new projects, 2020 onward</h3>
+      ${ps.length? ps.map(projCard).join("") : `<p class="empty">No Board-approved generation or storage project is sited in ${esc(m)}. Check the table below for projects without a disclosed site.</p>`}`;
+    document.getElementById("backBtn").onclick=()=>selectMuni(null);
+    el.querySelectorAll("details[data-asset]").forEach(d=>d.addEventListener("toggle",()=>{ if(d.open){state.openAsset=d.dataset.asset;} else if(state.openAsset===d.dataset.asset){state.openAsset=null;} drawMarkers(); }));
+    el.querySelectorAll("details[data-proj]").forEach(d=>d.addEventListener("toggle",()=>{ if(d.open){state.openRow=d.dataset.proj;} else if(state.openRow===d.dataset.proj){state.openRow=null;} drawMarkers(); }));
+    const open = el.querySelector("details[open]");
+    if(open) open.scrollIntoView({block:"nearest"});
+  }
+  el.querySelectorAll("[data-goto]").forEach(a=>a.onclick=e=>{e.preventDefault();selectMuni(a.dataset.goto);});
+}
+
+// ---------- pipeline ----------
+function renderYears(){
+  const years = d3.range(2020, 2027);
+  const data = years.map(y=>{
+    const ps = PROJECTS.filter(p=>p.year===y && live(p));
+    const by = {solar:0,bess:0,gas:0};
+    ps.forEach(p=>p.comps.forEach(c=>by[c.f]=(by[c.f]||0)+c.mw));
+    return {y, by, tot:d3.sum(Object.values(by)), n:ps.length};
+  });
+  const unk = PROJECTS.filter(p=>p.year==null);
+  document.getElementById("yearnote").textContent = unk.length?`No Board approvals of new generation were found for 2020. Not charted: ${fmt(d3.sum(unk,p=>p.mw))} MW of Tranche 1 storage (${unk.map(p=>p.name).join(', ')}) whose Board letter date was not located.`:"";
+  const max = d3.max(data,d=>d.tot)||1;
+  const any = state.year!=null;
+  document.getElementById("yearbars").innerHTML = data.map(d=>`<button class="yb ${any?"anysel":""}" data-y="${d.y}" aria-pressed="${state.year===d.y}" aria-label="${d.y}: ${fmt(d.tot)} megawatts in ${d.n} approvals">
+     <span class="yv">${d.tot?fmt(d.tot)+" MW":"—"}</span>
+     <span class="col" style="height:${d.tot/max*82}px">${["solar","bess","gas"].map(f=>d.by[f]?`<i style="height:${d.by[f]/d.tot*100}%;background:var(${FUEL[f].v})"></i>`:"").join("")}</span>
+     <span class="yl">${d.y}</span></button>`).join("");
+  document.querySelectorAll(".yb").forEach(b=>b.onclick=()=>{ const y=+b.dataset.y; state.year = state.year===y?null:y; render(); });
+}
+
+
+// ---------- project stage (derived from status fields) ----------
+const STAGES = {
+  test:{l:"Testing", v:"--st-test"}, build:{l:"In construction", v:"--st-build"},
+  pre:{l:"Pre-construction", v:"--st-pre"}, pause:{l:"Paused", v:"--st-pause"},
+  none:{l:"No update", v:"--st-none"}, rev:{l:"Revoked", v:"--revoked"}
+};
+const TODAY = "2026-11-03";
+PROJECTS.forEach(p=>{
+  p.stage = p.status==="revoked" ? "rev"
+    : p.status==="operating" ? "test"
+    : p.id==="coamo" ? "pause"
+    : (p.con||"").startsWith("Yes") ? "build"
+    : (p.con||"").startsWith("No") ? "pre" : "none";
+});
+function stagePill(p){ const s=STAGES[p.stage]; return `<span class="stg ${p.stage==='rev'?'revoked':''}" style="--c:var(${s.v})">${s.l}</span>`; }
+function codCell(p){
+  if(!p.codD) return `<span style="color:var(--ink-2)">${esc(p.cod)}</span>${p.genera&&p.codN?`<div class="codx">${esc(p.codN)}</div>`:""}`;
+  const main = fmtD(p.codD), extra = p.cod.replace(/\s*\(.*\)$/,"");
+  const same = new Date(p.codD+"T12:00:00").toLocaleDateString("en-US",{year:"numeric",month:"short",day:"numeric"})===extra;
+  const paren = (p.cod.match(/\((.*)\)$/)||[])[1];
+  const sub = same ? (paren||"") : p.cod;
+  const past = p.codD < TODAY && p.status!=="revoked";
+  return `<div class="codd">${main}</div>${sub?`<div class="codx">${esc(sub)}</div>`:""}${past?`<span class="passed">Date has passed</span>`:""}`;
+}
+function renderCodChart(){
+  const ps = PROJECTS.filter(p=>live(p));
+  const buckets = [["2025","2025"],["2026","2026"],["2027","2027"],["2028","2028"],["2029","2029 or later"],["none","No firm date"]];
+  const key = p => !p.codD ? "none" : (+p.codD.slice(0,4) >= 2029 ? "2029" : p.codD.slice(0,4));
+  const data = buckets.map(([k,l])=>{
+    const list = ps.filter(p=>key(p)===k);
+    const by = {}; list.forEach(p=>p.comps.forEach(c=>by[c.f]=(by[c.f]||0)+c.mw));
+    return {k,l,n:list.length,by,tot:d3.sum(Object.values(by))};
+  }).filter(d=>d.n);
+  const max = d3.max(data,d=>d.tot)||1;
+  document.getElementById("codchart").innerHTML = `<h3>When approved capacity is expected online</h3>
+    <p class="sub">Active projects by the year of their expected COD, from the latest tracker or ASAP report. Dates are developer- or LUMA-reported and several in 2025 and 2026 have already passed without commercial operation.</p>
+    <div class="codrows">${data.map(d=>`<span class="yl">${d.l}</span>
+      <span class="track" role="img" aria-label="${d.l}: ${fmt(d.tot)} MW across ${d.n} projects"><span style="display:flex;width:${d.tot/max*100}%">${["solar","bess","gas"].filter(f=>d.by[f]).map(f=>`<i style="width:${d.by[f]/d.tot*100}%;background:var(${FUEL[f].v})" title="${FUEL[f].label}: ${fmt(d.by[f])} MW"></i>`).join("")}</span></span>
+      <span class="v"><b>${fmt(d.tot)} MW</b> · ${d.n} project${d.n===1?"":"s"}</span>`).join("")}</div>`;
+}
+
+// ---------- procurement averages (solar and storage) ----------
+function procRows(){
+  // one record per solar or storage component of an active project, with its year-one rate where comparable
+  const recs = [];
+  PROJECTS.filter(live).forEach(p=>{
+    p.comps.forEach(c=>{
+      if(c.f!=="solar" && c.f!=="bess") return;
+      let rate=null;
+      if(p.fp){
+        if(c.f==="solar"){ const f=p.fp.find(f=>f.u==="kWh"&&(!f.l||f.l==="PV")); if(f) rate=f.v; }
+        else { const f=p.fp.find(f=>f.u==="MWmo"); if(f) rate=f.v; }
+      }
+      recs.push({proc:p.proc, o:p.procO, f:c.f, mw:c.mw, rate, genera:!!p.genera});
+    });
+  });
+  return recs;
+}
+function agg(rs){
+  const priced = rs.filter(r=>r.rate!=null);
+  const w = d3.sum(priced,r=>r.mw);
+  return { n:rs.length, mw:d3.sum(rs,r=>r.mw), avg: rs.length? d3.sum(rs,r=>r.mw)/rs.length : null,
+           rate: w? d3.sum(priced,r=>r.rate*r.mw)/w : null, priced:priced.length,
+           genera: rs.length>0 && rs.every(r=>r.genera) };
+}
+const fK = v => "$"+v.toFixed(4);
+const fM = v => "$"+Math.round(v).toLocaleString("en-US");
+function renderProcSum(){
+  const recs = procRows();
+  const S = agg(recs.filter(r=>r.f==="solar")), B = agg(recs.filter(r=>r.f==="bess"));
+  const Bp = agg(recs.filter(r=>r.f==="bess"&&!r.genera));
+  const procs = d3.groups(recs,r=>r.proc).sort((a,b)=>a[1][0].o-b[1][0].o);
+  const cell = (a,u) => !a.n ? `<td class="grp na">—</td><td class="na">—</td><td class="na">—</td>`
+    : `<td class="grp">${a.n}</td><td>${fmt(a.avg)} MW</td><td>${a.genera?'<span class="na">No PPA</span>':a.rate==null?'<span class="na">Not reported</span>':(u==="k"?fK(a.rate):fM(a.rate))+(a.priced<a.n?`<span class="na"> (${a.priced} of ${a.n})</span>`:"")}</td>`;
+  document.getElementById("procsum").innerHTML = `
+   <div class="psum">
+    <div class="ptile"><h3><span class="sw" style="background:var(--f-solar)"></span>Solar PV procurements</h3>
+      <div class="figs"><div class="fig"><b>${fmt(S.avg)} MW</b><span>average project size (${S.n} projects, ${fmt(S.mw)} MW)</span></div>
+      <div class="fig"><b>${fK(S.rate)}<small style="font-size:13px;font-weight:500;color:var(--ink-3)">/kWh</small></b><span>average year-one rate, capacity-weighted</span></div></div>
+      <div class="basis">Rate based on ${S.priced} of ${S.n} solar projects with a reported $/kWh price.</div></div>
+    <div class="ptile"><h3><span class="sw" style="background:var(--f-bess)"></span>Battery storage procurements</h3>
+      <div class="figs"><div class="fig"><b>${fmt(B.avg)} MW</b><span>average project size (${B.n} projects, ${fmt(B.mw)} MW)</span></div>
+      <div class="fig"><b>${fM(Bp.rate)}<small style="font-size:13px;font-weight:500;color:var(--ink-3)">/MW-month</small></b><span>average capacity rate, capacity-weighted</span></div></div>
+      <div class="basis">Rate based on ${Bp.priced} of ${B.n} storage projects with a $/MW-month price; Genera's PREPA-owned batteries have no rate.</div></div>
+   </div>
+   <div class="pmwrap"><table class="pm"><thead>
+     <tr><th>Procurement</th><th colspan="3" class="grp" style="text-align:center">Solar PV</th><th colspan="3" class="grp" style="text-align:center">Battery storage</th></tr>
+     <tr><th></th><th class="grp">Projects</th><th>Average size</th><th>Average rate ($/kWh)</th><th class="grp">Projects</th><th>Average size</th><th>Average rate ($/MW-month)</th></tr>
+   </thead><tbody>
+     ${procs.map(([k,rs])=>`<tr><td>${esc(k)}</td>${cell(agg(rs.filter(r=>r.f==="solar")),"k")}${cell(agg(rs.filter(r=>r.f==="bess")),"m")}</tr>`).join("")}
+     <tr class="tot"><td>All procurements</td>${cell(S,"k")}${(()=>{ const t={...B, rate:Bp.rate, priced:Bp.priced, genera:false}; return cell(t,"m"); })()}</tr>
+   </tbody></table></div>
+   <p class="pmnote">Active (non-revoked) projects only; a solar-plus-storage project counts once in each technology. Rates are year-one fixed payments before escalators, weighted by contracted MW. Storage priced in $/kWh (AES Salinas and Jobos) and storage bundled into a single solar rate (Coamo, YFN) count toward average size but not the storage rate. Thermal projects are excluded.</p>`;
+}
+
+// ---------- fixed payment cell ----------
+const FPU = { kWh:{max:0.25, v:"--f-solar", l:"Energy price, $/kWh"}, MWmo:{max:30000, v:"--f-bess", l:"Storage capacity price, $/MW-month"} };
+function fpFmt(f){ return f.u==="kWh" ? `${f.approx?"≈":""}$${f.v.toFixed(4)}/kWh` : `$${f.v.toLocaleString("en-US",{maximumFractionDigits:2})}/MW-month`; }
+function fpCell(p){
+  if(p.genera) return `<span style="color:var(--ink-2)">Not applicable</span><div class="fpm">Genera initiative for PREPA; no PPA or fixed payment</div>`;
+  if(!p.fp) return `<span style="color:var(--ink-3)">Not reported</span>`;
+  return p.fp.map(f=>{
+    const U = FPU[f.u];
+    const num = f.u==="kWh" ? `${f.approx?"≈":""}$${f.v.toFixed(4)}` : `$${Math.round(f.v).toLocaleString("en-US")}`;
+    const meta = [f.esc, f.cap?`cap $${f.cap}`:null].filter(Boolean).join(" · ");
+    return `<div class="fpl"><div class="fpv">${f.l?`<span class="lab">${esc(f.l)}</span>`:""}<b>${num}</b><span class="u">${f.u==="kWh"?"/kWh":"/MW-mo"}</span></div>
+      <div class="fpbar" title="${esc(U.l)}"><i style="width:${Math.min(100,f.v/U.max*100)}%;background:var(${U.v})"></i></div>
+      ${meta||f.n?`<div class="fpm">${esc(meta)}${meta&&f.n?"<br>":""}${f.n?`<span class="${f.flag?"flag":""}">${esc(f.n)}</span>`:""}</div>`:""}</div>`;
+  }).join("");
+}
+
+function renderTable(){
+  document.getElementById("stagekey").innerHTML = Object.keys(STAGES).map(k=>stagePill({stage:k})).join("");
+  let rows = PROJECTS.filter(p=>(state.showRevoked||live(p)) && (state.year==null||p.year===state.year) && (state.tech==="all"||p.tech===state.tech));
+  const {k,dir} = state.sort;
+  const val = p => k==="name"?p.name : k==="proc"?(p.procO+100+"|"+p.first) : k==="muni"?(p.muni||"~") : k==="mw"?p.mw : k==="cod"?(p.codD||"9999") : k==="fp"?(p.fp?(p.fp[0].u==="kWh"?p.fp[0].v:1000+p.fp[0].v/1000):1e9) : p.first;
+  rows.sort((a,b)=>{ const x=val(a),y=val(b); return (typeof x==="number"? x-y : String(x).localeCompare(String(y),"es"))*dir; });
+  const tb = document.querySelector("#ptable tbody");
+  tb.innerHTML = rows.map(p=>`
+    <tr class="main ${p.status==="revoked"?"revoked":""}" data-id="${p.id}" tabindex="0" aria-expanded="${state.openRow===p.id}">
+      <td><span class="nm">${esc(p.name)}</span></td>
+      <td><span class="proc">${esc(p.proc)}</span>${p.procX?`<div class="procx">${esc(p.procX)}</div>`:""}</td>
+      <td>${p.muni?`<a href="#" data-goto="${esc(p.muni)}">${esc(p.muni)}</a>`:`<span style="color:var(--ink-3)">Site not disclosed</span>`}</td>
+      <td>${p.comps.map(c=>`<span style="white-space:nowrap"><span class="sw" style="background:var(${FUEL[c.f].v});margin-right:5px;vertical-align:-1px"></span>${FUEL[c.f].label} ${fmt(c.mw)}</span>`).join("<br>")}</td>
+      <td class="num"><b>${fmt(p.mw)}</b></td>
+      <td>${p.dateUnknown?"Not located":(p.appr[0].mo?fmtM(p.first):(p.appr[0].approx?"c. ":"")+fmtD(p.first))}<div style="color:var(--ink-3);font-size:12.5px">${esc(p.appr[0].a)}${p.appr.length>1?`; ${p.appr.length-1} later action${p.appr.length>2?"s":""}`:""}</div></td>
+      <td class="cs"><div class="stagerow">${stagePill(p)}${p.status==="conditional"?statusTag(p):""}${p.genera?`<span class="tag gen">Genera initiative · not a PPA</span>`:""}</div><div class="csx clamp">${esc(p.cs)}</div></td>
+      <td class="cod">${codCell(p)}</td>
+      <td class="fp">${fpCell(p)}</td>
+    </tr>
+    ${state.openRow===p.id?`<tr class="detail"><td colspan="9"><div class="dgrid"><div>${projDetail(p)}</div></div></td></tr>`:""}`).join("");
+  const sum = d3.sum(rows.filter(live),p=>p.mw);
+  document.getElementById("tableCount").textContent = `${rows.length} project${rows.length===1?"":"s"}; ${fmt(sum)} MW active`;
+  tb.querySelectorAll("tr.main").forEach(tr=>{
+    const toggle=()=>{ const id=tr.dataset.id; state.openRow = state.openRow===id?null:id; renderTable(); drawMarkers(); if(state.muni) renderPanel(); };
+    tr.onclick=e=>{ if(e.target.closest("a")) return; toggle(); };
+    tr.onkeydown=e=>{ if(e.key==="Enter"||e.key===" "){e.preventDefault();toggle();} };
+  });
+  tb.querySelectorAll("[data-goto]").forEach(a=>a.onclick=e=>{e.preventDefault(); selectMuni(a.dataset.goto); document.querySelector(".mapcard").scrollIntoView({behavior:"smooth",block:"start"});});
+  document.querySelectorAll("#ptable th button").forEach(b=>{ b.textContent = b.textContent.replace(/ [↑↓]$/,"") + (b.dataset.sort===k?(dir>0?" ↑":" ↓"):""); });
+}
+
+// ---------- wiring ----------
+function selectMuni(m, keepOpen){
+  state.muni = m || null;
+  if(!keepOpen){ state.openAsset=null; }
+  document.getElementById("muniSelect").value = state.muni||"";
+  render();
+}
+function zoomTo(){
+  let k=1, tx=0, ty=0;
+  if(state.muni){
+    const f = GEO.features.find(f=>f.properties.n===state.muni);
+    const polys = f.geometry.coordinates.map(c=>({type:"Polygon",coordinates:c}));
+    const big = polys.sort((a,b)=>d3.geoArea(b)-d3.geoArea(a))[0];
+    const [[x0,y0],[x1,y1]] = path.bounds(big);
+    k = Math.min(7, 0.62/Math.max((x1-x0)/W,(y1-y0)/H));
+    tx = W/2 - k*(x0+x1)/2; ty = H/2 - k*(y0+y1)/2;
+  }
+  const reduce = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  const from = K, to = k;
+  gZoom.transition().duration(reduce?0:550).ease(d3.easeCubicInOut)
+    .attr("transform",`translate(${tx},${ty}) scale(${k})`)
+    .tween("k",()=>{ const i=d3.interpolateNumber(from,to); return tt=>{ K=i(tt); scaleMarks(); }; });
+}
+function scaleMarks(){
+  gAssets.selectAll("circle").attr("r",a=>rA(d3.sum(a.units.filter(u=>state.fuels.has(u.f)),u=>u.mw))/K);
+  gProj.selectAll("path").attr("transform",p=>`translate(${p.cx+p.ox/Math.sqrt(K)},${p.cy+p.oy/Math.sqrt(K)}) scale(${1/K})`);
+  gLabels.selectAll("text").style("font-size",(9/K)+"px").attr("y",f=>centroid[f.properties.n][1]+3/K).style("stroke-width",(2.5/K)+"px");
+}
+let lastMuni;
+const TABS = {projects:"tab-projects", procurement:"tab-procurement", "data-checks":"tab-checks"};
+function showTab(name, push){
+  if(!TABS[name]) name="projects";
+  document.querySelectorAll(".tabs button").forEach(b=>b.setAttribute("aria-selected", b.dataset.tab===name));
+  Object.entries(TABS).forEach(([k,id])=>{ document.getElementById(id).hidden = k!==name; });
+  if(push){ try{ history.replaceState(null,"","#"+name); }catch(e){} }
+}
+document.querySelectorAll(".tabs button").forEach(b=>b.onclick=()=>showTab(b.dataset.tab,true));
+window.addEventListener("hashchange",()=>{ const h=location.hash.slice(1); if(TABS[h]) showTab(h); });
+function render(){ drawShade(); drawMarkers(); renderPanel(); renderYears(); renderCodChart(); renderProcSum(); renderTable(); if(lastMuni!==state.muni){ lastMuni=state.muni; zoomTo(); } }
+
+const sel = document.getElementById("muniSelect");
+muniNames.forEach(n=>{ const o=document.createElement("option"); o.value=n; o.textContent=n; sel.appendChild(o); });
+sel.onchange=()=>selectMuni(sel.value);
+function wireSeg(id, key){
+  document.querySelectorAll(`#${id} button`).forEach(b=>b.onclick=()=>{
+    state[key]=b.dataset.v;
+    document.querySelectorAll(`#${id} button`).forEach(x=>x.setAttribute("aria-pressed", x===b));
+    render();
+  });
+}
+wireSeg("shadeSeg","shade"); wireSeg("techSeg","tech");
+document.getElementById("lyrAssets").onchange=e=>{state.showAssets=e.target.checked;drawMarkers();};
+document.getElementById("lyrProj").onchange=e=>{state.showProj=e.target.checked;drawMarkers();};
+document.getElementById("lyrLabels").onchange=e=>{state.labels=e.target.checked;drawShade();};
+document.getElementById("showRevoked").onchange=e=>{state.showRevoked=e.target.checked;render();};
+document.querySelectorAll("#ptable th button").forEach(b=>b.onclick=()=>{
+  const k=b.dataset.sort; state.sort = {k, dir: state.sort.k===k ? -state.sort.dir : (k==="mw"?-1:1)}; renderTable();
+});
+svg.on("click",ev=>{ if(ev.target===svg.node()) selectMuni(null); });
+document.addEventListener("keydown",e=>{ if(e.key==="Escape" && state.muni) selectMuni(null); });
+if(window.matchMedia) window.matchMedia("(prefers-color-scheme: dark)").addEventListener?.("change",render);
+
+document.getElementById("srcList").innerHTML = Object.values(SRC).map(s=>`<li>${srcItem(s)}</li>`).join("");
+renderFigures();
+render();
+{ const h=location.hash.slice(1); if(TABS[h]) showTab(h); }
+</script>
+</body>
+</html>
