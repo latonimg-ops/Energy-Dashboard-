@@ -182,7 +182,7 @@ section.pipeline .dek{margin-top:6px}
 .yb[aria-pressed="false"].anysel{opacity:.35}
 .filters{display:flex;flex-wrap:wrap;gap:10px 20px;align-items:center;margin:26px 0 10px}
 .tablewrap{overflow-x:auto;border:1px solid var(--rule);border-radius:10px;background:var(--panel)}
-table.pt{width:100%;border-collapse:collapse;font-size:13.5px;min-width:1400px}
+table.pt{width:100%;border-collapse:collapse;font-size:13.5px;min-width:1540px}
 .proc{display:inline-block;font-size:12px;font-weight:600;color:var(--pc,var(--ink-2));border:1px solid color-mix(in srgb,var(--pc,var(--rule)) 32%,transparent);border-left:3px solid var(--pc,var(--rule));border-radius:4px;padding:1px 7px;white-space:nowrap;background:color-mix(in srgb,var(--pc,var(--panel)) 9%,var(--panel))}
 .prockey{display:flex;flex-wrap:wrap;gap:6px 10px;margin:4px 0 10px;font-size:12px;color:var(--ink-3);align-items:center}
 .procx{color:var(--ink-3);font-size:11.5px;margin-top:3px;line-height:1.3}
@@ -450,7 +450,8 @@ footer{margin-top:28px;padding-top:14px;border-top:1px solid var(--rule);font-si
         <th>Technology and fuel</th>
         <th class="num"><button data-sort="mw">Capacity (MW)</button></th>
         <th><button data-sort="date">First Board approval</button></th>
-        <th><button data-sort="cod">Expected COD</button></th>
+        <th><button data-sort="cod">Expected COD</button><div style="font-weight:400;color:var(--ink-3);font-size:11.5px">operative date</div></th>
+        <th><button data-sort="codluma">Amended COD</button><div style="font-weight:400;color:var(--ink-3);font-size:11.5px">LUMA, October 2026</div></th>
         <th><button data-sort="behind">Against base case</button><div style="font-weight:400;color:var(--ink-3);font-size:11.5px">24 months from approval</div></th>
         <th>Current status</th>
         <th><button data-sort="fp">Fixed payment</button><div style="font-weight:400;color:var(--ink-3);font-size:11.5px">$/kWh or $/MW-month</div></th>
@@ -1246,6 +1247,16 @@ Object.entries(EXTRA_APPR).forEach(([id,list])=>{ const p=PROJECTS.find(q=>q.id=
   p.appr=[{d:"2023-10-01", mo:true, a:"Approved", w:"ESSA ("+TW+")"},{d:"2025-01-01", mo:true, a:"Approved", w:"Amendment for DOE financing ("+TW+")"}];
   p.src=[...new Set([...p.src,"trk"])]; });
 
+// ---------- LUMA's amended commercial operation dates (Table 7, October 2026 collaborative report) ----------
+const COD_LUMA = {
+ "ciro1p":"2027-02", "xzerta":"2028-12", "cfe-jobos":"2026-05", "cfe-salinas":"2027-02",
+ "yfn":"2026-12", "penuelas-bess":"2028-04", "guayama-solar":"2028-08", "tetris":"2027-12",
+ "caguas-bess":"2028-04", "ponce-bess":"2028-04", "pattern-bar-bess":"2028-05",
+ "rev-yabucoa-energy":"2028-07", "naguabo-ep":"2028-12", "solaner":"2026-10", "t2-marisol":"2027-12",
+ "t2-sj":"na", "t2-vb":"na", "infinigen-isabela":"na"
+};
+PROJECTS.forEach(p=>{ p.codLuma = COD_LUMA[p.id] || null; });
+
 // ---------- derived ----------
 PROJECTS.forEach(p=>{
   p.mw = d3.sum(p.comps,c=>c.mw);
@@ -1649,6 +1660,13 @@ PROJECTS.forEach(p=>{
   else { p.behind = null; p.notDue = true; }                                   // 24 months not yet elapsed
 });
 function stagePill(p){ const s=STAGES[p.stage]; return `<span class="stg ${p.stage==='rev'?'revoked':''}" style="--c:var(${s.v})">${s.l}</span>`; }
+function lumaCell(p){
+  if(!p.codLuma) return `<span style="color:var(--ink-3)">Not listed</span>`;
+  if(p.codLuma==="na") return `<div style="color:var(--ink-2)">Not available</div><div class="codx">Listed by LUMA with no date</div>`;
+  const d = fmtM(p.codLuma+"-01");
+  const same = p.codD && p.codD.slice(0,7)===p.codLuma;
+  return `<div class="codd">${d}</div><div class="codx">${same?"Matches the operative date":"Differs from the operative date"}</div>`;
+}
 function behindCell(p){
   if(p.status==="review") return `<span style="color:var(--ink-3)">No approval yet</span>`;
   if(p.status==="revoked") return `<span style="color:var(--ink-3)">Approval revoked</span>`;
@@ -1766,7 +1784,7 @@ function renderTable(){
   document.getElementById("prockey").innerHTML = Object.values(PROC_FAM).map(f=>`<span class="proc" style="--pc:var(${f.v})">${f.l}</span>`).join("");
   let rows = PROJECTS.filter(p=>(state.showRevoked||shown(p)) && (state.year==null||p.year===state.year) && (state.tech==="all"||p.tech===state.tech));
   const {k,dir} = state.sort;
-  const val = p => k==="name"?p.name : k==="proc"?(p.procO+100+"|"+p.first) : k==="muni"?(p.muni||"~") : k==="mw"?p.mw : k==="cod"?(p.codD||"9999") : k==="behind"?(p.behind==null?-1e9:p.behind) : k==="fp"?(p.fp?(p.fp[0].u==="kWh"?p.fp[0].v:1000+p.fp[0].v/1000):1e9) : p.first;
+  const val = p => k==="name"?p.name : k==="proc"?(p.procO+100+"|"+p.first) : k==="muni"?(p.muni||"~") : k==="mw"?p.mw : k==="cod"?(p.codD||"9999") : k==="behind"?(p.behind==null?-1e9:p.behind) : k==="codluma"?(p.codLuma&&p.codLuma!=="na"?p.codLuma:"9999") : k==="fp"?(p.fp?(p.fp[0].u==="kWh"?p.fp[0].v:1000+p.fp[0].v/1000):1e9) : p.first;
   rows.sort((a,b)=>{ const x=val(a),y=val(b); return (typeof x==="number"? x-y : String(x).localeCompare(String(y),"es"))*dir; });
   const tb = document.querySelector("#ptable tbody");
   tb.innerHTML = rows.map(p=>`
@@ -1778,11 +1796,12 @@ function renderTable(){
       <td class="num"><b>${fmt(p.mw)}</b></td>
       <td>${p.status==="review"?'<span class="underrev">Under FOMB review</span>':p.dateUnknown?"Not located":(p.appr[0].mo?fmtM(p.first):(p.appr[0].approx?"c. ":"")+fmtD(p.first))}${p.status==="review"?"":`<div style="color:var(--ink-3);font-size:12.5px">${esc(p.appr[0].a)}${p.appr.length>1?`; ${p.appr.length-1} later action${p.appr.length>2?"s":""}`:""}</div>`}</td>
       <td class="cod">${codCell(p)}</td>
+      <td class="cod">${lumaCell(p)}</td>
       <td class="cod">${behindCell(p)}</td>
       <td class="cs"><div class="stagerow">${stagePill(p)}${p.status==="conditional"?statusTag(p):""}${p.genera?`<span class="tag gen">Genera initiative · not a PPA</span>`:""}</div><div class="csx clamp">${esc(p.cs)}</div></td>
       <td class="fp">${fpCell(p)}</td>
     </tr>
-    ${state.openRow===p.id?`<tr class="detail"><td colspan="10"><div class="dgrid"><div>${projDetail(p)}</div></div></td></tr>`:""}`).join("");
+    ${state.openRow===p.id?`<tr class="detail"><td colspan="11"><div class="dgrid"><div>${projDetail(p)}</div></div></td></tr>`:""}`).join("");
   const sum = d3.sum(rows.filter(live),p=>p.mw);
   const rev = d3.sum(rows.filter(p=>p.status==="review"),p=>p.mw);
   document.getElementById("tableCount").textContent =
