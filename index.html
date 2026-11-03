@@ -15,6 +15,7 @@
   --sea:#D3E2E8; --land:#FAFBF9; --border:#9EADB3;
   --shade-0:#F4F7F7; --shade-1:#D6E4EA; --shade-2:#9FC1CF; --shade-3:#5B8FA8; --shade-4:#2C5A72;
   --fomb:#A8285F; --fomb-soft:#F6E3EC; --revoked:#8A9499; --focus:#1F6FEB;
+  --pr-legacy:#3353A0; --pr-tranche:#00A8C1; --pr-asap:#277539; --pr-accel:#C882C2; --pr-thermal:#685100; --pr-genera:#CB6440;
   --f-bunker:#96522A; --f-diesel:#D4862C; --f-gas:#3C8DC9; --f-coal:#5E6670; --f-solar:#C9920C;
   --f-wind:#2F9C83; --f-hydro:#2B52A8; --f-bess:#AF4694; --f-lfg:#6F8C2B;
   --st-test:#1F7A55; --st-build:#2C6E9C; --st-pre:#8A6A12; --st-pause:#B4532A; --st-none:#7A888F; --st-review:#6B4FA8; --warn:#9A5B00; --warn-soft:#FBEBD2;
@@ -25,6 +26,7 @@
     --rule:#33434B; --rule-2:#24323A; --sea:#0C2230; --land:#1D2A31; --border:#4E6069;
     --shade-0:#1D2A31; --shade-1:#1F3B4A; --shade-2:#2A5A72; --shade-3:#3F7F9E; --shade-4:#79B4CF;
     --fomb:#E5689E; --fomb-soft:#3A2230; --revoked:#6F7B80; --focus:#6AA7FF;
+    --pr-legacy:#4D71C8; --pr-tranche:#0AA5BE; --pr-asap:#368346; --pr-accel:#C075B9; --pr-thermal:#766200; --pr-genera:#CC6C4A;
     --f-bunker:#8F4F2A; --f-diesel:#C68230; --f-gas:#3F9BDE; --f-coal:#656B70; --f-solar:#AD8610;
     --f-wind:#2FA98C; --f-hydro:#6E86E2; --f-lfg:#7D9A2C; --f-bess:#CC62AC;
     --st-test:#5CC795; --st-build:#6FB0E0; --st-pre:#D9B455; --st-pause:#EB8A5E; --st-none:#8D9CA3; --st-review:#A78BE0; --warn:#F0B35A; --warn-soft:#3A2C17;
@@ -35,6 +37,7 @@
   --rule:#33434B; --rule-2:#24323A; --sea:#0C2230; --land:#1D2A31; --border:#4E6069;
   --shade-0:#1D2A31; --shade-1:#1F3B4A; --shade-2:#2A5A72; --shade-3:#3F7F9E; --shade-4:#79B4CF;
   --fomb:#E5689E; --fomb-soft:#3A2230; --revoked:#6F7B80; --focus:#6AA7FF;
+    --pr-legacy:#4D71C8; --pr-tranche:#0AA5BE; --pr-asap:#368346; --pr-accel:#C075B9; --pr-thermal:#766200; --pr-genera:#CC6C4A;
   --f-bunker:#8F4F2A; --f-diesel:#C68230; --f-gas:#3F9BDE; --f-coal:#656B70; --f-solar:#AD8610;
     --f-wind:#2FA98C; --f-hydro:#6E86E2; --f-lfg:#7D9A2C; --f-bess:#CC62AC;
     --st-test:#5CC795; --st-build:#6FB0E0; --st-pre:#D9B455; --st-pause:#EB8A5E; --st-none:#8D9CA3; --st-review:#A78BE0; --warn:#F0B35A; --warn-soft:#3A2C17;
@@ -152,7 +155,8 @@ section.pipeline .dek{margin-top:6px}
 .filters{display:flex;flex-wrap:wrap;gap:10px 20px;align-items:center;margin:26px 0 10px}
 .tablewrap{overflow-x:auto;border:1px solid var(--rule);border-radius:10px;background:var(--panel)}
 table.pt{width:100%;border-collapse:collapse;font-size:13.5px;min-width:1280px}
-.proc{display:inline-block;font-size:12px;font-weight:600;color:var(--ink-2);border:1px solid var(--rule);border-radius:4px;padding:1px 6px;white-space:nowrap}
+.proc{display:inline-block;font-size:12px;font-weight:600;color:var(--pc,var(--ink-2));border:1px solid color-mix(in srgb,var(--pc,var(--rule)) 32%,transparent);border-left:3px solid var(--pc,var(--rule));border-radius:4px;padding:1px 7px;white-space:nowrap;background:color-mix(in srgb,var(--pc,var(--panel)) 9%,var(--panel))}
+.prockey{display:flex;flex-wrap:wrap;gap:6px 10px;margin:4px 0 10px;font-size:12px;color:var(--ink-3);align-items:center}
 .procx{color:var(--ink-3);font-size:11.5px;margin-top:3px;line-height:1.3}
 .tabs{display:flex;gap:2px;margin:22px 0 4px;border-bottom:1px solid var(--rule);overflow-x:auto}
 .tabs button{border:0;background:none;padding:9px 14px;cursor:pointer;font-size:14px;font-weight:600;color:var(--ink-3);border-bottom:2px solid transparent;margin-bottom:-1px;white-space:nowrap}
@@ -221,6 +225,7 @@ table.pm{width:100%;border-collapse:collapse;font-size:13px;min-width:720px}
 .codd{font-weight:600;white-space:nowrap}
 .codx{color:var(--ink-3);font-size:12.5px;margin-top:2px}
 .passed{display:inline-block;margin-top:4px;font-size:11.5px;font-weight:600;color:var(--warn);background:var(--warn-soft);padding:1px 7px;border-radius:999px}
+.underrev{color:var(--st-review);font-weight:600}
 .stagekey{display:flex;flex-wrap:wrap;gap:6px 10px;margin:4px 0 10px;font-size:12px;color:var(--ink-3);align-items:center}
 .codchart{margin:30px 0 4px}
 .codchart h3{font-size:15px;margin:0 0 2px}
@@ -384,6 +389,7 @@ footer{margin-top:28px;padding-top:14px;border-top:1px solid var(--rule);font-si
     <label class="check"><input type="checkbox" id="showRevoked" checked> Include revoked approvals</label>
     <span class="tlabel" id="tableCount"></span>
   </div>
+  <div class="prockey" aria-label="Procurement route key">Procurement:<span id="prockey" style="display:contents"></span></div>
   <div class="stagekey" aria-label="Project stage key">Stage:<span id="stagekey" style="display:contents"></span><span>Status text is truncated in the table; open a row for the full update.</span></div>
   <div class="fpkey"><span>Fixed payment bars compare like with like:</span><span><i style="background:var(--f-solar)"></i>energy price, scaled to $0.25/kWh</span><span><i style="background:var(--f-bess)"></i>storage capacity price, scaled to $30,000/MW-month</span><span>Year-one rates from the July 2026 tracker; ASAP batteries use the standard-offer rate.</span></div>
   <div class="tablewrap">
@@ -905,11 +911,11 @@ const PROJECTS = [
   appr:[{d:"2026-07-01", mo:true, a:"Under Board review", w:"Submitted under the accelerated evaluation process; no determination issued"}], dateUnknown:true,
   terms:"$33,750/MW-month, six-hour storage", fpOwn:[{v:33750,u:"MWmo",n:"Submitted rate, pending review"}], src:[],
   cs:"Submitted under the accelerated evaluation process; awaiting an Oversight Board determination.", cod:"Not available", codD:null, con:"No", ix:"Not stated"},
- {id:"rev-montalva-pv", name:"Montalva solar", dev:"Not stated", muni:null, program:"Accelerated procurement (EO 2025-047)", own:true,
+ {id:"rev-montalva-pv", name:"Montalva solar", dev:"Not stated", muni:"Guánica", program:"Accelerated procurement (EO 2025-047)", own:true,
   comps:[{f:"solar",mw:80}], status:"review", statusText:"Under Oversight Board review; not counted as approved capacity",
   appr:[{d:"2026-07-01", mo:true, a:"Under Board review", w:"Submitted under the accelerated evaluation process; no determination issued"}], dateUnknown:true,
   terms:"$0.1245/kWh", fpOwn:[{v:0.1245,u:"kWh",n:"Submitted rate, pending review"}], src:[], cs:"Submitted under the accelerated evaluation process; awaiting an Oversight Board determination.", cod:"Not available", codD:null, con:"No", ix:"Not stated"},
- {id:"rev-montalva-bess", name:"Montalva storage", dev:"Not stated", muni:null, program:"Accelerated procurement (EO 2025-047)", own:true,
+ {id:"rev-montalva-bess", name:"Montalva storage", dev:"Not stated", muni:"Guánica", program:"Accelerated procurement (EO 2025-047)", own:true,
   comps:[{f:"bess",mw:80,mwh:400}], status:"review", statusText:"Under Oversight Board review; 5-hour duration (80 MW / 400 MWh)",
   appr:[{d:"2026-07-01", mo:true, a:"Under Board review", w:"Submitted under the accelerated evaluation process; no determination issued"}], dateUnknown:true,
   terms:"$29,325/MW-month, five-hour storage", fpOwn:[{v:29325,u:"MWmo",n:"Submitted rate, pending review"}], src:[],
@@ -983,17 +989,25 @@ const FP = {
  "ck1":[{v:0.121,u:"kWh",esc:"Flat",n:"$121/MWh"}]
 };
 PROJECTS.forEach(p=>{ p.fp = p.fpOwn || FP[p.id] || null; });
-const PROC = {
-  "Legacy PPOA (renegotiated)":{l:"Legacy PPOA", o:1},
-  "Tranche 1":{l:"Tranche 1", o:2}, "Tranche 2":{l:"Tranche 2", o:3},
-  "LUMA ASAP standard offer":{l:"ASAP", o:4, x:"LUMA standard offer"},
-  "Accelerated procurement (EO 2025-047)":{l:"Accelerated", o:5, x:"EO 2025-047"},
-  "Genera BESS initiative (not a PPA)":{l:"Genera BESS", o:6, x:"Not a PPA"},
-  "Genera peakers (FEMA-funded, not a PPA)":{l:"Genera peakers", o:6.5, x:"FEMA-funded, not a PPA"},
-  "P3 Authority RFP 2023-01":{l:"P3 RFP 2023-01", o:7, x:"New generation"},
-  "3PPO emergency RFP TPG2":{l:"Temporary generation", o:8, x:"3PPO emergency RFP"}
+// c: colour family. Ten procurement routes fold into six families so the palette stays
+// distinguishable; the chip always carries its own name, so colour is a second cue, not the only one.
+const PROC_FAM = {
+  legacy:{l:"Legacy PPOA", v:"--pr-legacy"}, tranche:{l:"Tranche 1, 2 and 4", v:"--pr-tranche"},
+  asap:{l:"LUMA ASAP", v:"--pr-asap"}, accel:{l:"Accelerated evaluation", v:"--pr-accel"},
+  thermal:{l:"Thermal procurement", v:"--pr-thermal"}, genera:{l:"Genera (PREPA-owned)", v:"--pr-genera"}
 };
-PROJECTS.forEach(p=>{ const q=PROC[p.program]||{l:p.program,o:9}; p.proc=q.l; p.procO=q.o; p.procX=q.x||""; });
+const PROC = {
+  "Legacy PPOA (renegotiated)":{l:"Legacy PPOA", o:1, c:"legacy"},
+  "Tranche 1":{l:"Tranche 1", o:2, c:"tranche"}, "Tranche 2":{l:"Tranche 2", o:3, c:"tranche"},
+  "Tranche 4":{l:"Tranche 4", o:3.5, c:"tranche"},
+  "LUMA ASAP standard offer":{l:"ASAP", o:4, x:"LUMA standard offer", c:"asap"},
+  "Accelerated procurement (EO 2025-047)":{l:"Accelerated", o:5, x:"EO 2025-047", c:"accel"},
+  "Genera BESS initiative (not a PPA)":{l:"Genera BESS", o:6, x:"Not a PPA", c:"genera"},
+  "Genera peakers (FEMA-funded, not a PPA)":{l:"Genera peakers", o:6.5, x:"FEMA-funded, not a PPA", c:"genera"},
+  "P3 Authority RFP 2023-01":{l:"P3 RFP 2023-01", o:7, x:"New generation", c:"thermal"},
+  "3PPO emergency RFP TPG2":{l:"Temporary generation", o:8, x:"3PPO emergency RFP", c:"thermal"}
+};
+PROJECTS.forEach(p=>{ const q=PROC[p.program]||{l:p.program,o:9}; p.proc=q.l; p.procO=q.o; p.procX=q.x||""; p.procC=q.c||null; });
 
 
 // ---- Additional Board actions listed in PREPA's July 2026 tracker (month precision; letters not reviewed) ----
@@ -1139,7 +1153,7 @@ function drawMarkers(){
     .attr("transform",p=>`translate(${p.cx+p.ox/Math.sqrt(K)},${p.cy+p.oy/Math.sqrt(K)}) scale(${1/K})`)
     .attr("d",p=>diamond(rP(p.mw)))
     .classed("dim",p=>state.muni && p.muni!==state.muni)
-    .on("mousemove",(ev,p)=>showTip(ev,`<b>${esc(p.name)}</b><br>${esc(p.muni)} · ${esc(p.program)}<br>${fmt(p.mw)} MW · ${p.status==="revoked"?"approval revoked":p.dateUnknown?"Board letter not located":"Board approval "+fmtD(p.first)}`))
+    .on("mousemove",(ev,p)=>showTip(ev,`<b>${esc(p.name)}</b><br>${esc(p.muni)} · ${esc(p.program)}<br>${fmt(p.mw)} MW · ${p.status==="revoked"?"approval revoked":p.status==="review"?"Under FOMB review":p.dateUnknown?"Board letter not located":"Board approval "+fmtD(p.first)}`))
     .on("mouseleave",hideTip)
     .on("click",(ev,p)=>{ ev.stopPropagation(); state.openRow=p.id; selectMuni(p.muni,true); });
 }
@@ -1217,7 +1231,7 @@ function projDetail(p){
     ${p.terms?`<dt>Terms</dt><dd>${esc(p.terms)}</dd>`:""}
     ${p.note?`<dt>Note</dt><dd>${esc(p.note)}</dd>`:""}</dl>
     <div style="font-weight:600;margin-top:8px">Board actions</div>
-    <ul class="appr">${p.appr.map(x=>`<li><time datetime="${x.d}">${p.dateUnknown?"Date not located":(x.mo?fmtM(x.d):(x.approx?"c. ":"")+fmtD(x.d))}</time>${esc(x.a)}. <span style="color:var(--ink-2)">${esc(x.w)}</span></li>`).join("")}</ul>
+    <ul class="appr">${p.appr.map(x=>`<li><time datetime="${x.d}">${p.status==="review"?"Under FOMB review":p.dateUnknown?"Date not located":(x.mo?fmtM(x.d):(x.approx?"c. ":"")+fmtD(x.d))}</time>${esc(x.a)}. <span style="color:var(--ink-2)">${esc(x.w)}</span></li>`).join("")}</ul>
     ${p.conf==="inferred"?`<p class="note" style="color:var(--fomb)">Board approval inferred: the executed contract and DOE closing require it under the Contract Review Policy, but the specific letter was not located.</p>`:""}
     ${srcLinks(p.src)}`;
 }
@@ -1429,6 +1443,7 @@ function fpCell(p){
 
 function renderTable(){
   document.getElementById("stagekey").innerHTML = Object.keys(STAGES).map(k=>stagePill({stage:k})).join("");
+  document.getElementById("prockey").innerHTML = Object.values(PROC_FAM).map(f=>`<span class="proc" style="--pc:var(${f.v})">${f.l}</span>`).join("");
   let rows = PROJECTS.filter(p=>(state.showRevoked||shown(p)) && (state.year==null||p.year===state.year) && (state.tech==="all"||p.tech===state.tech));
   const {k,dir} = state.sort;
   const val = p => k==="name"?p.name : k==="proc"?(p.procO+100+"|"+p.first) : k==="muni"?(p.muni||"~") : k==="mw"?p.mw : k==="cod"?(p.codD||"9999") : k==="fp"?(p.fp?(p.fp[0].u==="kWh"?p.fp[0].v:1000+p.fp[0].v/1000):1e9) : p.first;
@@ -1437,11 +1452,11 @@ function renderTable(){
   tb.innerHTML = rows.map(p=>`
     <tr class="main ${p.status==="revoked"?"revoked":""}" data-id="${p.id}" tabindex="0" aria-expanded="${state.openRow===p.id}">
       <td><span class="nm">${esc(p.name)}</span></td>
-      <td><span class="proc">${esc(p.proc)}</span>${p.procX?`<div class="procx">${esc(p.procX)}</div>`:""}</td>
+      <td><span class="proc"${p.procC?` style="--pc:var(${PROC_FAM[p.procC].v})"`:""}>${esc(p.proc)}</span>${p.procX?`<div class="procx">${esc(p.procX)}</div>`:""}</td>
       <td>${p.muni?`<a href="#" data-goto="${esc(p.muni)}">${esc(p.muni)}</a>`:`<span style="color:var(--ink-3)">Site not disclosed</span>`}</td>
       <td>${p.comps.map(c=>`<span style="white-space:nowrap"><span class="sw" style="background:var(${FUEL[c.f].v});margin-right:5px;vertical-align:-1px"></span>${FUEL[c.f].label} ${fmt(c.mw)}</span>`).join("<br>")}</td>
       <td class="num"><b>${fmt(p.mw)}</b></td>
-      <td>${p.dateUnknown?"Not located":(p.appr[0].mo?fmtM(p.first):(p.appr[0].approx?"c. ":"")+fmtD(p.first))}<div style="color:var(--ink-3);font-size:12.5px">${esc(p.appr[0].a)}${p.appr.length>1?`; ${p.appr.length-1} later action${p.appr.length>2?"s":""}`:""}</div></td>
+      <td>${p.status==="review"?'<span class="underrev">Under FOMB review</span>':p.dateUnknown?"Not located":(p.appr[0].mo?fmtM(p.first):(p.appr[0].approx?"c. ":"")+fmtD(p.first))}${p.status==="review"?"":`<div style="color:var(--ink-3);font-size:12.5px">${esc(p.appr[0].a)}${p.appr.length>1?`; ${p.appr.length-1} later action${p.appr.length>2?"s":""}`:""}</div>`}</td>
       <td class="cs"><div class="stagerow">${stagePill(p)}${p.status==="conditional"?statusTag(p):""}${p.genera?`<span class="tag gen">Genera initiative · not a PPA</span>`:""}</div><div class="csx clamp">${esc(p.cs)}</div></td>
       <td class="cod">${codCell(p)}</td>
       <td class="fp">${fpCell(p)}</td>
