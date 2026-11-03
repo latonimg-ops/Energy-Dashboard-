@@ -17,7 +17,7 @@
   --fomb:#A8285F; --fomb-soft:#F6E3EC; --revoked:#8A9499; --focus:#1F6FEB;
   --f-bunker:#96522A; --f-diesel:#D4862C; --f-gas:#3C8DC9; --f-coal:#5E6670; --f-solar:#C9920C;
   --f-wind:#2F9C83; --f-hydro:#2B52A8; --f-bess:#AF4694; --f-lfg:#6F8C2B;
-  --st-test:#1F7A55; --st-build:#2C6E9C; --st-pre:#8A6A12; --st-pause:#B4532A; --st-none:#7A888F; --warn:#9A5B00; --warn-soft:#FBEBD2;
+  --st-test:#1F7A55; --st-build:#2C6E9C; --st-pre:#8A6A12; --st-pause:#B4532A; --st-none:#7A888F; --st-review:#6B4FA8; --warn:#9A5B00; --warn-soft:#FBEBD2;
 }
 @media (prefers-color-scheme: dark){
   :root:not([data-theme="light"]){
@@ -27,7 +27,7 @@
     --fomb:#E5689E; --fomb-soft:#3A2230; --revoked:#6F7B80; --focus:#6AA7FF;
     --f-bunker:#8F4F2A; --f-diesel:#C68230; --f-gas:#3F9BDE; --f-coal:#656B70; --f-solar:#AD8610;
     --f-wind:#2FA98C; --f-hydro:#6E86E2; --f-lfg:#7D9A2C; --f-bess:#CC62AC;
-    --st-test:#5CC795; --st-build:#6FB0E0; --st-pre:#D9B455; --st-pause:#EB8A5E; --st-none:#8D9CA3; --warn:#F0B35A; --warn-soft:#3A2C17;
+    --st-test:#5CC795; --st-build:#6FB0E0; --st-pre:#D9B455; --st-pause:#EB8A5E; --st-none:#8D9CA3; --st-review:#A78BE0; --warn:#F0B35A; --warn-soft:#3A2C17;
   }
 }
 :root[data-theme="dark"]{
@@ -37,7 +37,7 @@
   --fomb:#E5689E; --fomb-soft:#3A2230; --revoked:#6F7B80; --focus:#6AA7FF;
   --f-bunker:#8F4F2A; --f-diesel:#C68230; --f-gas:#3F9BDE; --f-coal:#656B70; --f-solar:#AD8610;
     --f-wind:#2FA98C; --f-hydro:#6E86E2; --f-lfg:#7D9A2C; --f-bess:#CC62AC;
-    --st-test:#5CC795; --st-build:#6FB0E0; --st-pre:#D9B455; --st-pause:#EB8A5E; --st-none:#8D9CA3; --warn:#F0B35A; --warn-soft:#3A2C17;
+    --st-test:#5CC795; --st-build:#6FB0E0; --st-pre:#D9B455; --st-pause:#EB8A5E; --st-none:#8D9CA3; --st-review:#A78BE0; --warn:#F0B35A; --warn-soft:#3A2C17;
 }
 *{box-sizing:border-box}
 html,body{margin:0}
@@ -79,6 +79,7 @@ select.muni{padding:6px 8px;border:1px solid var(--rule);border-radius:6px;backg
 .asset:hover,.asset.hl{stroke:var(--ink);stroke-width:2}
 .proj{fill:var(--fomb-soft);stroke:var(--fomb);stroke-width:1.6;cursor:pointer}
 .proj.revoked{stroke:var(--revoked);stroke-dasharray:2 2;fill:none}
+.proj.review{stroke:var(--st-review);stroke-dasharray:3 2;fill:none}
 .proj:hover,.proj.hl{stroke-width:2.8}
 .dim{opacity:.18}
 .legend{background:var(--panel);border-top:1px solid var(--rule);padding:10px 12px;font-size:12px}
@@ -126,6 +127,7 @@ details.item[open]>summary .tw{transform:rotate(90deg)}
 .tag.fomb{border-color:var(--fomb);color:var(--fomb)}
 .tag.rev{border-color:var(--revoked);color:var(--revoked);text-decoration:line-through}
 .tag.cond{border-style:dashed;border-color:var(--fomb);color:var(--fomb)}
+.tag.review{border-style:dashed;border-color:var(--st-review);color:var(--st-review)}
 .tag.gen{border-color:var(--ink-3);color:var(--ink-2);background:var(--rule-2)}
 .tag.op{background:var(--ink);color:var(--paper);border-color:var(--ink)}
 .appr{list-style:none;padding:0;margin:6px 0 0;border-left:2px solid var(--fomb);padding-left:10px}
@@ -295,7 +297,7 @@ footer{margin-top:28px;padding-top:14px;border-top:1px solid var(--rule);font-si
 
 <section class="pipeline" id="pipeline">
   <h2>New generation approved by the Oversight Board, 2020 to date</h2>
-  <p class="dek">Contracts reviewed under the Board's Contract Review Policy (PROMESA §204(b)(2)). Bars show active (non-revoked) capacity by the year of first Board approval; select a year to filter the table and map. Open a row for approval history, contract terms, and sources.</p>
+  <p class="dek">Contracts reviewed under the Board's Contract Review Policy (PROMESA §204(b)(2)). Bars show approved, non-revoked capacity by the year of first Board approval; capacity still under Board review is listed in the table but excluded from the bars. Select a year to filter the table and map. Open a row for approval history, contract terms, and sources.</p>
   <div class="tabs" role="tablist" aria-label="Pipeline views">
     <button role="tab" id="t-projects" data-tab="projects" aria-selected="true" aria-controls="tab-projects">Projects</button>
     <button role="tab" id="t-procurement" data-tab="procurement" aria-selected="false" aria-controls="tab-procurement">Procurement averages</button>
@@ -305,12 +307,15 @@ footer{margin-top:28px;padding-top:14px;border-top:1px solid var(--rule);font-si
   <div class="tabpanel" id="tab-checks" role="tabpanel" aria-labelledby="t-checks" hidden>
     <div class="checks">
       <div class="chk ok"><h3>Reconciled and verified</h3><ul>
-        <li>Coquí Power's accelerated-procurement block reconciles exactly to the tracker's own subtotals: eleven solar contracts totalling <b>523 MW</b> and eleven storage contracts totalling <b>599 MW</b>, 1,122 MW across 22 contracts.</li>
+        <li>Coquí Power's accelerated-procurement block reconciles exactly to the tracker's own subtotals: eleven solar contracts totalling <b>523 MW</b> and eleven storage contracts totalling <b>599 MW</b>, 1,122 MW across 22 contracts. Only the eleven solar PPOAs are approved; the storage contracts remain under Board review and are excluded from approved capacity.</li>
         <li>Genera's six batteries sum to 430 MW, matching the program total the Energy Bureau approved.</li>
         <li>Every average and headline figure on this page was recomputed from the project records. Solar now averages 59.7 MW at a weighted $0.1262/kWh across 27 contracts; storage averages 65.5 MW at a weighted $21,987/MW-month across 40 contracts (rate based on the 30 carrying a $/MW-month price).</li>
       </ul></div>
       <div class="chk fix"><h3>Corrected against the two source documents</h3><ul>
-        <li><b>1,332 MW added</b> that the page previously listed as "not yet mapped": Coquí Power's 22 contracts (1,122 MW, July 2026), the Yabucoa and Naguabo Energy Park batteries (80 MW each, June 2026) and Infinigen Isabela (50 MW, May 2025).</li>
+        <li><b>733 MW of approved capacity added</b> that the page previously listed as "not yet mapped": Coquí Power's eleven solar PPOAs (523 MW, July 2026), the Yabucoa and Naguabo Energy Park batteries (80 MW each, June 2026) and Infinigen Isabela (50 MW, May 2025).</li>
+        <li><b>1,128 MW is now tracked as under Board review</b> rather than approved, and is kept out of every approved total: Coquí Power's eleven storage contracts (599 MW), Yabucoa Energy storage (100 MW), Montalva solar (80 MW) and storage (80 MW), Emerald II Helios storage (25 MW) and Genera's four peaker sites (244 MW). These appear in the table and on the map with a dashed outline.</li>
+        <li>Added Genera's <b>244 MW flexible generation program</b> at Costa Sur, Yabucoa, Jobos and Daguao as thermal projects. The EPC contract under RFP #5195 goes to the P3 Authority and the Oversight Board in Q4 2026, so none is approved capacity yet.</li>
+        <li>Recorded September 2026 actual output for the four units LUMA reports on, against their nameplate: Aguirre 2 at 285 MW of 450, San Juan 6 at 160 MW of 220, Costa Sur 5 at its full 410 MW and Palo Seco 4 at 180 MW of 216.</li>
         <li><b>Pattern Barceloneta storage 50 → 120 MW</b> and <b>Santa Isabel storage 50 → 100 MW</b>. Both documents carry the larger figures, so the March 2026 amendment is treated as the operative one.</li>
         <li><b>Yabucoa Energy Park solar 38.7 → 100 MW</b>, following the capacity increase the tracker records in June 2026.</li>
         <li><b>Solaner San Germán 35 → 40 MW</b> and <b>Infinigen Horizon 18 → 20 MW</b>, taking the contracted capacity in both documents over the earlier figures.</li>
@@ -341,7 +346,11 @@ footer{margin-top:28px;padding-top:14px;border-top:1px solid var(--rule);font-si
       </ul></div>
       <div class="chk gap"><h3>Open items</h3><ul>
         <li><b>The tracker's Power Expectations row is stale.</b> It still lists the 400 MW Aguirre contract as active and executed on June 10, 2026, but the Board revoked its approval on August 14, 2026, and LUMA's October 2026 report refers to "the contract cancellation of one provider". The page keeps it revoked.</li>
-        <li>Counted nowhere, because the tracker marks them under Board review rather than approved: Putnam's CIRO BESS (90 MW), CIRO One X (25 MW), CIRO Two battery (35 MW) and Guayama battery (25 MW), plus Xzerta Energy Volt (60 MW).</li>
+        <li>Also under Board review, but with no capacity or rate detail supplied, so not yet listed as rows: Putnam's CIRO BESS (90 MW), CIRO One X (25 MW), CIRO Two battery (35 MW) and Guayama battery (25 MW), plus Xzerta Energy Volt (60 MW).</li>
+        <li>Rates for the accelerated-evaluation submissions are the figures supplied with the project list: Emerald II Helios $33,750/MW-month over six hours, Montalva storage $29,325/MW-month over five hours, Yabucoa Energy $15,500/MW-month, Montalva solar $0.1245/kWh and Coquí storage $23,500/MW-month. They are submitted terms, not approved ones.</li>
+        <li>Sites are not stated for Montalva or Emerald II Helios, so neither is drawn on the map.</li>
+        <li><b>The peaker capacities are an even split and need confirming.</b> LUMA's report gives 244 MW for the four sites together and never breaks it down, so each site is shown at 61 MW purely so the rows sum to the program total. Commissioning targets are firmer: Costa Sur Q3 2027, Yabucoa Q1 2028, and Jobos and Daguao pending decommissioning authorisation.</li>
+        <li>Two environmental inspections required in the next six months — Costa Sur by November 5, 2026 and Palo Seco by April 2027 — are reported as unfunded in Genera's approved budget, as is the Aguirre 2 overhaul that would restore 115 MW.</li>
         <li>Four Coquí sites — Esmeralda, Caracol, Sierra and La Tuna — have no disclosed municipality and are not drawn on the map. The other seven are placed from the contract name, not from a stated site.</li>
         <li>Two expected CODs have passed without commercial operation: CS/UR Juncos (Sep 2025) and CFE Jobos (May 2026). YFN Yabucoa's lapsed August 2026 date is superseded by LUMA's December 2026.</li>
         <li>LUMA reports the Convergent storage projects at Peñuelas, Ponce and Caguas, and the Tetris solar project, are in the process of being acquired by Pattern.</li>
@@ -401,8 +410,10 @@ footer{margin-top:28px;padding-top:14px;border-top:1px solid var(--rule);font-si
     <h3>What is and isn't included</h3>
     <ul>
       <li>Included: PREPA-owned plants (thermal operated by Genera PR; hydro retained by PREPA), independent power producers, FEMA-funded temporary units, and utility-scale renewables connected to LUMA's grid.</li>
+      <li>Genera's four replacement peaker sites and its six batteries are PREPA-owned programs rather than power purchase agreements, so they carry no contracted rate. The peakers are counted as under review because their EPC contract has not yet gone to the Board.</li>
       <li>Not included: roughly 1,230 MW of rooftop solar (June 2025), customer-sited generators, and projects approved only by PREPA or the Energy Bureau but not yet reviewed by the Board.</li>
-      <li>Coquí Power's eleven sites are shown as paired solar-plus-storage projects because the tracker lists a separate PPOA and ESSA for each farm; the table's 22 underlying contracts are reported as eleven rows.</li>
+      <li>Coquí Power's eleven sites appear as 22 rows, one per contract, because the solar PPOAs are approved while the companion storage ESSAs are still under Board review.</li>
+      <li>Projects under Board review are drawn with a dashed outline, listed in the table and excluded from every approved-capacity total, including the headline figures, the approval-year chart and the procurement averages.</li>
       <li>Now included, after the November 2026 reconciliation: Coquí Power's 22 accelerated-procurement contracts (523 MW solar and 599 MW storage, July 2026), the Yabucoa and Naguabo Energy Park batteries (80 MW each, June 2026) and the Infinigen Isabela battery (50 MW, May 2025).</li>
       <li>Still excluded because the tracker marks them under Board review rather than approved: Putnam's CIRO BESS (90 MW), CIRO One X (25 MW), CIRO Two battery (35 MW) and Guayama battery (25 MW), and Xzerta Energy Volt (60 MW).</li>
       <li>Genera's six battery projects (430 MW) are a Genera PR initiative, not power purchase agreements: PREPA owns the batteries at its existing plants and pays no contracted rate. They are included because PREPA's tracker lists Board approval in January 2025; status comes from Genera's September 2026 progress report, which gives construction milestones but no COD.</li>
@@ -481,19 +492,19 @@ const ASSETS = [
  {id:"aguirre", name:"Aguirre Power Complex", muni:"Salinas", lat:17.9519, lon:-66.2308, ...PREPA_T, units:[
    {u:"Steam unit 1", f:"bunker", mw:450}, {u:"Steam unit 2", f:"bunker", mw:450},
    {u:"Combined cycle (2 blocks)", f:"diesel", mw:592}, {u:"Peaking turbines (2 × 21 MW)", f:"diesel", mw:42}],
-   note:"Largest plant on the island. Steam unit 2 was restored mid-2025 and three combined-cycle units were reactivated in August 2025.", src:["crs","eia","prfaa"]},
+   note:"Largest plant on the island. Steam unit 2 was restored mid-2025 and three combined-cycle units were reactivated in August 2025. LUMA's October 2026 collaborative report gives September 2026 output: unit 2 ran at 285 MW against a 450 MW nameplate, regulating between 230 and 280 MW. A major overhaul in March and April 2027 would raise it to 400 MW, but depends on approval of a budget increase.", src:["crs","eia","prfaa"]},
  {id:"costasur", name:"Costa Sur Power Plant", muni:"Guayanilla", lat:18.008, lon:-66.768, ...PREPA_T, units:[
    {u:"Steam unit 5", f:"gas", mw:410, n:"dual-fuel, oil backup"}, {u:"Steam unit 6", f:"gas", mw:410, n:"dual-fuel, oil backup"},
    {u:"Peaking turbines (2 × 21 MW)", f:"diesel", mw:42}],
-   note:"Units 3–4 are retired. A 410 MW unit returned from repair in May 2025. EIA reports 966 MW for the full site.", src:["eia","prfaa","wri"]},
+   note:"Units 3–4 are retired. A 410 MW unit returned from repair in May 2025. EIA reports 966 MW for the full site. LUMA's October 2026 collaborative report gives September 2026 output: unit 5 ran at its full 410 MW with no outages. A required environmental inspection is due November 5, 2026 and was not funded in Genera's approved budget.", src:["eia","prfaa","wri"]},
  {id:"sanjuan", name:"San Juan Power Plant", muni:"San Juan", lat:18.427, lon:-66.1045, ...PREPA_T, units:[
    {u:"Steam units 7–10 (4 × 100 MW)", f:"bunker", mw:400}, {u:"Combined cycle unit 5", f:"gas", mw:220, n:"diesel backup"},
    {u:"Combined cycle unit 6", f:"gas", mw:220, n:"diesel backup"}, {u:"Temporary TM2500 units (FEMA-funded)", f:"gas", mw:200, n:"placed in service Sept 2023"}],
-   note:"Temporary units were installed by NFE under a federally funded program. EIA reports 784 MW for the permanent plant.", src:["eia","nfe","luma24"]},
+   note:"Temporary units were installed by NFE under a federally funded program. EIA reports 784 MW for the permanent plant. LUMA's October 2026 collaborative report gives September 2026 output: combined-cycle unit 6 ran at 160 MW against a 220 MW nameplate. Its steam-unit repair was moved up to October 2026 and should add 60 MW, for 210 MW.", src:["eia","nfe","luma24"]},
  {id:"paloseco", name:"Palo Seco Power Plant", muni:"Toa Baja", lat:18.4553, lon:-66.1486, ...PREPA_T, units:[
    {u:"Steam unit 3", f:"bunker", mw:216}, {u:"Steam unit 4", f:"bunker", mw:216, n:"back in service 2025 after stator fire"},
    {u:"Temporary TM units (FEMA-funded)", f:"gas", mw:150, n:"in service June 2023"}],
-   note:"Units 1–2 are retired. Gas conversion of units 3–4 was reported as under way in June 2026.", src:["prfaa","nfe","vocero"]},
+   note:"Units 1–2 are retired. Gas conversion of units 3–4 was reported as under way in June 2026. LUMA's October 2026 collaborative report gives September 2026 output: unit 4 rose to 180 MW from 150 MW against a 216 MW nameplate. A required environmental inspection is due April 2027 and was not funded in the current budget.", src:["prfaa","nfe","vocero"]},
  {id:"cambalache", name:"Cambalache Power Plant", muni:"Arecibo", lat:18.4691, lon:-66.6968, ...PREPA_T, units:[
    {u:"Combustion turbines 1–3 (3 × 82.5 MW)", f:"diesel", mw:247.5}],
    note:"Peaking plant. Natural gas conversion of units 2–3 was reported as under way in June 2026.", src:["wri","eia","vocero"]},
@@ -700,71 +711,183 @@ const PROJECTS = [
   fpOwn:[{v:23866,u:"MWmo",n:"Average over the term"}], src:["trk","collab","prebApr"],
   cs:"Interconnection agreement signed; site work under way. LUMA (October 2026): the developer must supply a new Power System Simulator model and execute pending contracts before implementation.", cod:"Dec 31, 2027", codD:"2027-12-31", codN:"LUMA gives July 2028", con:"Yes (land movement)", ix:"Yes"},
  {id:"coqui-esmeralda", name:"Esmeralda Solar Farm", dev:"Coquí Power", muni:null, program:"Accelerated procurement (EO 2025-047)", own:true,
-  comps:[{f:"solar",mw:80},{f:"bess",mw:80}], status:"approved", statusText:"One of 22 Coquí Power contracts (523 MW solar, 599 MW storage) listed as Board-approved in July 2026",
-  appr:[{d:"2026-07-01", mo:true, a:"Approved", w:"PPOA and ESSA under the accelerated procurement process (Listed in PREPA's July 2026 tracker)"}],
-  terms:"Solar 25 years; storage 20 years. Guaranteed COD two years from the closing date", note:"The tracker does not disclose this project's site.",
-  fpOwn:[{v:0.12400,u:"kWh",l:"PV",esc:"+1%/yr"},{v:23500,u:"MWmo",l:"Storage",esc:"+2%/yr"}], src:["trk"],
+  comps:[{f:"solar",mw:80}], status:"approved", statusText:"One of eleven Coquí Power solar PPOAs approved by the Board in July 2026 (523 MW in total)",
+  appr:[{d:"2026-07-01", mo:true, a:"Approved", w:"PPOA under the accelerated evaluation process (Listed in PREPA's July 2026 tracker)"}],
+  terms:"25 years; guaranteed COD two years from the closing date", note:"The tracker does not disclose this project's site.",
+  fpOwn:[{v:0.12400,u:"kWh",esc:"+1%/yr"}], src:["trk"],
   cs:"PREPA's tracker (July 2026): construction has commenced for U.S. tax safe-harbor purposes through initiation of off-site transformer manufacturing. On-site construction has not yet begun.", cod:"Two years from the closing date", codD:null, con:"No (off-site safe-harbor work only)", ix:"Yes (see comments)"},
+ {id:"coqui-esmeralda-bess", name:"Esmeralda Solar Farm storage", dev:"Coquí Power", muni:null, program:"Accelerated procurement (EO 2025-047)", own:true,
+  comps:[{f:"bess",mw:80}], status:"review", statusText:"Companion storage contract still under Oversight Board review; not counted as approved capacity",
+  appr:[{d:"2026-07-01", mo:true, a:"Under Board review", w:"ESSA submitted under the accelerated evaluation process; no determination issued"}], dateUnknown:true,
+  terms:"20 years; $23,500/MW-month escalating 2%/yr if approved", note:"The tracker does not disclose this project's site.",
+  fpOwn:[{v:23500,u:"MWmo",esc:"+2%/yr",n:"Submitted rate, pending review"}], src:["trk"],
+  cs:"Submitted under the accelerated evaluation process; awaiting an Oversight Board determination.", cod:"Not available", codD:null, con:"No", ix:"Yes (see comments)"},
  {id:"coqui-caracol", name:"Caracol Solar Farm", dev:"Coquí Power", muni:null, program:"Accelerated procurement (EO 2025-047)", own:true,
-  comps:[{f:"solar",mw:25},{f:"bess",mw:25}], status:"approved", statusText:"One of 22 Coquí Power contracts (523 MW solar, 599 MW storage) listed as Board-approved in July 2026",
-  appr:[{d:"2026-07-01", mo:true, a:"Approved", w:"PPOA and ESSA under the accelerated procurement process (Listed in PREPA's July 2026 tracker)"}],
-  terms:"Solar 25 years; storage 20 years. Guaranteed COD two years from the closing date", note:"The tracker does not disclose this project's site.",
-  fpOwn:[{v:0.15800,u:"kWh",l:"PV",esc:"+1%/yr"},{v:23500,u:"MWmo",l:"Storage",esc:"+2%/yr"}], src:["trk"],
+  comps:[{f:"solar",mw:25}], status:"approved", statusText:"One of eleven Coquí Power solar PPOAs approved by the Board in July 2026 (523 MW in total)",
+  appr:[{d:"2026-07-01", mo:true, a:"Approved", w:"PPOA under the accelerated evaluation process (Listed in PREPA's July 2026 tracker)"}],
+  terms:"25 years; guaranteed COD two years from the closing date", note:"The tracker does not disclose this project's site.",
+  fpOwn:[{v:0.15800,u:"kWh",esc:"+1%/yr"}], src:["trk"],
   cs:"PREPA's tracker (July 2026): construction has commenced for U.S. tax safe-harbor purposes through initiation of off-site transformer manufacturing. On-site construction has not yet begun.", cod:"Two years from the closing date", codD:null, con:"No (off-site safe-harbor work only)", ix:"Yes (see comments)"},
+ {id:"coqui-caracol-bess", name:"Caracol Solar Farm storage", dev:"Coquí Power", muni:null, program:"Accelerated procurement (EO 2025-047)", own:true,
+  comps:[{f:"bess",mw:25}], status:"review", statusText:"Companion storage contract still under Oversight Board review; not counted as approved capacity",
+  appr:[{d:"2026-07-01", mo:true, a:"Under Board review", w:"ESSA submitted under the accelerated evaluation process; no determination issued"}], dateUnknown:true,
+  terms:"20 years; $23,500/MW-month escalating 2%/yr if approved", note:"The tracker does not disclose this project's site.",
+  fpOwn:[{v:23500,u:"MWmo",esc:"+2%/yr",n:"Submitted rate, pending review"}], src:["trk"],
+  cs:"Submitted under the accelerated evaluation process; awaiting an Oversight Board determination.", cod:"Not available", codD:null, con:"No", ix:"Yes (see comments)"},
  {id:"coqui-sierra", name:"Sierra Solar Farm", dev:"Coquí Power", muni:null, program:"Accelerated procurement (EO 2025-047)", own:true,
-  comps:[{f:"solar",mw:25},{f:"bess",mw:25}], status:"approved", statusText:"One of 22 Coquí Power contracts (523 MW solar, 599 MW storage) listed as Board-approved in July 2026",
-  appr:[{d:"2026-07-01", mo:true, a:"Approved", w:"PPOA and ESSA under the accelerated procurement process (Listed in PREPA's July 2026 tracker)"}],
-  terms:"Solar 25 years; storage 20 years. Guaranteed COD two years from the closing date", note:"The tracker does not disclose this project's site.",
-  fpOwn:[{v:0.17000,u:"kWh",l:"PV",esc:"+1%/yr"},{v:23500,u:"MWmo",l:"Storage",esc:"+2%/yr"}], src:["trk"],
+  comps:[{f:"solar",mw:25}], status:"approved", statusText:"One of eleven Coquí Power solar PPOAs approved by the Board in July 2026 (523 MW in total)",
+  appr:[{d:"2026-07-01", mo:true, a:"Approved", w:"PPOA under the accelerated evaluation process (Listed in PREPA's July 2026 tracker)"}],
+  terms:"25 years; guaranteed COD two years from the closing date", note:"The tracker does not disclose this project's site.",
+  fpOwn:[{v:0.17000,u:"kWh",esc:"+1%/yr"}], src:["trk"],
   cs:"PREPA's tracker (July 2026): construction has commenced for U.S. tax safe-harbor purposes through initiation of off-site transformer manufacturing. On-site construction has not yet begun.", cod:"Two years from the closing date", codD:null, con:"No (off-site safe-harbor work only)", ix:"Yes (see comments)"},
+ {id:"coqui-sierra-bess", name:"Sierra Solar Farm storage", dev:"Coquí Power", muni:null, program:"Accelerated procurement (EO 2025-047)", own:true,
+  comps:[{f:"bess",mw:25}], status:"review", statusText:"Companion storage contract still under Oversight Board review; not counted as approved capacity",
+  appr:[{d:"2026-07-01", mo:true, a:"Under Board review", w:"ESSA submitted under the accelerated evaluation process; no determination issued"}], dateUnknown:true,
+  terms:"20 years; $23,500/MW-month escalating 2%/yr if approved", note:"The tracker does not disclose this project's site.",
+  fpOwn:[{v:23500,u:"MWmo",esc:"+2%/yr",n:"Submitted rate, pending review"}], src:["trk"],
+  cs:"Submitted under the accelerated evaluation process; awaiting an Oversight Board determination.", cod:"Not available", codD:null, con:"No", ix:"Yes (see comments)"},
  {id:"coqui-salinas", name:"Salinas Solar Farm", dev:"Coquí Power", muni:"Salinas", program:"Accelerated procurement (EO 2025-047)", own:true,
-  comps:[{f:"solar",mw:74},{f:"bess",mw:74}], status:"approved", statusText:"One of 22 Coquí Power contracts (523 MW solar, 599 MW storage) listed as Board-approved in July 2026",
-  appr:[{d:"2026-07-01", mo:true, a:"Approved", w:"PPOA and ESSA under the accelerated procurement process (Listed in PREPA's July 2026 tracker)"}],
-  terms:"Solar 25 years; storage 20 years. Guaranteed COD two years from the closing date", note:"Municipality inferred from the contract name; PREPA's tracker does not state a site.",
-  fpOwn:[{v:0.13100,u:"kWh",l:"PV",esc:"+1%/yr"},{v:23500,u:"MWmo",l:"Storage",esc:"+2%/yr"}], src:["trk"],
+  comps:[{f:"solar",mw:74}], status:"approved", statusText:"One of eleven Coquí Power solar PPOAs approved by the Board in July 2026 (523 MW in total)",
+  appr:[{d:"2026-07-01", mo:true, a:"Approved", w:"PPOA under the accelerated evaluation process (Listed in PREPA's July 2026 tracker)"}],
+  terms:"25 years; guaranteed COD two years from the closing date", note:"Municipality inferred from the contract name; PREPA's tracker does not state a site.",
+  fpOwn:[{v:0.13100,u:"kWh",esc:"+1%/yr"}], src:["trk"],
   cs:"PREPA's tracker (July 2026): construction has commenced for U.S. tax safe-harbor purposes through initiation of off-site transformer manufacturing. On-site construction has not yet begun.", cod:"Two years from the closing date", codD:null, con:"No (off-site safe-harbor work only)", ix:"Yes (see comments)"},
+ {id:"coqui-salinas-bess", name:"Salinas Solar Farm storage", dev:"Coquí Power", muni:"Salinas", program:"Accelerated procurement (EO 2025-047)", own:true,
+  comps:[{f:"bess",mw:74}], status:"review", statusText:"Companion storage contract still under Oversight Board review; not counted as approved capacity",
+  appr:[{d:"2026-07-01", mo:true, a:"Under Board review", w:"ESSA submitted under the accelerated evaluation process; no determination issued"}], dateUnknown:true,
+  terms:"20 years; $23,500/MW-month escalating 2%/yr if approved", note:"Municipality inferred from the contract name; PREPA's tracker does not state a site.",
+  fpOwn:[{v:23500,u:"MWmo",esc:"+2%/yr",n:"Submitted rate, pending review"}], src:["trk"],
+  cs:"Submitted under the accelerated evaluation process; awaiting an Oversight Board determination.", cod:"Not available", codD:null, con:"No", ix:"Yes (see comments)"},
  {id:"coqui-guayama-etc", name:"Guayama ETC Solar Farm", dev:"Coquí Power", muni:"Guayama", program:"Accelerated procurement (EO 2025-047)", own:true,
-  comps:[{f:"solar",mw:50},{f:"bess",mw:50}], status:"approved", statusText:"One of 22 Coquí Power contracts (523 MW solar, 599 MW storage) listed as Board-approved in July 2026",
-  appr:[{d:"2026-07-01", mo:true, a:"Approved", w:"PPOA and ESSA under the accelerated procurement process (Listed in PREPA's July 2026 tracker)"}],
-  terms:"Solar 25 years; storage 20 years. Guaranteed COD two years from the closing date", note:"Municipality inferred from the contract name; PREPA's tracker does not state a site.",
-  fpOwn:[{v:0.16000,u:"kWh",l:"PV",esc:"+1%/yr"},{v:23500,u:"MWmo",l:"Storage",esc:"+2%/yr"}], src:["trk"],
+  comps:[{f:"solar",mw:50}], status:"approved", statusText:"One of eleven Coquí Power solar PPOAs approved by the Board in July 2026 (523 MW in total)",
+  appr:[{d:"2026-07-01", mo:true, a:"Approved", w:"PPOA under the accelerated evaluation process (Listed in PREPA's July 2026 tracker)"}],
+  terms:"25 years; guaranteed COD two years from the closing date", note:"Municipality inferred from the contract name; PREPA's tracker does not state a site.",
+  fpOwn:[{v:0.16000,u:"kWh",esc:"+1%/yr"}], src:["trk"],
   cs:"PREPA's tracker (July 2026): construction has commenced for U.S. tax safe-harbor purposes through initiation of off-site transformer manufacturing. On-site construction has not yet begun.", cod:"Two years from the closing date", codD:null, con:"No (off-site safe-harbor work only)", ix:"Yes (see comments)"},
+ {id:"coqui-guayama-etc-bess", name:"Guayama ETC Solar Farm storage", dev:"Coquí Power", muni:"Guayama", program:"Accelerated procurement (EO 2025-047)", own:true,
+  comps:[{f:"bess",mw:50}], status:"review", statusText:"Companion storage contract still under Oversight Board review; not counted as approved capacity",
+  appr:[{d:"2026-07-01", mo:true, a:"Under Board review", w:"ESSA submitted under the accelerated evaluation process; no determination issued"}], dateUnknown:true,
+  terms:"20 years; $23,500/MW-month escalating 2%/yr if approved", note:"Municipality inferred from the contract name; PREPA's tracker does not state a site.",
+  fpOwn:[{v:23500,u:"MWmo",esc:"+2%/yr",n:"Submitted rate, pending review"}], src:["trk"],
+  cs:"Submitted under the accelerated evaluation process; awaiting an Oversight Board determination.", cod:"Not available", codD:null, con:"No", ix:"Yes (see comments)"},
  {id:"coqui-aguirre", name:"Aguirre Solar Farm", dev:"Coquí Power", muni:"Salinas", program:"Accelerated procurement (EO 2025-047)", own:true,
-  comps:[{f:"solar",mw:34},{f:"bess",mw:50}], status:"approved", statusText:"One of 22 Coquí Power contracts (523 MW solar, 599 MW storage) listed as Board-approved in July 2026",
-  appr:[{d:"2026-07-01", mo:true, a:"Approved", w:"PPOA and ESSA under the accelerated procurement process (Listed in PREPA's July 2026 tracker)"}],
-  terms:"Solar 25 years; storage 20 years. Guaranteed COD two years from the closing date", note:"Municipality inferred from the contract name; PREPA's tracker does not state a site.",
-  fpOwn:[{v:0.16600,u:"kWh",l:"PV",esc:"+1%/yr"},{v:23500,u:"MWmo",l:"Storage",esc:"+2%/yr"}], src:["trk"],
+  comps:[{f:"solar",mw:34}], status:"approved", statusText:"One of eleven Coquí Power solar PPOAs approved by the Board in July 2026 (523 MW in total)",
+  appr:[{d:"2026-07-01", mo:true, a:"Approved", w:"PPOA under the accelerated evaluation process (Listed in PREPA's July 2026 tracker)"}],
+  terms:"25 years; guaranteed COD two years from the closing date", note:"Municipality inferred from the contract name; PREPA's tracker does not state a site.",
+  fpOwn:[{v:0.16600,u:"kWh",esc:"+1%/yr"}], src:["trk"],
   cs:"PREPA's tracker (July 2026): construction has commenced for U.S. tax safe-harbor purposes through initiation of off-site transformer manufacturing. On-site construction has not yet begun.", cod:"Two years from the closing date", codD:null, con:"No (off-site safe-harbor work only)", ix:"Yes (see comments)"},
+ {id:"coqui-aguirre-bess", name:"Aguirre Solar Farm storage", dev:"Coquí Power", muni:"Salinas", program:"Accelerated procurement (EO 2025-047)", own:true,
+  comps:[{f:"bess",mw:50}], status:"review", statusText:"Companion storage contract still under Oversight Board review; not counted as approved capacity",
+  appr:[{d:"2026-07-01", mo:true, a:"Under Board review", w:"ESSA submitted under the accelerated evaluation process; no determination issued"}], dateUnknown:true,
+  terms:"20 years; $23,500/MW-month escalating 2%/yr if approved", note:"Municipality inferred from the contract name; PREPA's tracker does not state a site.",
+  fpOwn:[{v:23500,u:"MWmo",esc:"+2%/yr",n:"Submitted rate, pending review"}], src:["trk"],
+  cs:"Submitted under the accelerated evaluation process; awaiting an Oversight Board determination.", cod:"Not available", codD:null, con:"No", ix:"Yes (see comments)"},
  {id:"coqui-juana-diaz", name:"Juana Díaz Solar Farm", dev:"Coquí Power", muni:"Juana Díaz", program:"Accelerated procurement (EO 2025-047)", own:true,
-  comps:[{f:"solar",mw:25},{f:"bess",mw:25}], status:"approved", statusText:"One of 22 Coquí Power contracts (523 MW solar, 599 MW storage) listed as Board-approved in July 2026",
-  appr:[{d:"2026-07-01", mo:true, a:"Approved", w:"PPOA and ESSA under the accelerated procurement process (Listed in PREPA's July 2026 tracker)"}],
-  terms:"Solar 25 years; storage 20 years. Guaranteed COD two years from the closing date", note:"Municipality inferred from the contract name; PREPA's tracker does not state a site.",
-  fpOwn:[{v:0.15300,u:"kWh",l:"PV",esc:"+1%/yr"},{v:23500,u:"MWmo",l:"Storage",esc:"+2%/yr"}], src:["trk"],
+  comps:[{f:"solar",mw:25}], status:"approved", statusText:"One of eleven Coquí Power solar PPOAs approved by the Board in July 2026 (523 MW in total)",
+  appr:[{d:"2026-07-01", mo:true, a:"Approved", w:"PPOA under the accelerated evaluation process (Listed in PREPA's July 2026 tracker)"}],
+  terms:"25 years; guaranteed COD two years from the closing date", note:"Municipality inferred from the contract name; PREPA's tracker does not state a site.",
+  fpOwn:[{v:0.15300,u:"kWh",esc:"+1%/yr"}], src:["trk"],
   cs:"PREPA's tracker (July 2026): construction has commenced for U.S. tax safe-harbor purposes through initiation of off-site transformer manufacturing. On-site construction has not yet begun.", cod:"Two years from the closing date", codD:null, con:"No (off-site safe-harbor work only)", ix:"No (see comments)"},
+ {id:"coqui-juana-diaz-bess", name:"Juana Díaz Solar Farm storage", dev:"Coquí Power", muni:"Juana Díaz", program:"Accelerated procurement (EO 2025-047)", own:true,
+  comps:[{f:"bess",mw:25}], status:"review", statusText:"Companion storage contract still under Oversight Board review; not counted as approved capacity",
+  appr:[{d:"2026-07-01", mo:true, a:"Under Board review", w:"ESSA submitted under the accelerated evaluation process; no determination issued"}], dateUnknown:true,
+  terms:"20 years; $23,500/MW-month escalating 2%/yr if approved", note:"Municipality inferred from the contract name; PREPA's tracker does not state a site.",
+  fpOwn:[{v:23500,u:"MWmo",esc:"+2%/yr",n:"Submitted rate, pending review"}], src:["trk"],
+  cs:"Submitted under the accelerated evaluation process; awaiting an Oversight Board determination.", cod:"Not available", codD:null, con:"No", ix:"No (see comments)"},
  {id:"coqui-sabana-grande", name:"Sabana Grande Solar Farm", dev:"Coquí Power", muni:"Sabana Grande", program:"Accelerated procurement (EO 2025-047)", own:true,
-  comps:[{f:"solar",mw:25},{f:"bess",mw:25}], status:"approved", statusText:"One of 22 Coquí Power contracts (523 MW solar, 599 MW storage) listed as Board-approved in July 2026",
-  appr:[{d:"2026-07-01", mo:true, a:"Approved", w:"PPOA and ESSA under the accelerated procurement process (Listed in PREPA's July 2026 tracker)"}],
-  terms:"Solar 25 years; storage 20 years. Guaranteed COD two years from the closing date", note:"Municipality inferred from the contract name; PREPA's tracker does not state a site.",
-  fpOwn:[{v:0.18400,u:"kWh",l:"PV",esc:"+1%/yr"},{v:23500,u:"MWmo",l:"Storage",esc:"+2%/yr"}], src:["trk"],
+  comps:[{f:"solar",mw:25}], status:"approved", statusText:"One of eleven Coquí Power solar PPOAs approved by the Board in July 2026 (523 MW in total)",
+  appr:[{d:"2026-07-01", mo:true, a:"Approved", w:"PPOA under the accelerated evaluation process (Listed in PREPA's July 2026 tracker)"}],
+  terms:"25 years; guaranteed COD two years from the closing date", note:"Municipality inferred from the contract name; PREPA's tracker does not state a site.",
+  fpOwn:[{v:0.18400,u:"kWh",esc:"+1%/yr"}], src:["trk"],
   cs:"PREPA's tracker (July 2026): construction has commenced for U.S. tax safe-harbor purposes through initiation of off-site transformer manufacturing. On-site construction has not yet begun.", cod:"Two years from the closing date", codD:null, con:"No (off-site safe-harbor work only)", ix:"No (see comments)"},
+ {id:"coqui-sabana-grande-bess", name:"Sabana Grande Solar Farm storage", dev:"Coquí Power", muni:"Sabana Grande", program:"Accelerated procurement (EO 2025-047)", own:true,
+  comps:[{f:"bess",mw:25}], status:"review", statusText:"Companion storage contract still under Oversight Board review; not counted as approved capacity",
+  appr:[{d:"2026-07-01", mo:true, a:"Under Board review", w:"ESSA submitted under the accelerated evaluation process; no determination issued"}], dateUnknown:true,
+  terms:"20 years; $23,500/MW-month escalating 2%/yr if approved", note:"Municipality inferred from the contract name; PREPA's tracker does not state a site.",
+  fpOwn:[{v:23500,u:"MWmo",esc:"+2%/yr",n:"Submitted rate, pending review"}], src:["trk"],
+  cs:"Submitted under the accelerated evaluation process; awaiting an Oversight Board determination.", cod:"Not available", codD:null, con:"No", ix:"No (see comments)"},
  {id:"coqui-santa-isabel", name:"Santa Isabel Solar Farm", dev:"Coquí Power", muni:"Santa Isabel", program:"Accelerated procurement (EO 2025-047)", own:true,
-  comps:[{f:"solar",mw:40},{f:"bess",mw:100}], status:"approved", statusText:"One of 22 Coquí Power contracts (523 MW solar, 599 MW storage) listed as Board-approved in July 2026",
-  appr:[{d:"2026-07-01", mo:true, a:"Approved", w:"PPOA and ESSA under the accelerated procurement process (Listed in PREPA's July 2026 tracker)"}],
-  terms:"Solar 25 years; storage 20 years. Guaranteed COD two years from the closing date", note:"Municipality inferred from the contract name; PREPA's tracker does not state a site.",
-  fpOwn:[{v:0.15000,u:"kWh",l:"PV",esc:"+1%/yr"},{v:23500,u:"MWmo",l:"Storage",esc:"+2%/yr"}], src:["trk"],
+  comps:[{f:"solar",mw:40}], status:"approved", statusText:"One of eleven Coquí Power solar PPOAs approved by the Board in July 2026 (523 MW in total)",
+  appr:[{d:"2026-07-01", mo:true, a:"Approved", w:"PPOA under the accelerated evaluation process (Listed in PREPA's July 2026 tracker)"}],
+  terms:"25 years; guaranteed COD two years from the closing date", note:"Municipality inferred from the contract name; PREPA's tracker does not state a site.",
+  fpOwn:[{v:0.15000,u:"kWh",esc:"+1%/yr"}], src:["trk"],
   cs:"PREPA's tracker (July 2026): construction has commenced for U.S. tax safe-harbor purposes through initiation of off-site transformer manufacturing. On-site construction has not yet begun.", cod:"Two years from the closing date", codD:null, con:"No (off-site safe-harbor work only)", ix:"Yes (see comments)"},
+ {id:"coqui-santa-isabel-bess", name:"Santa Isabel Solar Farm storage", dev:"Coquí Power", muni:"Santa Isabel", program:"Accelerated procurement (EO 2025-047)", own:true,
+  comps:[{f:"bess",mw:100}], status:"review", statusText:"Companion storage contract still under Oversight Board review; not counted as approved capacity",
+  appr:[{d:"2026-07-01", mo:true, a:"Under Board review", w:"ESSA submitted under the accelerated evaluation process; no determination issued"}], dateUnknown:true,
+  terms:"20 years; $23,500/MW-month escalating 2%/yr if approved", note:"Municipality inferred from the contract name; PREPA's tracker does not state a site.",
+  fpOwn:[{v:23500,u:"MWmo",esc:"+2%/yr",n:"Submitted rate, pending review"}], src:["trk"],
+  cs:"Submitted under the accelerated evaluation process; awaiting an Oversight Board determination.", cod:"Not available", codD:null, con:"No", ix:"Yes (see comments)"},
  {id:"coqui-naguabo", name:"Naguabo Solar Farm", dev:"Coquí Power", muni:"Naguabo", program:"Accelerated procurement (EO 2025-047)", own:true,
-  comps:[{f:"solar",mw:45},{f:"bess",mw:45}], status:"approved", statusText:"One of 22 Coquí Power contracts (523 MW solar, 599 MW storage) listed as Board-approved in July 2026",
-  appr:[{d:"2026-07-01", mo:true, a:"Approved", w:"PPOA and ESSA under the accelerated procurement process (Listed in PREPA's July 2026 tracker)"}],
-  terms:"Solar 25 years; storage 20 years. Guaranteed COD two years from the closing date", note:"Municipality inferred from the contract name; PREPA's tracker does not state a site.",
-  fpOwn:[{v:0.17036,u:"kWh",l:"PV",esc:"+1%/yr"},{v:23500,u:"MWmo",l:"Storage",esc:"+2%/yr"}], src:["trk"],
+  comps:[{f:"solar",mw:45}], status:"approved", statusText:"One of eleven Coquí Power solar PPOAs approved by the Board in July 2026 (523 MW in total)",
+  appr:[{d:"2026-07-01", mo:true, a:"Approved", w:"PPOA under the accelerated evaluation process (Listed in PREPA's July 2026 tracker)"}],
+  terms:"25 years; guaranteed COD two years from the closing date", note:"Municipality inferred from the contract name; PREPA's tracker does not state a site.",
+  fpOwn:[{v:0.17036,u:"kWh",esc:"+1%/yr"}], src:["trk"],
   cs:"PREPA's tracker (July 2026): construction has commenced for U.S. tax safe-harbor purposes through initiation of off-site transformer manufacturing. On-site construction has not yet begun.", cod:"Two years from the closing date", codD:null, con:"No (off-site safe-harbor work only)", ix:"Yes (see comments)"},
+ {id:"coqui-naguabo-bess", name:"Naguabo Solar Farm storage", dev:"Coquí Power", muni:"Naguabo", program:"Accelerated procurement (EO 2025-047)", own:true,
+  comps:[{f:"bess",mw:45}], status:"review", statusText:"Companion storage contract still under Oversight Board review; not counted as approved capacity",
+  appr:[{d:"2026-07-01", mo:true, a:"Under Board review", w:"ESSA submitted under the accelerated evaluation process; no determination issued"}], dateUnknown:true,
+  terms:"20 years; $23,500/MW-month escalating 2%/yr if approved", note:"Municipality inferred from the contract name; PREPA's tracker does not state a site.",
+  fpOwn:[{v:23500,u:"MWmo",esc:"+2%/yr",n:"Submitted rate, pending review"}], src:["trk"],
+  cs:"Submitted under the accelerated evaluation process; awaiting an Oversight Board determination.", cod:"Not available", codD:null, con:"No", ix:"Yes (see comments)"},
  {id:"coqui-la-tuna", name:"La Tuna Solar Farm", dev:"Coquí Power", muni:null, program:"Accelerated procurement (EO 2025-047)", own:true,
-  comps:[{f:"solar",mw:100},{f:"bess",mw:100}], status:"approved", statusText:"One of 22 Coquí Power contracts (523 MW solar, 599 MW storage) listed as Board-approved in July 2026",
-  appr:[{d:"2026-07-01", mo:true, a:"Approved", w:"PPOA and ESSA under the accelerated procurement process (Listed in PREPA's July 2026 tracker)"}],
-  terms:"Solar 25 years; storage 20 years. Guaranteed COD two years from the closing date", note:"The tracker does not disclose this project's site.",
-  fpOwn:[{v:0.12800,u:"kWh",l:"PV",esc:"+1%/yr"},{v:23500,u:"MWmo",l:"Storage",esc:"+2%/yr"}], src:["trk"],
+  comps:[{f:"solar",mw:100}], status:"approved", statusText:"One of eleven Coquí Power solar PPOAs approved by the Board in July 2026 (523 MW in total)",
+  appr:[{d:"2026-07-01", mo:true, a:"Approved", w:"PPOA under the accelerated evaluation process (Listed in PREPA's July 2026 tracker)"}],
+  terms:"25 years; guaranteed COD two years from the closing date", note:"The tracker does not disclose this project's site.",
+  fpOwn:[{v:0.12800,u:"kWh",esc:"+1%/yr"}], src:["trk"],
   cs:"PREPA's tracker (July 2026): construction has commenced for U.S. tax safe-harbor purposes through initiation of off-site transformer manufacturing. On-site construction has not yet begun.", cod:"Two years from the closing date", codD:null, con:"No (off-site safe-harbor work only)", ix:"Yes (see comments)"},
+ {id:"coqui-la-tuna-bess", name:"La Tuna Solar Farm storage", dev:"Coquí Power", muni:null, program:"Accelerated procurement (EO 2025-047)", own:true,
+  comps:[{f:"bess",mw:100}], status:"review", statusText:"Companion storage contract still under Oversight Board review; not counted as approved capacity",
+  appr:[{d:"2026-07-01", mo:true, a:"Under Board review", w:"ESSA submitted under the accelerated evaluation process; no determination issued"}], dateUnknown:true,
+  terms:"20 years; $23,500/MW-month escalating 2%/yr if approved", note:"The tracker does not disclose this project's site.",
+  fpOwn:[{v:23500,u:"MWmo",esc:"+2%/yr",n:"Submitted rate, pending review"}], src:["trk"],
+  cs:"Submitted under the accelerated evaluation process; awaiting an Oversight Board determination.", cod:"Not available", codD:null, con:"No", ix:"Yes (see comments)"},
+ // ---- Genera's 244 MW flexible generation program (four peaker sites) ----
+ {id:"peaker-costasur", name:"Costa Sur peakers", dev:"Genera PR (PREPA-owned)", muni:"Guayanilla", program:"Genera peakers (FEMA-funded, not a PPA)", own:true, genera:true,
+  comps:[{f:"gas",mw:61, n:"Share of the 244 MW program; per-site split not disclosed"}], status:"review",
+  statusText:"Part of Genera's 244 MW flexible generation program; the EPC contract goes to the P3 Authority and the Oversight Board in Q4 2026",
+  appr:[{d:"2026-10-01", mo:true, a:"Not yet before the Board", w:"EPC contract submission to the P3 Authority and the Oversight Board targeted for Q4 2026"}], dateUnknown:true,
+  terms:"FEMA-funded replacement peaking units; PREPA owns the plant and pays no contracted rate", note:"The report gives 244 MW for the four sites together and does not break the capacity down by site; 61 MW is the program total divided evenly, shown so the four rows sum correctly.",
+  src:["collab"], cs:"Closing documentation phase. FEMA approval was requested September 20, 2024 and granted October 30, 2025; contractor procurement began immediately and is still under way, with proposals for RFP #5228 (civil, structural and peaker installation) extended to October 2026. Genera is developing the scope of work for the point-of-interconnection RFP.", cod:"Targeted Q3 2027", codD:"2027-09-30", con:"No", ix:"Point-of-interconnection RFP in preparation"},
+ {id:"peaker-yabucoa", name:"Yabucoa peakers", dev:"Genera PR (PREPA-owned)", muni:"Yabucoa", program:"Genera peakers (FEMA-funded, not a PPA)", own:true, genera:true,
+  comps:[{f:"gas",mw:61, n:"Share of the 244 MW program; per-site split not disclosed"}], status:"review",
+  statusText:"Part of Genera's 244 MW flexible generation program; the EPC contract goes to the P3 Authority and the Oversight Board in Q4 2026",
+  appr:[{d:"2026-10-01", mo:true, a:"Not yet before the Board", w:"EPC contract submission to the P3 Authority and the Oversight Board targeted for Q4 2026"}], dateUnknown:true,
+  terms:"FEMA-funded replacement peaking units; PREPA owns the plant and pays no contracted rate", note:"The report gives 244 MW for the four sites together and does not break the capacity down by site; 61 MW is the program total divided evenly, shown so the four rows sum correctly.",
+  src:["collab"], cs:"The only peaker site taken out of service so far. LUMA authorised disconnection and decommissioning on April 10, 2026; the P3 Authority issued the decommissioning notice on June 2, 2026; Genera submitted its decommissioning plan on July 1 and received conditional approval on September 10, 2026, then revised and resubmitted it. The demolition contract went to the P3 Authority on September 25 and the EPC contract is under negotiation. Notice to proceed remains contingent on final approval of the decommissioning plan and on the land transfer agreed with PREPA on September 25.", cod:"Targeted Q1 2028", codD:"2028-03-31", con:"No", ix:"Point-of-interconnection RFP in preparation"},
+ {id:"peaker-jobos", name:"Jobos peakers", dev:"Genera PR (PREPA-owned)", muni:"Guayama", program:"Genera peakers (FEMA-funded, not a PPA)", own:true, genera:true,
+  comps:[{f:"gas",mw:61, n:"Share of the 244 MW program; per-site split not disclosed"}], status:"review",
+  statusText:"Part of Genera's 244 MW flexible generation program; the EPC contract goes to the P3 Authority and the Oversight Board in Q4 2026",
+  appr:[{d:"2026-10-01", mo:true, a:"Not yet before the Board", w:"EPC contract submission to the P3 Authority and the Oversight Board targeted for Q4 2026"}], dateUnknown:true,
+  terms:"FEMA-funded replacement peaking units; PREPA owns the plant and pays no contracted rate", note:"The report gives 244 MW for the four sites together and does not break the capacity down by site; 61 MW is the program total divided evenly, shown so the four rows sum correctly.",
+  src:["collab"], cs:"EPC contract under RFP #5195 is being negotiated; submission to the P3 Authority and the Oversight Board is targeted for Q4 2026. LUMA concurred with decommissioning the impaired Jobos 1-1 unit in November 2024 but objected to Jobos 1-2, and demolition of the impaired unit cannot begin without risk to the operating unit. Decommissioning remains contingent on interconnecting the Vega Baja and Cambalache batteries.", cod:"Pending decommissioning authorisation", codD:null, con:"No", ix:"Point-of-interconnection RFP in preparation"},
+ {id:"peaker-daguao", name:"Daguao peakers", dev:"Genera PR (PREPA-owned)", muni:"Ceiba", program:"Genera peakers (FEMA-funded, not a PPA)", own:true, genera:true,
+  comps:[{f:"gas",mw:61, n:"Share of the 244 MW program; per-site split not disclosed"}], status:"review",
+  statusText:"Part of Genera's 244 MW flexible generation program; the EPC contract goes to the P3 Authority and the Oversight Board in Q4 2026",
+  appr:[{d:"2026-10-01", mo:true, a:"Not yet before the Board", w:"EPC contract submission to the P3 Authority and the Oversight Board targeted for Q4 2026"}], dateUnknown:true,
+  terms:"FEMA-funded replacement peaking units; PREPA owns the plant and pays no contracted rate", note:"The report gives 244 MW for the four sites together and does not break the capacity down by site; 61 MW is the program total divided evenly, shown so the four rows sum correctly.",
+  src:["collab"], cs:"EPC contract under RFP #5195 is being negotiated; submission to the P3 Authority and the Oversight Board is targeted for Q4 2026. LUMA objected to decommissioning Daguao 1-1 and 1-2; conditional approval was granted in January 2026 contingent on battery installation, with Vega Baja and Cambalache required to be interconnected first.", cod:"Pending decommissioning authorisation", codD:null, con:"No", ix:"Point-of-interconnection RFP in preparation"},
+ // ---- Accelerated evaluation: submitted but still under Oversight Board review ----
+ {id:"rev-yabucoa-energy", name:"Yabucoa Energy storage", dev:"Not stated", muni:"Yabucoa", program:"Accelerated procurement (EO 2025-047)", own:true,
+  comps:[{f:"bess",mw:100}], status:"review", statusText:"Under Oversight Board review; not counted as approved capacity",
+  appr:[{d:"2026-07-01", mo:true, a:"Under Board review", w:"Submitted under the accelerated evaluation process; no determination issued"}], dateUnknown:true,
+  terms:"$15,500/MW-month", fpOwn:[{v:15500,u:"MWmo",n:"Submitted rate, pending review"}],
+  note:"LUMA's October 2026 report shows 100 MW of storage at Yabucoa Energy Park. Whether this is the same contract as the Board-approved 80 MW Go Green battery, or a separate submission, is not resolved in the documents reviewed.",
+  src:["collab"], cs:"Submitted under the accelerated evaluation process; awaiting an Oversight Board determination.", cod:"Not available", codD:null, con:"No", ix:"Not stated"},
+ {id:"rev-emerald2", name:"Emerald II Helios storage", dev:"Not stated", muni:null, program:"Accelerated procurement (EO 2025-047)", own:true,
+  comps:[{f:"bess",mw:25,mwh:150}], status:"review", statusText:"Under Oversight Board review; 6-hour duration (25 MW / 150 MWh)",
+  appr:[{d:"2026-07-01", mo:true, a:"Under Board review", w:"Submitted under the accelerated evaluation process; no determination issued"}], dateUnknown:true,
+  terms:"$33,750/MW-month, six-hour storage", fpOwn:[{v:33750,u:"MWmo",n:"Submitted rate, pending review"}], src:[],
+  cs:"Submitted under the accelerated evaluation process; awaiting an Oversight Board determination.", cod:"Not available", codD:null, con:"No", ix:"Not stated"},
+ {id:"rev-montalva-pv", name:"Montalva solar", dev:"Not stated", muni:null, program:"Accelerated procurement (EO 2025-047)", own:true,
+  comps:[{f:"solar",mw:80}], status:"review", statusText:"Under Oversight Board review; not counted as approved capacity",
+  appr:[{d:"2026-07-01", mo:true, a:"Under Board review", w:"Submitted under the accelerated evaluation process; no determination issued"}], dateUnknown:true,
+  terms:"$0.1245/kWh", fpOwn:[{v:0.1245,u:"kWh",n:"Submitted rate, pending review"}], src:[], cs:"Submitted under the accelerated evaluation process; awaiting an Oversight Board determination.", cod:"Not available", codD:null, con:"No", ix:"Not stated"},
+ {id:"rev-montalva-bess", name:"Montalva storage", dev:"Not stated", muni:null, program:"Accelerated procurement (EO 2025-047)", own:true,
+  comps:[{f:"bess",mw:80,mwh:400}], status:"review", statusText:"Under Oversight Board review; 5-hour duration (80 MW / 400 MWh)",
+  appr:[{d:"2026-07-01", mo:true, a:"Under Board review", w:"Submitted under the accelerated evaluation process; no determination issued"}], dateUnknown:true,
+  terms:"$29,325/MW-month, five-hour storage", fpOwn:[{v:29325,u:"MWmo",n:"Submitted rate, pending review"}], src:[],
+  cs:"Submitted under the accelerated evaluation process; awaiting an Oversight Board determination.", cod:"Not available", codD:null, con:"No", ix:"Not stated"},
 ];
 
 // ---- Current status and expected COD: PREPA Appendix A, Renewable Generation Projects Tracker (July 2026) ----
@@ -840,6 +963,7 @@ const PROC = {
   "LUMA ASAP standard offer":{l:"ASAP", o:4, x:"LUMA standard offer"},
   "Accelerated procurement (EO 2025-047)":{l:"Accelerated", o:5, x:"EO 2025-047"},
   "Genera BESS initiative (not a PPA)":{l:"Genera BESS", o:6, x:"Not a PPA"},
+  "Genera peakers (FEMA-funded, not a PPA)":{l:"Genera peakers", o:6.5, x:"FEMA-funded, not a PPA"},
   "P3 Authority RFP 2023-01":{l:"P3 RFP 2023-01", o:7, x:"New generation"},
   "3PPO emergency RFP TPG2":{l:"Temporary generation", o:8, x:"3PPO emergency RFP"}
 };
@@ -880,7 +1004,8 @@ ASSETS.forEach(a=>{
   const byF = d3.rollups(a.units,v=>d3.sum(v,u=>u.mw),u=>u.f).sort((x,y)=>y[1]-x[1]);
   a.primary = byF[0][0];
 });
-const live = p => p.status!=="revoked";
+const live = p => p.status!=="revoked" && p.status!=="review";   // counted as approved capacity
+const shown = p => p.status!=="revoked";                          // drawn and tabulated by default
 const fmt = n => (Math.round(n*10)/10).toLocaleString("en-US");
 const fmtM = s => new Date(s+"T12:00:00").toLocaleDateString("en-US",{year:"numeric",month:"short"});
 const fmtD = s => new Date(s+"T12:00:00").toLocaleDateString("en-US",{year:"numeric",month:"short",day:"numeric"});
@@ -901,7 +1026,8 @@ function renderFigures(){
     <li class="fomb"><b>${fmt(gen+sto)} MW</b>approved by the Board since 2021</li>
     <li class="fomb"><b>${fmt(sto)} MW</b>of it battery storage</li>
     <li class="fomb"><b>${fmt(gen)} MW</b>of it solar and thermal</li>
-    <li><b>${ap.length}</b>active approvals, plus ${PROJECTS.length-ap.length} revoked</li>`;
+    <li><b>${fmt(d3.sum(PROJECTS.filter(p=>p.status==="review").flatMap(p=>p.comps),c=>c.mw))} MW</b>further capacity under Board review</li>
+    <li><b>${ap.length}</b>active approvals, plus ${PROJECTS.filter(p=>p.status==="review").length} under review and ${PROJECTS.filter(p=>p.status==="revoked").length} revoked</li>`;
 }
 
 // ---------- map ----------
@@ -981,9 +1107,9 @@ function drawMarkers(){
     .on("mouseleave",hideTip)
     .on("click",(ev,a)=>{ ev.stopPropagation(); state.openAsset=a.id; selectMuni(a.muni,true); });
 
-  const projs = state.showProj ? PROJECTS.filter(p=>p.muni && (state.showRevoked||live(p)) && (state.year==null||p.year===state.year) && (state.tech==="all"||p.tech===state.tech)) : [];
+  const projs = state.showProj ? PROJECTS.filter(p=>p.muni && (state.showRevoked||shown(p)) && (state.year==null||p.year===state.year) && (state.tech==="all"||p.tech===state.tech)) : [];
   gProj.selectAll("path").data(projs, d=>d.id).join("path")
-    .attr("class",p=>"proj"+(p.status==="revoked"?" revoked":"")+(state.openRow===p.id?" hl":""))
+    .attr("class",p=>"proj"+(p.status==="revoked"?" revoked":"")+(p.status==="review"?" review":"")+(state.openRow===p.id?" hl":""))
     .attr("transform",p=>`translate(${p.cx+p.ox/Math.sqrt(K)},${p.cy+p.oy/Math.sqrt(K)}) scale(${1/K})`)
     .attr("d",p=>diamond(rP(p.mw)))
     .classed("dim",p=>state.muni && p.muni!==state.muni)
@@ -1009,7 +1135,7 @@ function drawShade(){
     const b = breaks(max);
     ramp = `<div class="ramp">${state.shade==="fomb"?"Approved new MW":"Existing MW"}: <span class="b" style="background:var(--shade-0);border:1px solid var(--rule)"></span>0 <span class="b" style="background:var(--shade-1)"></span>≤${b[0]} <span class="b" style="background:var(--shade-2)"></span>≤${b[1]} <span class="b" style="background:var(--shade-3)"></span>≤${b[2]} <span class="b" style="background:var(--shade-4)"></span>≤${fmt(max)}</div>`;
   }
-  document.getElementById("legend").innerHTML = `<div class="row">${chips}</div><div class="ramp">Circles: existing assets by main fuel, sized by MW. <span class="dia"></span> Board-approved projects, near municipal center.</div>${ramp}`;
+  document.getElementById("legend").innerHTML = `<div class="row">${chips}</div><div class="ramp">Circles: existing assets by main fuel, sized by MW. <span class="dia"></span> Board-approved projects, near municipal center. Dashed outline: under Board review.</div>${ramp}`;
   document.querySelectorAll("#legend .chip").forEach(b=>b.onclick=()=>{
     const f=b.dataset.f;
     if(state.fuels.has(f)&&state.fuels.size===Object.keys(FUEL).length){ state.fuels=new Set([f]); }
@@ -1030,6 +1156,7 @@ const srcItem = s => s.u ? `<a href="${s.u}" target="_blank" rel="noopener">${es
 function srcLinks(keys){ return `<div class="src">Sources: ${keys.map(k=>srcItem(SRC[k])).join("; ")}</div>`; }
 function statusTag(p){
   if(p.status==="revoked") return `<span class="tag rev">Revoked</span>`;
+  if(p.status==="review") return `<span class="tag review">Under Board review</span>`;
   if(p.status==="conditional") return `<span class="tag cond">Conditional</span>`;
   if(p.status==="operating") return `<span class="tag op">Partly operating</span>`;
   return `<span class="tag fomb">Approved</span>`;
@@ -1132,7 +1259,7 @@ function renderYears(){
     ps.forEach(p=>p.comps.forEach(c=>by[c.f]=(by[c.f]||0)+c.mw));
     return {y, by, tot:d3.sum(Object.values(by)), n:ps.length};
   });
-  const unk = PROJECTS.filter(p=>p.year==null);
+  const unk = PROJECTS.filter(p=>p.year==null && live(p));
   document.getElementById("yearnote").textContent = unk.length?`No Board approvals of new generation were found for 2020. Not charted: ${fmt(d3.sum(unk,p=>p.mw))} MW of Tranche 1 storage (${unk.map(p=>p.name).join(', ')}) whose Board letter date was not located.`:"";
   const max = d3.max(data,d=>d.tot)||1;
   const any = state.year!=null;
@@ -1159,11 +1286,12 @@ function renderYears(){
 const STAGES = {
   test:{l:"Testing", v:"--st-test"}, build:{l:"In construction", v:"--st-build"},
   pre:{l:"Pre-construction", v:"--st-pre"}, pause:{l:"Paused", v:"--st-pause"},
-  none:{l:"No update", v:"--st-none"}, rev:{l:"Revoked", v:"--revoked"}
+  none:{l:"No update", v:"--st-none"}, review:{l:"Under Board review", v:"--st-review"}, rev:{l:"Revoked", v:"--revoked"}
 };
 const TODAY = "2026-11-03";
 PROJECTS.forEach(p=>{
   p.stage = p.status==="revoked" ? "rev"
+    : p.status==="review" ? "review"
     : p.status==="operating" ? "test"
     : p.id==="coamo" ? "pause"
     : (p.con||"").startsWith("Yes") ? "build"
@@ -1275,7 +1403,7 @@ function fpCell(p){
 
 function renderTable(){
   document.getElementById("stagekey").innerHTML = Object.keys(STAGES).map(k=>stagePill({stage:k})).join("");
-  let rows = PROJECTS.filter(p=>(state.showRevoked||live(p)) && (state.year==null||p.year===state.year) && (state.tech==="all"||p.tech===state.tech));
+  let rows = PROJECTS.filter(p=>(state.showRevoked||shown(p)) && (state.year==null||p.year===state.year) && (state.tech==="all"||p.tech===state.tech));
   const {k,dir} = state.sort;
   const val = p => k==="name"?p.name : k==="proc"?(p.procO+100+"|"+p.first) : k==="muni"?(p.muni||"~") : k==="mw"?p.mw : k==="cod"?(p.codD||"9999") : k==="fp"?(p.fp?(p.fp[0].u==="kWh"?p.fp[0].v:1000+p.fp[0].v/1000):1e9) : p.first;
   rows.sort((a,b)=>{ const x=val(a),y=val(b); return (typeof x==="number"? x-y : String(x).localeCompare(String(y),"es"))*dir; });
@@ -1294,7 +1422,9 @@ function renderTable(){
     </tr>
     ${state.openRow===p.id?`<tr class="detail"><td colspan="9"><div class="dgrid"><div>${projDetail(p)}</div></div></td></tr>`:""}`).join("");
   const sum = d3.sum(rows.filter(live),p=>p.mw);
-  document.getElementById("tableCount").textContent = `${rows.length} project${rows.length===1?"":"s"}; ${fmt(sum)} MW active`;
+  const rev = d3.sum(rows.filter(p=>p.status==="review"),p=>p.mw);
+  document.getElementById("tableCount").textContent =
+    `${rows.length} project${rows.length===1?"":"s"}; ${fmt(sum)} MW approved` + (rev?`, ${fmt(rev)} MW under review`:"");
   tb.querySelectorAll("tr.main").forEach(tr=>{
     const toggle=()=>{ const id=tr.dataset.id; state.openRow = state.openRow===id?null:id; renderTable(); drawMarkers(); if(state.muni) renderPanel(); };
     tr.onclick=e=>{ if(e.target.closest("a")) return; toggle(); };
