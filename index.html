@@ -18,7 +18,7 @@
   --pr-legacy:#3353A0; --pr-tranche:#00A8C1; --pr-asap:#277539; --pr-accel:#C882C2; --pr-thermal:#685100; --pr-genera:#CB6440;
   --f-bunker:#96522A; --f-diesel:#D4862C; --f-gas:#3C8DC9; --f-coal:#5E6670; --f-solar:#C9920C;
   --f-wind:#2F9C83; --f-hydro:#2B52A8; --f-bess:#AF4694; --f-lfg:#6F8C2B;
-  --st-test:#1F7A55; --st-build:#2C6E9C; --st-pre:#8A6A12; --st-pause:#B4532A; --st-none:#7A888F; --st-review:#6B4FA8; --warn:#9A5B00; --warn-soft:#FBEBD2;
+  --st-test:#1F7A55; --st-build:#2C6E9C; --st-pre:#8A6A12; --st-pause:#B4532A; --st-none:#7A888F; --st-review:#6B4FA8; --st-site:#1F7A8C; --warn:#9A5B00; --warn-soft:#FBEBD2;
 }
 @media (prefers-color-scheme: dark){
   :root:not([data-theme="light"]){
@@ -29,7 +29,7 @@
     --pr-legacy:#4D71C8; --pr-tranche:#0AA5BE; --pr-asap:#368346; --pr-accel:#C075B9; --pr-thermal:#766200; --pr-genera:#CC6C4A;
     --f-bunker:#8F4F2A; --f-diesel:#C68230; --f-gas:#3F9BDE; --f-coal:#656B70; --f-solar:#AD8610;
     --f-wind:#2FA98C; --f-hydro:#6E86E2; --f-lfg:#7D9A2C; --f-bess:#CC62AC;
-    --st-test:#5CC795; --st-build:#6FB0E0; --st-pre:#D9B455; --st-pause:#EB8A5E; --st-none:#8D9CA3; --st-review:#A78BE0; --warn:#F0B35A; --warn-soft:#3A2C17;
+    --st-test:#5CC795; --st-build:#6FB0E0; --st-pre:#D9B455; --st-pause:#EB8A5E; --st-none:#8D9CA3; --st-review:#A78BE0; --st-site:#4FB5C7; --warn:#F0B35A; --warn-soft:#3A2C17;
   }
 }
 :root[data-theme="dark"]{
@@ -40,7 +40,7 @@
     --pr-legacy:#4D71C8; --pr-tranche:#0AA5BE; --pr-asap:#368346; --pr-accel:#C075B9; --pr-thermal:#766200; --pr-genera:#CC6C4A;
   --f-bunker:#8F4F2A; --f-diesel:#C68230; --f-gas:#3F9BDE; --f-coal:#656B70; --f-solar:#AD8610;
     --f-wind:#2FA98C; --f-hydro:#6E86E2; --f-lfg:#7D9A2C; --f-bess:#CC62AC;
-    --st-test:#5CC795; --st-build:#6FB0E0; --st-pre:#D9B455; --st-pause:#EB8A5E; --st-none:#8D9CA3; --st-review:#A78BE0; --warn:#F0B35A; --warn-soft:#3A2C17;
+    --st-test:#5CC795; --st-build:#6FB0E0; --st-pre:#D9B455; --st-pause:#EB8A5E; --st-none:#8D9CA3; --st-review:#A78BE0; --st-site:#4FB5C7; --warn:#F0B35A; --warn-soft:#3A2C17;
 }
 *{box-sizing:border-box}
 html,body{margin:0}
@@ -54,6 +54,23 @@ header{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:8px 32px;align-
 h1{font-size:clamp(24px,3.2vw,36px);line-height:1.12;font-weight:700;letter-spacing:-.015em;margin:0;max-width:28ch}
 .dek{color:var(--ink-2);margin:10px 0 0;max-width:64ch}
 .asof{color:var(--ink-3);font-size:13px;text-align:right;white-space:nowrap}
+.secttl{font-size:24px;letter-spacing:-.01em;margin:0 0 4px}
+.progress{margin:26px 0 0}
+.pgrid{display:grid;gap:10px;margin:14px 0 0}
+.prow{display:grid;grid-template-columns:120px minmax(0,1fr) auto;gap:14px;align-items:center;font-size:13.5px}
+.prow .pl{display:inline-flex;align-items:center;gap:7px;color:var(--ink);font-weight:600}
+.prow .pl i{width:10px;height:10px;border-radius:3px;display:inline-block;flex:none}
+.ptrack{height:22px;border-radius:4px;background:var(--rule-2);overflow:hidden;position:relative}
+.ptrack i{display:block;height:100%;border-radius:4px}
+.prow .pv{white-space:nowrap;color:var(--ink-2);font-variant-numeric:proportional-nums}
+.prow .pv b{color:var(--ink);font-size:15px}
+.story{margin:34px 0 0;padding:22px 24px;background:var(--panel);border:1px solid var(--rule);border-radius:12px}
+.story h2{font-size:22px;letter-spacing:-.01em;margin:0 0 10px}
+.story p{margin:0 0 11px;max-width:84ch;color:var(--ink-2);font-size:15px;line-height:1.6}
+.story p:last-child{margin-bottom:0}
+.story b{color:var(--ink);font-weight:600}
+.story .beat{color:var(--fomb);font-weight:700;font-size:12.5px;letter-spacing:.06em;text-transform:uppercase;display:block;margin:18px 0 5px}
+.story .beat:first-child{margin-top:0}
 .kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(232px,1fr));gap:12px;grid-column:1/-1;margin:20px 0 2px}
 .kpi{background:var(--panel);border:1px solid var(--rule);border-radius:10px;padding:14px 16px 15px;display:flex;flex-direction:column}
 .kpi .lab{font-size:12.5px;color:var(--ink-3);font-weight:600;letter-spacing:.012em;text-transform:none}
@@ -165,7 +182,7 @@ section.pipeline .dek{margin-top:6px}
 .yb[aria-pressed="false"].anysel{opacity:.35}
 .filters{display:flex;flex-wrap:wrap;gap:10px 20px;align-items:center;margin:26px 0 10px}
 .tablewrap{overflow-x:auto;border:1px solid var(--rule);border-radius:10px;background:var(--panel)}
-table.pt{width:100%;border-collapse:collapse;font-size:13.5px;min-width:1280px}
+table.pt{width:100%;border-collapse:collapse;font-size:13.5px;min-width:1400px}
 .proc{display:inline-block;font-size:12px;font-weight:600;color:var(--pc,var(--ink-2));border:1px solid color-mix(in srgb,var(--pc,var(--rule)) 32%,transparent);border-left:3px solid var(--pc,var(--rule));border-radius:4px;padding:1px 7px;white-space:nowrap;background:color-mix(in srgb,var(--pc,var(--panel)) 9%,var(--panel))}
 .prockey{display:flex;flex-wrap:wrap;gap:6px 10px;margin:4px 0 10px;font-size:12px;color:var(--ink-3);align-items:center}
 .procx{color:var(--ink-3);font-size:11.5px;margin-top:3px;line-height:1.3}
@@ -220,7 +237,7 @@ table.pm{width:100%;border-collapse:collapse;font-size:13px;min-width:720px}
 .chartkey .sw2{width:11px;height:11px;border-radius:3px;display:inline-block;flex:none}
 .chartkey .cap{color:var(--ink-3)}
 .fpkey i{display:inline-block;width:18px;height:4px;border-radius:2px;vertical-align:middle;margin-right:5px}
-.pt td.cs{min-width:230px;max-width:300px}
+.pt td.cs{min-width:210px;max-width:280px}
 .pt .csx{color:var(--ink-2);font-size:12.5px;margin-top:4px;line-height:1.4}
 .pt td.cod{min-width:140px}
 .pt th{text-align:left;font-weight:600;font-size:12.5px;color:var(--ink-2);padding:10px 9px;border-bottom:1px solid var(--rule);white-space:nowrap}
@@ -280,40 +297,19 @@ footer{margin-top:28px;padding-top:14px;border-top:1px solid var(--rule);font-si
 <header>
   <div>
     <h1>Puerto Rico power generation, municipality by municipality</h1>
-    <p class="dek">Every utility-scale generation asset on the grid, public and private, with its fuel and nameplate capacity by unit. Drill into any municipality to see the new generation and storage projects the Financial Oversight and Management Board has approved since 2020.</p>
+    <p class="dek">What Puerto Rico has on the grid today, what the Financial Oversight and Management Board has approved to add since 2021, how much of that has actually arrived, and when the rest realistically will. Built from EIA's generator inventory, PREPA's project tracker, LUMA's monthly filings and the Board's own approval letters.</p>
   </div>
   <div class="asof">Compiled September 15, 2026<br>Reconciled November 3, 2026 against PREPA's July 2026<br>tracker and LUMA's October 2026 report</div>
   <div class="kpis" id="figures"></div>
 </header>
 
-<div class="toolbar" role="group" aria-label="Map controls">
-  <div><span class="tlabel">Shade municipalities by</span>
-    <span class="seg" id="shadeSeg">
-      <button data-v="existing" aria-pressed="true">Existing capacity</button>
-      <button data-v="fomb" aria-pressed="false">Approved new capacity</button>
-      <button data-v="none" aria-pressed="false">None</button>
-    </span>
-  </div>
-  <label class="check"><input type="checkbox" id="lyrAssets" checked> Existing assets</label>
-  <label class="check"><input type="checkbox" id="lyrProj" checked> Approved projects</label>
-  <label class="check"><input type="checkbox" id="lyrLabels"> Municipality names</label>
-  <label><span class="tlabel">Go to</span><select class="muni" id="muniSelect" aria-label="Select a municipality"><option value="">All of Puerto Rico</option></select></label>
-</div>
+<section class="progress" id="progressSection"></section>
+<section class="story" id="storySection"></section>
 
-<div class="layout">
-  <div>
-    <div class="mapcard">
-      <svg id="map" viewBox="0 0 960 420" role="img" aria-label="Map of Puerto Rico's 78 municipalities with generation assets and approved projects"></svg>
-      <div class="hint" id="hint">Click a municipality or marker</div>
-      <div class="legend" id="legend"></div>
-    </div>
-  </div>
-  <aside class="panel" id="panel" aria-live="polite"></aside>
-</div>
 
 <section class="pipeline" id="pipeline">
-  <h2>New generation approved by the Oversight Board, 2020 to date</h2>
-  <p class="dek">Contracts reviewed under the Board's Contract Review Policy (PROMESA §204(b)(2)). Bars show approved, non-revoked capacity by the year of first Board approval; capacity still under Board review is listed in the table but excluded from the bars. Select a year to filter the table and map. Open a row for approval history, contract terms, and sources.</p>
+  <h2 class="secttl">Every project, and how far behind it is</h2>
+  <p class="dek" style="max-width:92ch">Contracts reviewed under the Board's Contract Review Policy (PROMESA §204(b)(2)), sorted by how far the reported commercial operation date sits beyond a base case of 24 months from approval. Open a row for approval history, contract terms and sources.</p>
   <div class="tabs" role="tablist" aria-label="Pipeline views">
     <button role="tab" id="t-projects" data-tab="projects" aria-selected="true" aria-controls="tab-projects">Projects</button>
     <button role="tab" id="t-procurement" data-tab="procurement" aria-selected="false" aria-controls="tab-procurement">Procurement averages</button>
@@ -408,6 +404,10 @@ footer{margin-top:28px;padding-top:14px;border-top:1px solid var(--rule);font-si
         <li>The tracker's summary page shows Tetris Power's amended COD as the spreadsheet value 46752; this converts to December 31, 2027, which the Tetris detail page confirms.</li>
         <li>The tracker's summary page repeats the two Coquí Power rows with strikethrough formatting; they are counted once.</li>
       </ul></div>
+      <div class="chk ok"><h3>Approvals by year</h3>
+        <p class="cnote" style="margin:0 0 8px">Active, non-revoked capacity by the year of first Board approval.</p>
+        <div id="approvalTotals"></div>
+      </div>
       <div class="chk gap"><h3>Open items</h3><ul>
         <li><b>The tracker's Power Expectations row is stale.</b> It still lists the 400 MW Aguirre contract as active and executed on June 10, 2026, but the Board revoked its approval on August 14, 2026, and LUMA's October 2026 report refers to "the contract cancellation of one provider". The page keeps it revoked.</li>
         <li>The 100 MW Yabucoa Energy Park solar PPOA is confirmed as a Go Green contract under Tranche 1, so LUMA's Table 7 simply does not carry it. It is separate from the 100 MW Yabucoa Energy battery submitted under the accelerated evaluation process, and both are counted.</li>
@@ -426,10 +426,6 @@ footer{margin-top:28px;padding-top:14px;border-top:1px solid var(--rule);font-si
     </div>
   </div>
   <div class="tabpanel" id="tab-projects" role="tabpanel" aria-labelledby="t-projects">
-  <div class="chartkey" id="chartkey" aria-label="Key for the approval and commercial-operation charts"></div>
-  <div class="yearbars" id="yearbars"></div>
-  <p class="tlabel" id="yearnote" style="margin:26px 0 0"></p>
-  <div class="codchart" id="codchart"></div>
   <div class="filters">
     <div><span class="tlabel">Technology</span>
       <span class="seg" id="techSeg">
@@ -454,14 +450,43 @@ footer{margin-top:28px;padding-top:14px;border-top:1px solid var(--rule);font-si
         <th>Technology and fuel</th>
         <th class="num"><button data-sort="mw">Capacity (MW)</button></th>
         <th><button data-sort="date">First Board approval</button></th>
-        <th>Current status</th>
         <th><button data-sort="cod">Expected COD</button></th>
+        <th><button data-sort="behind">Against base case</button><div style="font-weight:400;color:var(--ink-3);font-size:11.5px">24 months from approval</div></th>
+        <th>Current status</th>
         <th><button data-sort="fp">Fixed payment</button><div style="font-weight:400;color:var(--ink-3);font-size:11.5px">$/kWh or $/MW-month</div></th>
       </tr></thead>
       <tbody></tbody>
     </table>
   </div>
   </div>
+</section>
+
+<section class="mapsection" id="mapsection">
+  <h2 class="secttl">Where it all sits</h2>
+  <p class="dek" style="max-width:88ch">Every generating asset on the grid and every Board-approved or pending project, by municipality. Shade the map by what exists today or by what has been approved, and click any municipality to drill in.</p>
+<div class="toolbar" role="group" aria-label="Map controls">
+  <div><span class="tlabel">Shade municipalities by</span>
+    <span class="seg" id="shadeSeg">
+      <button data-v="existing" aria-pressed="true">Existing capacity</button>
+      <button data-v="fomb" aria-pressed="false">Approved new capacity</button>
+      <button data-v="none" aria-pressed="false">None</button>
+    </span>
+  </div>
+  <label class="check"><input type="checkbox" id="lyrAssets" checked> Existing assets</label>
+  <label class="check"><input type="checkbox" id="lyrProj" checked> Approved projects</label>
+  <label class="check"><input type="checkbox" id="lyrLabels"> Municipality names</label>
+  <label><span class="tlabel">Go to</span><select class="muni" id="muniSelect" aria-label="Select a municipality"><option value="">All of Puerto Rico</option></select></label>
+</div>
+<div class="layout">
+  <div>
+    <div class="mapcard">
+      <svg id="map" viewBox="0 0 960 420" role="img" aria-label="Map of Puerto Rico's 78 municipalities with generation assets and approved projects"></svg>
+      <div class="hint" id="hint">Click a municipality or marker</div>
+      <div class="legend" id="legend"></div>
+    </div>
+  </div>
+  <aside class="panel" id="panel" aria-live="polite"></aside>
+</div>
 </section>
 
 <section class="caveats">
@@ -712,7 +737,7 @@ const ASSETS = [
 // ---- Board-approved projects (2020 onward) ----
 // status: operating | approved | conditional | revoked
 const PROJECTS = [
- {id:"ciro1p", name:"CIRO One Salinas", dev:"CIRO Energy Group", muni:"Salinas", program:"Legacy PPOA (renegotiated)",
+ {id:"ciro1p", name:"CIRO One Salinas", dev:"CIRO Energy Group", muni:"Salinas", program:"Tranche 0",
   comps:[{f:"solar",mw:140, n:"90 MW phase 1 + 50 MW phase 2"}], status:"operating", statusText:"Phase 1 (90 MW + 51.5 MW battery) interconnected January 2026 and on compliance testing; LUMA gives commercial operation as February 2027",
   appr:[{d:"2021-03-01", a:"Approved", w:"Amended and restated PPOA (Board allowed up to 150 MW of legacy PPOAs: CIRO One 90 MW, Xzerta 60 MW)"}, {d:"2024-01-18", a:"Approved", w:"PPOA amendment"}],
   terms:"25-year term", src:["fombCiro","luma26","pvtech","prebList"]},
@@ -1241,7 +1266,7 @@ const fmtM = s => new Date(s+"T12:00:00").toLocaleDateString("en-US",{year:"nume
 const fmtD = s => new Date(s+"T12:00:00").toLocaleDateString("en-US",{year:"numeric",month:"short",day:"numeric"});
 const esc = s => String(s??"").replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
 
-const state = {muni:null, shade:"existing", showAssets:true, showProj:true, labels:false, fuels:new Set(Object.keys(FUEL)), year:null, tech:"all", showRevoked:true, sort:{k:"date",dir:1}, openRow:null, openAsset:null};
+const state = {muni:null, shade:"existing", showAssets:true, showProj:true, labels:false, fuels:new Set(Object.keys(FUEL)), year:null, tech:"all", showRevoked:true, sort:{k:"behind",dir:-1}, openRow:null, openAsset:null};
 
 // ---------- header figures ----------
 // ink that stays legible on a filled block
@@ -1267,14 +1292,14 @@ function techParts(list){
   const by = {}; list.forEach(p=>p.comps.forEach(c=>by[c.f]=(by[c.f]||0)+c.mw));
   return TECH.filter(([f])=>by[f]).map(([f,l])=>({l, mw:by[f], c:fc(f)}));
 }
+// Target capacity from the most recent Integrated Resource Plan.
+// Set mw and src when the figure is confirmed; the tile states that it is outstanding until then.
+const IRP_TARGET = {mw:null, label:"Target capacity, last IRP", src:"Puerto Rico Energy Bureau Integrated Resource Plan"};
 function renderFigures(){
   const ex = d3.sum(ASSETS,a=>a.mw);
   const ns = d3.sum(ASSETS,a=>d3.sum(a.units,u=>u.ns==null?u.mw:u.ns));
   const priv = d3.sum(ASSETS.filter(a=>a.sector==="private"),a=>a.mw);
-  const ap = PROJECTS.filter(live), rv = PROJECTS.filter(p=>p.status==="review");
-  const apMW = d3.sum(ap,p=>p.mw), rvMW = d3.sum(rv,p=>p.mw);
-  const nRevoked = PROJECTS.filter(p=>p.status==="revoked").length;
-  // existing fleet, grouped into four families so the bar stays readable
+  const gap = ex-ns;
   const fuelMW = {}; ASSETS.forEach(a=>a.units.forEach(u=>fuelMW[u.f]=(fuelMW[u.f]||0)+u.mw));
   const g = ks => d3.sum(ks,k=>fuelMW[k]||0);
   const exParts = [
@@ -1283,24 +1308,25 @@ function renderFigures(){
     {l:"Coal", mw:g(["coal"]), c:fc("coal")},
     {l:"Renewable and storage", mw:g(["solar","wind","hydro","bess","lfg"]), c:fc("wind")}
   ].filter(x=>x.mw>0);
+  const t = IRP_TARGET;
+  const third = t.mw!=null
+    ? `${kpiNum(t.mw,"MW")}<div class="sub">${esc(t.src)} · the fleet is ${ns>=t.mw?`<b style="color:var(--st-test)">${fmt(ns-t.mw)} MW above</b>`:`<b style="color:var(--st-pause)">${fmt(t.mw-ns)} MW short of</b>`} it on net summer capacity</div>`
+    : `<div class="val" style="color:var(--ink-3)">—</div><div class="sub">Figure outstanding. Supply the target and the IRP it comes from and this tile will compare it against the ${fmt(ns)} MW operational today.</div>`;
   document.getElementById("figures").innerHTML = `
     <div class="kpi hero">
-      <div class="lab">On the grid today</div>
+      <div class="lab">On the grid — nameplate</div>
       ${kpiNum(ex,"MW")}
-      <div class="sub"><b style="color:var(--ink)">${fmt(ns)} MW</b> net summer capacity, the figure that counts for adequacy · ${ASSETS.length} assets · ${Math.round(priv/ex*100)}% privately owned</div>
+      <div class="sub">Installed across ${ASSETS.length} utility-scale assets · ${Math.round(priv/ex*100)}% privately owned</div>
       ${segBlock(exParts, ex)}
     </div>
-    <div class="kpi accent">
-      <div class="lab">Approved by the Oversight Board since 2021</div>
-      ${kpiNum(apMW,"MW")}
-      <div class="sub">${ap.length} projects${nRevoked?` · ${nRevoked} approval later revoked`:""}</div>
-      ${segBlock(techParts(ap), apMW)}
+    <div class="kpi">
+      <div class="lab">Operational now</div>
+      ${kpiNum(ns,"MW")}
+      <div class="sub">Net summer capacity, EIA's rating of what the fleet can actually deliver. <b style="color:var(--ink)">${fmt(gap)} MW</b> below nameplate, ${fmt(249)} MW of it at Palo Seco, where unit 4 is rated at zero.</div>
     </div>
     <div class="kpi">
-      <div class="lab">Still before the Board</div>
-      ${kpiNum(rvMW,"MW")}
-      <div class="sub">${rv.length} projects awaiting a determination · excluded from every approved total</div>
-      ${segBlock(techParts(rv), rvMW)}
+      <div class="lab">${esc(t.label)}</div>
+      ${third}
     </div>`;
 }
 
@@ -1387,7 +1413,7 @@ function drawMarkers(){
     .attr("transform",p=>`translate(${p.cx+p.ox/Math.sqrt(K)},${p.cy+p.oy/Math.sqrt(K)}) scale(${1/K})`)
     .attr("d",p=>diamond(rP(p.mw)))
     .classed("dim",p=>state.muni && p.muni!==state.muni)
-    .on("mousemove",(ev,p)=>showTip(ev,`<b>${esc(p.name)}</b><br>${esc(p.muni)} · ${esc(p.program)}<br>${fmt(p.mw)} MW · ${p.status==="revoked"?"approval revoked":p.status==="review"?"Under FOMB review":p.dateUnknown?"Board letter not located":"Board approval "+fmtD(p.first)}`))
+    .on("mousemove",(ev,p)=>showTip(ev,`<b>${esc(p.name)}</b><br>${fmt(p.mw)} MW · ${esc(compText(p))}<br>Expected COD: ${p.codD?fmtD(p.codD):esc(p.cod||"not reported")}${p.behind!=null&&p.behind>0?`<br><span style="opacity:.85">${p.behind.toLocaleString("en-US")} days behind the 24-month base case</span>`:""}${p.status==="review"?'<br><span style="opacity:.85">Under FOMB review</span>':""}`))
     .on("mouseleave",hideTip)
     .on("click",(ev,p)=>{ ev.stopPropagation(); state.openRow=p.id; selectMuni(p.muni,true); });
 }
@@ -1519,68 +1545,128 @@ function renderPanel(){
 }
 
 // ---------- pipeline ----------
-function renderChartKey(){
-  document.getElementById("chartkey").innerHTML =
-    `<span class="cap">Both charts:</span>` +
-    ["solar","bess","gas"].map(f=>`<span class="k"><span class="sw2" style="background:var(${FUEL[f].v})"></span>${f==="gas"?"Thermal (gas)":FUEL[f].label}</span>`).join("") +
-    `<span class="cap">Hover any bar for the breakdown.</span>`;
+// ---------- what is actually online, and the story ----------
+const TECHG = [["solar","Solar","--f-solar"],["bess","Storage","--f-bess"],["gas","Thermal","--f-gas"]];
+function techTotals(list){
+  const t={}; TECHG.forEach(([f])=>t[f]={ap:0,on:0});
+  list.forEach(p=>p.comps.forEach(c=>{ if(!t[c.f]) return; t[c.f].ap+=c.mw; if(p.online) t[c.f].on+=c.mw; }));
+  return t;
 }
-function renderYears(){
-  const years = d3.range(2020, 2027);
+function renderProgress(){
+  const ap = PROJECTS.filter(live);
+  const t = techTotals(ap);
+  const apMW = d3.sum(ap,p=>p.mw), onMW = d3.sum(ap.filter(p=>p.online),p=>p.mw);
+  const onNames = ap.filter(p=>p.online).map(p=>p.name);
+  const row=(label,col,on,total)=>{
+    const pct = total? on/total*100 : 0;
+    return `<div class="prow"><span class="pl"><i style="background:var(${col})"></i>${label}</span>
+      <span class="ptrack" role="img" aria-label="${label}: ${fmt(on)} of ${fmt(total)} megawatts online, ${pct.toFixed(1)} percent"><i style="width:${Math.max(pct,0.6)}%;background:var(${col})"></i></span>
+      <span class="pv"><b>${fmt(on)}</b> of ${fmt(total)} MW · <b>${pct.toFixed(1)}%</b></span></div>`;
+  };
+  document.getElementById("progressSection").innerHTML = `
+    <h2 class="secttl">How much of the approved pipeline is actually online</h2>
+    <p class="dek" style="max-width:88ch">Of the ${fmt(apMW)} MW the Oversight Board has approved since 2021, this is what has reached the grid, by technology.</p>
+    <div class="pgrid">
+      ${TECHG.map(([f,l,c])=>row(l,c,t[f].on,t[f].ap)).join("")}
+      <div class="prow" style="border-top:1px solid var(--rule);padding-top:10px;margin-top:2px">
+        <span class="pl">All approved</span>
+        <span class="ptrack"><i style="width:${Math.max(onMW/apMW*100,0.6)}%;background:var(--fomb)"></i></span>
+        <span class="pv"><b>${fmt(onMW)}</b> of ${fmt(apMW)} MW · <b>${(onMW/apMW*100).toFixed(1)}%</b></span></div>
+    </div>
+    <p class="tlabel" style="margin:12px 0 0;max-width:88ch">${onNames.length? `The only approved capacity on the grid is ${onNames.join(" and ")}, a Tranche 0 contract that synchronised in November 2025 and is still running compliance tests ahead of commercial operation. Nothing else has arrived.` : "No approved capacity has reached the grid."}</p>`;
+}
+function renderStory(){
+  const ap = PROJECTS.filter(live), rv = PROJECTS.filter(p=>p.status==="review");
+  const apMW=d3.sum(ap,p=>p.mw), rvMW=d3.sum(rv,p=>p.mw), onMW=d3.sum(ap.filter(p=>p.online),p=>p.mw);
+  const ns = d3.sum(ASSETS,a=>d3.sum(a.units,u=>u.ns==null?u.mw:u.ns));
+  const beh = ap.filter(p=>p.behind!=null).map(p=>p.behind).sort((a,b)=>a-b);
+  const med = beh.length? beh[Math.floor(beh.length/2)] : 0;
+  const worst = ap.filter(p=>p.behind!=null).sort((a,b)=>b.behind-a.behind)[0];
+  const lapsed = ap.filter(p=>p.codD && p.codD < TODAY && p.stage!=="test");
+  const notStarted = ap.filter(p=>p.stage==="pre"||p.stage==="safe");
+  const list = modelSet();
+  const at = y => { const r = arrivalByYear(list, SCEN[y].m()).rows.find(r=>r.y===2028); return r?r.tot:0; };
+  document.getElementById("storySection").innerHTML = `
+    <h2>Has Puerto Rico authorised enough generation, and is any of it arriving?</h2>
+    <span class="beat">On paper, yes</span>
+    <p>The Board has approved <b>${fmt(apMW)} MW</b> since 2021, with another <b>${fmt(rvMW)} MW</b> still before it. Set against the <b>${fmt(ns)} MW</b> of net summer capacity the island actually has today, the approved pipeline alone is close to the size of the existing fleet, and far larger than the ${"700–850"} MW adequacy gap the Energy Bureau has identified. Authorisation is not the binding constraint.</p>
+    <span class="beat">In practice, almost none of it is here</span>
+    <p>Of that ${fmt(apMW)} MW, <b>${fmt(onMW)} MW</b> has reached the grid — <b>${(onMW/apMW*100).toFixed(1)}%</b> — and even that one project is still in compliance testing rather than commercial operation. <b>${notStarted.length} approved projects</b> have no construction on site at all. EIA's own planned-generator inventory for Puerto Rico, which records a unit once it is firmly scheduled, lists <b>22.2 MW</b>.</p>
+    <span class="beat">And the dates keep moving</span>
+    <p>Measured against a base case of commercial operation two years after Board approval, the median approved project is <b>${med} days</b> behind. ${worst?`${esc(worst.name)} is ${worst.behind.toLocaleString("en-US")} days behind that base, having been approved in ${fmtM(worst.first)} for a date now given as ${fmtD(worst.codD)}.`:""} ${lapsed.length?`${lapsed.length} project${lapsed.length===1?"":"s"} carr${lapsed.length===1?"ies":"y"} a reported date that has already passed without commercial operation.`:""}</p>
+    <span class="beat">So when can the island expect it</span>
+    <p>Taking developers at their word, <b>${fmt(at("reported"))} MW</b> is in service by the end of 2028. Applying the slippage this same portfolio has already recorded, it is <b>${fmt(at("p50"))} MW</b>; at the ninetieth percentile, <b>${fmt(at("p90"))} MW</b>. On the middle case, four years of approvals deliver roughly the size of today's shortfall — by the end of 2028, to a fleet whose largest plants were commissioned between 1960 and 1977.</p>
+    <p style="font-size:13.5px;color:var(--ink-3)">Every figure above is computed from the records in the tabs below and moves with them. The Arrival model tab sets out the slippage evidence and its limits.</p>`;
+}
+function renderApprovalTotals(){
+  const years = d3.range(2021, 2027);
   const data = years.map(y=>{
     const ps = PROJECTS.filter(p=>p.year===y && live(p));
-    const by = {solar:0,bess:0,gas:0};
-    ps.forEach(p=>p.comps.forEach(c=>by[c.f]=(by[c.f]||0)+c.mw));
-    return {y, by, tot:d3.sum(Object.values(by)), n:ps.length};
-  });
-  const unk = PROJECTS.filter(p=>p.year==null && live(p));
-  document.getElementById("yearnote").textContent = unk.length?`No Board approvals of new generation were found for 2020. Not charted: ${fmt(d3.sum(unk,p=>p.mw))} MW of Tranche 1 storage (${unk.map(p=>p.name).join(', ')}) whose Board letter date was not located.`:"";
-  const max = d3.max(data,d=>d.tot)||1;
-  const any = state.year!=null;
-  document.getElementById("yearbars").innerHTML = data.map(d=>`<button class="yb ${any?"anysel":""}" data-y="${d.y}" aria-pressed="${state.year===d.y}" aria-label="${d.y}: ${fmt(d.tot)} megawatts in ${d.n} approvals">
-     <span class="yv">${d.tot?fmt(d.tot)+" MW":"—"}</span>
-     <span class="col" style="height:${d.tot/max*148}px">${["solar","bess","gas"].map(f=>d.by[f]?`<i style="height:${d.by[f]/d.tot*100}%;background:var(${FUEL[f].v})"></i>`:"").join("")}</span>
-     <span class="yl">${d.y}</span></button>`).join("");
-  const byYear = Object.fromEntries(data.map(d=>[d.y,d]));
-  document.querySelectorAll(".yb").forEach(b=>{
-    const d = byYear[+b.dataset.y];
-    b.onclick=()=>{ const y=+b.dataset.y; state.year = state.year===y?null:y; render(); };
-    b.addEventListener("mousemove",ev=>{
-      if(!d.tot){ showTip(ev,`<b>${d.y}</b><br>No Board approvals of new generation found`); return; }
-      const lines = ["solar","bess","gas"].filter(f=>d.by[f])
-        .map(f=>`<span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:var(${FUEL[f].v});margin-right:5px"></span>${FUEL[f].label}: ${fmt(d.by[f])} MW`).join("<br>");
-      showTip(ev,`<b>${d.y} — ${fmt(d.tot)} MW</b><br>${d.n} approval${d.n===1?"":"s"}<br>${lines}<br><span style="opacity:.7">Click to filter the table and map</span>`);
-    });
-    b.addEventListener("mouseleave",hideTip);
-  });
+    const by = {}; ps.forEach(p=>p.comps.forEach(c=>by[c.f]=(by[c.f]||0)+c.mw));
+    return {y, by, tot:d3.sum(ps,p=>p.mw), n:ps.length};
+  }).filter(d=>d.n);
+  const el = document.getElementById("approvalTotals"); if(!el) return;
+  el.innerHTML = `<div class="ctabw"><table class="ctab"><thead><tr><th>Year of first Board approval</th><th>Projects</th><th>Solar</th><th>Storage</th><th>Thermal</th><th>Total</th></tr></thead><tbody>
+    ${data.map(d=>`<tr><td>${d.y}</td><td>${d.n}</td><td>${d.by.solar?fmt(d.by.solar)+" MW":"—"}</td><td>${d.by.bess?fmt(d.by.bess)+" MW":"—"}</td><td>${d.by.gas?fmt(d.by.gas)+" MW":"—"}</td><td><b>${fmt(d.tot)} MW</b></td></tr>`).join("")}
+    <tr><td><b>All years</b></td><td><b>${d3.sum(data,d=>d.n)}</b></td><td colspan="3"></td><td><b>${fmt(d3.sum(data,d=>d.tot))} MW</b></td></tr>
+  </tbody></table></div>`;
 }
-
 
 // ---------- project stage (derived from status fields) ----------
 const STAGES = {
-  test:{l:"Testing", v:"--st-test"}, build:{l:"In construction", v:"--st-build"},
-  pre:{l:"Pre-construction", v:"--st-pre"}, pause:{l:"Paused", v:"--st-pause"},
-  none:{l:"No update", v:"--st-none"}, review:{l:"Under Board review", v:"--st-review"}, rev:{l:"Revoked", v:"--revoked"}
+  test:{l:"Testing", v:"--st-test", d:"Built and energised, running compliance tests before commercial operation"},
+  build:{l:"In construction", v:"--st-build", d:"On-site construction under way"},
+  site:{l:"Site work only", v:"--st-site", d:"Earthworks and land movement; no plant erection yet"},
+  safe:{l:"Off-site only", v:"--st-pre", d:"Off-site equipment manufacturing to secure the tax credit; nothing on site"},
+  pre:{l:"Not started", v:"--st-none", d:"No construction of any kind reported"},
+  pause:{l:"Paused", v:"--st-pause", d:"Development halted"},
+  review:{l:"Under Board review", v:"--st-review", d:"Submitted; no Board determination yet"},
+  rev:{l:"Revoked", v:"--revoked", d:"Board approval withdrawn"}
 };
 const TODAY = "2026-11-03";
 PROJECTS.forEach(p=>{
+  const c = p.con || "";
   p.stage = p.status==="revoked" ? "rev"
     : p.status==="review" ? "review"
     : p.status==="operating" ? "test"
     : p.id==="coamo" ? "pause"
-    : (p.con||"").startsWith("Yes") ? "build"
-    : (p.con||"").startsWith("No") ? "pre" : "none";
+    : /land movement/i.test(c) ? "site"
+    : /safe.?harbor|safe.?harbour/i.test(c) ? "safe"
+    : c.startsWith("Yes") ? "build"
+    : "pre";
+  p.online = p.status==="operating";
+});
+// Base case: commercial operation 24 months after the first Board approval.
+// "Behind" is the reported date measured against that base, or today's date where none is reported.
+const DAY = 1000*60*60*24;
+const NOW = new Date(TODAY+"T12:00:00");
+PROJECTS.forEach(p=>{
+  if(p.dateUnknown || p.status==="revoked" || p.status==="review"){ p.baseCod=null; p.behind=null; return; }
+  const b = new Date(p.first+"T12:00:00"); b.setMonth(b.getMonth()+24);
+  p.baseCod = b;
+  if(p.codD){ p.behind = Math.round((new Date(p.codD+"T12:00:00")-b)/DAY); p.behindEst=false; }
+  else if(NOW > b){ p.behind = Math.round((NOW-b)/DAY); p.behindEst=true; }   // base case passed, still no date
+  else { p.behind = null; p.notDue = true; }                                   // 24 months not yet elapsed
 });
 function stagePill(p){ const s=STAGES[p.stage]; return `<span class="stg ${p.stage==='rev'?'revoked':''}" style="--c:var(${s.v})">${s.l}</span>`; }
-function codCell(p){
-  if(!p.codD) return `<span style="color:var(--ink-2)">${esc(p.cod)}</span>${p.genera&&p.codN?`<div class="codx">${esc(p.codN)}</div>`:""}`;
-  const main = fmtD(p.codD), extra = p.cod.replace(/\s*\(.*\)$/,"");
-  const same = new Date(p.codD+"T12:00:00").toLocaleDateString("en-US",{year:"numeric",month:"short",day:"numeric"})===extra;
-  const paren = (p.cod.match(/\((.*)\)$/)||[])[1];
-  const sub = same ? (paren||"") : p.cod;
-  const past = p.codD < TODAY && p.status!=="revoked";
-  return `<div class="codd">${main}</div>${sub?`<div class="codx">${esc(sub)}</div>`:""}${past?`<span class="passed">Date has passed</span>`:""}`;
+function behindCell(p){
+  if(p.status==="review") return `<span style="color:var(--ink-3)">No approval yet</span>`;
+  if(p.status==="revoked") return `<span style="color:var(--ink-3)">Approval revoked</span>`;
+  if(p.notDue) return `<div style="color:var(--ink-3)">Not yet due</div><div class="codx">Base case ${fmtM(p.baseCod.toISOString().slice(0,10))}</div>`;
+  if(p.behind==null) return `<span style="color:var(--ink-3)">—</span>`;
+  const d=p.behind, mo=Math.round(Math.abs(d)/30.44);
+  const late = d>0;
+  const col = !late ? "var(--st-test)" : d>365 ? "var(--st-pause)" : "var(--warn)";
+  return `<div class="codd" style="color:${col}">${late?"+":"\u2212"}${Math.abs(d).toLocaleString("en-US")} days</div>
+    <div class="codx">${late?`${mo} months behind`:`${mo} months inside`} the 24-month base case${p.behindEst?", and no date is reported":""}</div>`;
 }
+function codCell(p){
+  const main = p.codD ? fmtD(p.codD) : esc(p.cod||"Not reported");
+  const past = p.codD && p.codD < TODAY && p.status!=="revoked" && p.stage!=="test";
+  const base = p.baseCod ? `<div class="codx">Base case ${fmtM(p.baseCod.toISOString().slice(0,10))}</div>` : "";
+  return `<div class="codd">${main}</div>${base}${past?`<span class="passed">Date has passed</span>`:""}`;
+}
+
 function renderCodChart(){
   const ps = PROJECTS.filter(p=>live(p));
   const buckets = [["2025","2025"],["2026","2026"],["2027","2027"],["2028","2028"],["2029","2029 or later"],["none","No firm date"]];
@@ -1676,11 +1762,11 @@ function fpCell(p){
 }
 
 function renderTable(){
-  document.getElementById("stagekey").innerHTML = Object.keys(STAGES).map(k=>stagePill({stage:k})).join("");
+  document.getElementById("stagekey").innerHTML = Object.entries(STAGES).map(([k,v])=>`<span title="${esc(v.d||"")}">${stagePill({stage:k})}</span>`).join("");
   document.getElementById("prockey").innerHTML = Object.values(PROC_FAM).map(f=>`<span class="proc" style="--pc:var(${f.v})">${f.l}</span>`).join("");
   let rows = PROJECTS.filter(p=>(state.showRevoked||shown(p)) && (state.year==null||p.year===state.year) && (state.tech==="all"||p.tech===state.tech));
   const {k,dir} = state.sort;
-  const val = p => k==="name"?p.name : k==="proc"?(p.procO+100+"|"+p.first) : k==="muni"?(p.muni||"~") : k==="mw"?p.mw : k==="cod"?(p.codD||"9999") : k==="fp"?(p.fp?(p.fp[0].u==="kWh"?p.fp[0].v:1000+p.fp[0].v/1000):1e9) : p.first;
+  const val = p => k==="name"?p.name : k==="proc"?(p.procO+100+"|"+p.first) : k==="muni"?(p.muni||"~") : k==="mw"?p.mw : k==="cod"?(p.codD||"9999") : k==="behind"?(p.behind==null?-1e9:p.behind) : k==="fp"?(p.fp?(p.fp[0].u==="kWh"?p.fp[0].v:1000+p.fp[0].v/1000):1e9) : p.first;
   rows.sort((a,b)=>{ const x=val(a),y=val(b); return (typeof x==="number"? x-y : String(x).localeCompare(String(y),"es"))*dir; });
   const tb = document.querySelector("#ptable tbody");
   tb.innerHTML = rows.map(p=>`
@@ -1691,11 +1777,12 @@ function renderTable(){
       <td>${p.comps.map(c=>`<span style="white-space:nowrap"><span class="sw" style="background:var(${FUEL[c.f].v});margin-right:5px;vertical-align:-1px"></span>${FUEL[c.f].label} ${fmt(c.mw)}</span>`).join("<br>")}</td>
       <td class="num"><b>${fmt(p.mw)}</b></td>
       <td>${p.status==="review"?'<span class="underrev">Under FOMB review</span>':p.dateUnknown?"Not located":(p.appr[0].mo?fmtM(p.first):(p.appr[0].approx?"c. ":"")+fmtD(p.first))}${p.status==="review"?"":`<div style="color:var(--ink-3);font-size:12.5px">${esc(p.appr[0].a)}${p.appr.length>1?`; ${p.appr.length-1} later action${p.appr.length>2?"s":""}`:""}</div>`}</td>
-      <td class="cs"><div class="stagerow">${stagePill(p)}${p.status==="conditional"?statusTag(p):""}${p.genera?`<span class="tag gen">Genera initiative · not a PPA</span>`:""}</div><div class="csx clamp">${esc(p.cs)}</div></td>
       <td class="cod">${codCell(p)}</td>
+      <td class="cod">${behindCell(p)}</td>
+      <td class="cs"><div class="stagerow">${stagePill(p)}${p.status==="conditional"?statusTag(p):""}${p.genera?`<span class="tag gen">Genera initiative · not a PPA</span>`:""}</div><div class="csx clamp">${esc(p.cs)}</div></td>
       <td class="fp">${fpCell(p)}</td>
     </tr>
-    ${state.openRow===p.id?`<tr class="detail"><td colspan="9"><div class="dgrid"><div>${projDetail(p)}</div></div></td></tr>`:""}`).join("");
+    ${state.openRow===p.id?`<tr class="detail"><td colspan="10"><div class="dgrid"><div>${projDetail(p)}</div></div></td></tr>`:""}`).join("");
   const sum = d3.sum(rows.filter(live),p=>p.mw);
   const rev = d3.sum(rows.filter(p=>p.status==="review"),p=>p.mw);
   document.getElementById("tableCount").textContent =
@@ -1873,7 +1960,7 @@ document.getElementById("slipRange").addEventListener("input",e=>{
 });
 document.getElementById("inclReview").addEventListener("change",e=>{ mstate.review=e.target.checked; renderModel(); });
 window.addEventListener("hashchange",()=>{ const h=location.hash.slice(1); if(TABS[h]) showTab(h); });
-function render(){ drawShade(); drawMarkers(); renderPanel(); renderChartKey(); renderYears(); renderCodChart(); renderProcSum(); renderTable(); renderModel(); if(lastMuni!==state.muni){ lastMuni=state.muni; zoomTo(); } }
+function render(){ drawShade(); drawMarkers(); renderPanel(); renderProgress(); renderStory(); renderApprovalTotals(); renderProcSum(); renderTable(); renderModel(); if(lastMuni!==state.muni){ lastMuni=state.muni; zoomTo(); } }
 
 const sel = document.getElementById("muniSelect");
 muniNames.forEach(n=>{ const o=document.createElement("option"); o.value=n; o.textContent=n; sel.appendChild(o); });
