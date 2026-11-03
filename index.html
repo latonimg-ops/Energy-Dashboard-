@@ -54,10 +54,20 @@ header{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:8px 32px;align-
 h1{font-size:clamp(24px,3.2vw,36px);line-height:1.12;font-weight:700;letter-spacing:-.015em;margin:0;max-width:28ch}
 .dek{color:var(--ink-2);margin:10px 0 0;max-width:64ch}
 .asof{color:var(--ink-3);font-size:13px;text-align:right;white-space:nowrap}
-.figures{display:flex;flex-wrap:wrap;gap:6px 28px;margin:18px 0 0;padding:0;list-style:none;grid-column:1/-1}
-.figures li{font-size:14px;color:var(--ink-2)}
-.figures b{color:var(--ink);font-weight:600;font-size:17px;margin-right:4px}
-.figures .fomb b{color:var(--fomb)}
+.kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(232px,1fr));gap:12px;grid-column:1/-1;margin:20px 0 2px}
+.kpi{background:var(--panel);border:1px solid var(--rule);border-radius:10px;padding:14px 16px 15px;display:flex;flex-direction:column}
+.kpi .lab{font-size:12.5px;color:var(--ink-3);font-weight:600;letter-spacing:.012em;text-transform:none}
+.kpi .val{font-variant-numeric:proportional-nums;font-weight:700;letter-spacing:-.022em;line-height:1.02;margin:7px 0 0;font-size:37px;color:var(--ink)}
+.kpi.hero .val{font-size:52px}
+.kpi .val u{font-size:.4em;font-weight:600;color:var(--ink-2);margin-left:5px;text-decoration:none;letter-spacing:0}
+.kpi .sub{font-size:12.5px;color:var(--ink-2);margin-top:7px;line-height:1.45}
+.kpi.accent .val{color:var(--fomb)}
+.kpi .spacer{flex:1}
+.segbar{display:flex;gap:2px;height:26px;margin:11px 0 8px}
+.segbar i{border-radius:4px;font-size:11.5px;font-weight:700;font-style:normal;display:flex;align-items:center;padding-left:7px;overflow:hidden;white-space:nowrap;font-variant-numeric:proportional-nums}
+.seglegend{display:flex;flex-wrap:wrap;gap:3px 13px;font-size:12px;color:var(--ink-2)}
+.seglegend span{display:inline-flex;align-items:center;gap:5px}
+.seglegend i{width:9px;height:9px;border-radius:2px;display:inline-block;flex:none}
 
 .toolbar{display:flex;flex-wrap:wrap;gap:10px 22px;align-items:center;padding:14px 0}
 .seg{display:inline-flex;border:1px solid var(--rule);border-radius:6px;overflow:hidden;background:var(--panel)}
@@ -272,7 +282,7 @@ footer{margin-top:28px;padding-top:14px;border-top:1px solid var(--rule);font-si
     <p class="dek">Every utility-scale generation asset on the grid, public and private, with its fuel and nameplate capacity by unit. Drill into any municipality to see the new generation and storage projects the Financial Oversight and Management Board has approved since 2020.</p>
   </div>
   <div class="asof">Compiled September 15, 2026<br>Reconciled November 3, 2026 against PREPA's July 2026<br>tracker and LUMA's October 2026 report</div>
-  <ul class="figures" id="figures"></ul>
+  <div class="kpis" id="figures"></div>
 </header>
 
 <div class="toolbar" role="group" aria-label="Map controls">
@@ -1053,20 +1063,63 @@ const esc = s => String(s??"").replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">"
 const state = {muni:null, shade:"existing", showAssets:true, showProj:true, labels:false, fuels:new Set(Object.keys(FUEL)), year:null, tech:"all", showRevoked:true, sort:{k:"date",dir:1}, openRow:null, openAsset:null};
 
 // ---------- header figures ----------
+// ink that stays legible on a filled block
+function inkOn(hex){
+  const c = hex.replace("#",""); if(c.length<6) return "#fff";
+  const f = i => { const v = parseInt(c.substr(i,2),16)/255; return v<=.04045 ? v/12.92 : Math.pow((v+.055)/1.055,2.4); };
+  return (0.2126*f(0)+0.7152*f(2)+0.0722*f(4)) > 0.34 ? "#15202A" : "#FFFFFF";
+}
+const kpiNum = (v,u) => `<div class="val">${fmt(v)}<u>${u}</u></div>`;
+// one whole split into parts: thin bar + legend, shares printed inside wide enough blocks
+function segBlock(parts, total){
+  const bar = parts.map(x=>{
+    const share = x.mw/total, pct = Math.round(share*100);
+    return `<i style="width:${share*100}%;background:${x.c};color:${inkOn(x.c)}" title="${x.l}: ${fmt(x.mw)} MW">${share>0.12?pct+"%":""}</i>`;
+  }).join("");
+  const leg = parts.map(x=>`<span><i style="background:${x.c}"></i>${x.l} ${fmt(x.mw)} MW</span>`).join("");
+  return `<div class="spacer"></div>
+    <div class="segbar" role="img" aria-label="${parts.map(x=>`${x.l} ${fmt(x.mw)} megawatts`).join(", ")}">${bar}</div>
+    <div class="seglegend">${leg}</div>`;
+}
+const TECH = [["bess","Storage"],["solar","Solar"],["gas","Thermal"]];
+function techParts(list){
+  const by = {}; list.forEach(p=>p.comps.forEach(c=>by[c.f]=(by[c.f]||0)+c.mw));
+  return TECH.filter(([f])=>by[f]).map(([f,l])=>({l, mw:by[f], c:fc(f)}));
+}
 function renderFigures(){
   const ex = d3.sum(ASSETS,a=>a.mw);
   const priv = d3.sum(ASSETS.filter(a=>a.sector==="private"),a=>a.mw);
-  const ap = PROJECTS.filter(live);
-  const gen = d3.sum(ap.flatMap(p=>p.comps).filter(c=>c.f!=="bess"),c=>c.mw);
-  const sto = d3.sum(ap.flatMap(p=>p.comps).filter(c=>c.f==="bess"),c=>c.mw);
+  const ap = PROJECTS.filter(live), rv = PROJECTS.filter(p=>p.status==="review");
+  const apMW = d3.sum(ap,p=>p.mw), rvMW = d3.sum(rv,p=>p.mw);
+  const nRevoked = PROJECTS.filter(p=>p.status==="revoked").length;
+  // existing fleet, grouped into four families so the bar stays readable
+  const fuelMW = {}; ASSETS.forEach(a=>a.units.forEach(u=>fuelMW[u.f]=(fuelMW[u.f]||0)+u.mw));
+  const g = ks => d3.sum(ks,k=>fuelMW[k]||0);
+  const exParts = [
+    {l:"Oil", mw:g(["bunker","diesel"]), c:fc("bunker")},
+    {l:"Gas", mw:g(["gas"]), c:fc("gas")},
+    {l:"Coal", mw:g(["coal"]), c:fc("coal")},
+    {l:"Renewable and storage", mw:g(["solar","wind","hydro","bess","lfg"]), c:fc("wind")}
+  ].filter(x=>x.mw>0);
   document.getElementById("figures").innerHTML = `
-    <li><b>${fmt(ex)} MW</b>nameplate across ${ASSETS.length} mapped assets</li>
-    <li><b>${Math.round(priv/ex*100)}%</b>privately owned</li>
-    <li class="fomb"><b>${fmt(gen+sto)} MW</b>approved by the Board since 2021</li>
-    <li class="fomb"><b>${fmt(sto)} MW</b>of it battery storage</li>
-    <li class="fomb"><b>${fmt(gen)} MW</b>of it solar and thermal</li>
-    <li><b>${fmt(d3.sum(PROJECTS.filter(p=>p.status==="review").flatMap(p=>p.comps),c=>c.mw))} MW</b>further capacity under Board review</li>
-    <li><b>${ap.length}</b>active approvals, plus ${PROJECTS.filter(p=>p.status==="review").length} under review and ${PROJECTS.filter(p=>p.status==="revoked").length} revoked</li>`;
+    <div class="kpi hero">
+      <div class="lab">On the grid today</div>
+      ${kpiNum(ex,"MW")}
+      <div class="sub">Nameplate across ${ASSETS.length} utility-scale assets · ${Math.round(priv/ex*100)}% privately owned</div>
+      ${segBlock(exParts, ex)}
+    </div>
+    <div class="kpi accent">
+      <div class="lab">Approved by the Oversight Board since 2021</div>
+      ${kpiNum(apMW,"MW")}
+      <div class="sub">${ap.length} projects${nRevoked?` · ${nRevoked} approval later revoked`:""}</div>
+      ${segBlock(techParts(ap), apMW)}
+    </div>
+    <div class="kpi">
+      <div class="lab">Still before the Board</div>
+      ${kpiNum(rvMW,"MW")}
+      <div class="sub">${rv.length} projects awaiting a determination · excluded from every approved total</div>
+      ${segBlock(techParts(rv), rvMW)}
+    </div>`;
 }
 
 // ---------- map ----------
