@@ -1322,7 +1322,7 @@ PROJECTS.forEach(p=>{ p.luma = LUMA_T7[p.id] || null; p.codLuma = p.luma ? p.lum
 // a/aD  amended and approved COD, Appendix A; "Not applicable" where unchanged or none
 // f/fD  COD in the Executive Briefing to the Governor and the Board, 31 October 2026
 const CODS = {
- "ciro1p":{o:"24 months after FNTP",oD:null,a:"Not applicable",aD:null,f:"Feb 2027",fD:"2027-02-28"},
+ "ciro1p":{o:"24 months after full notice to proceed",oD:null,a:"Not applicable",aD:null,f:null,fD:null},
  "xzerta":{o:"Mar 30, 2024",oD:"2024-03-30",a:"Nov 30, 2027",aD:"2027-11-30",f:null,fD:null},
  "solaner":{o:"Oct 1, 2026",oD:"2026-10-01",a:"Dec 20, 2027",aD:"2027-12-20",f:"Dec 2027",fD:"2027-12-31"},
  "pattern-pv":{o:"Nov 30, 2025",oD:"2025-11-30",a:"Mar 31, 2028",aD:"2028-03-31",f:"Mar 2028",fD:"2028-03-31"},
@@ -1573,7 +1573,7 @@ function drawMarkers(){
     .attr("transform",p=>`translate(${p.cx+p.ox/Math.sqrt(K)},${p.cy+p.oy/Math.sqrt(K)}) scale(${1/K})`)
     .attr("d",p=>diamond(rP(p.mw)))
     .classed("dim",p=>state.muni && p.muni!==state.muni)
-    .on("mousemove",(ev,p)=>showTip(ev,`<b>${esc(p.name)}</b><br>${fmt(p.mw)} MW · ${esc(compText(p))}<br>Expected COD: ${p.codD?fmtD(p.codD):esc(p.cod||"not reported")}${p.behind!=null&&p.behind>0?`<br><span style="opacity:.85">${p.behind.toLocaleString("en-US")} days behind the 24-month base case</span>`:""}${p.status==="review"?'<br><span style="opacity:.85">Under FOMB review</span>':""}`))
+    .on("mousemove",(ev,p)=>showTip(ev,projTip(p)))
     .on("mouseleave",hideTip)
     .on("click",(ev,p)=>{ ev.stopPropagation(); state.openRow=p.id; selectMuni(p.muni,true); });
 }
@@ -1620,6 +1620,17 @@ function statusTag(p){
   if(p.status==="conditional") return `<span class="tag cond">Conditional</span>`;
   if(p.status==="operating") return `<span class="tag op">Partly operating</span>`;
   return `<span class="tag fomb">Approved</span>`;
+}
+function projTip(p){
+  const c = p.cods;
+  const rate = p.genera ? "No PPA rate" : (p.fp ? p.fp.map(f=>`${f.l?esc(f.l)+" ":""}${fpFmt(f)}`).join("<br>") : "Rate not reported");
+  let dl = "No commercial operation date";
+  if(c){
+    const amended = c.aD && (!c.oD || c.aD!==c.oD);
+    if(amended) dl = `Amended COD: ${esc(c.a)}`;
+    else if(c.o) dl = `Original COD: ${esc(c.o)}`;
+  } else if(p.codD) dl = `Expected COD: ${fmtD(p.codD)}`;
+  return `<b>${esc(p.name)}</b><br>${fmt(p.mw)} MW<br>${rate}<br>${dl}`;
 }
 function compText(p){ return p.comps.map(c=>`${FUEL[c.f].label} ${fmt(c.mw)} MW${c.mwh?` / ${fmt(c.mwh)} MWh`:""}`).join(" + "); }
 
@@ -1791,7 +1802,7 @@ function origCell(p){
   if(!c) return `<span style="color:var(--ink-3)">Not in Appendix A</span>`;
   return c.oD && !/;| after |anniversary/.test(c.o)
     ? `<div class="codd">${esc(c.o)}</div>`
-    : `<div style="color:${c.oD?"var(--ink)":"var(--ink-3)"};font-size:12.5px;line-height:1.35">${esc(c.o)}</div>`;
+    : `<div style="color:var(--ink);font-size:12.5px;line-height:1.35">${esc(c.o)}</div>`;
 }
 function amendCell(p){
   const c = p.cods;
