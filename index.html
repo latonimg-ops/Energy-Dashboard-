@@ -210,24 +210,6 @@ table.pt{width:100%;border-collapse:collapse;font-size:13.5px;min-width:1620px}
 .ctab td{padding:6px 10px 6px 0;border-top:1px solid var(--rule-2);vertical-align:top;color:var(--ink-2)}
 .ctab td:first-child{color:var(--ink);font-weight:500}
 .cnote{font-size:12.5px;color:var(--ink-3);margin:8px 0 0}
-.psum{margin:20px 0 6px;display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:12px}
-.ptile{background:var(--panel);border:1px solid var(--rule);border-radius:10px;padding:14px 16px}
-.ptile h3{display:flex;align-items:center;gap:7px;font-size:14px;margin:0 0 10px}
-.ptile .figs{display:flex;flex-wrap:wrap;gap:6px 28px}
-.ptile .fig b{display:block;font-size:24px;font-weight:700;letter-spacing:-.01em;line-height:1.1}
-.ptile .fig span{font-size:12.5px;color:var(--ink-3)}
-.ptile .basis{font-size:12px;color:var(--ink-3);margin-top:8px}
-.pmwrap{overflow-x:auto;border:1px solid var(--rule);border-radius:10px;background:var(--panel);margin:12px 0 4px}
-table.pm{width:100%;border-collapse:collapse;font-size:13px;min-width:720px}
-.pm th,.pm td{padding:7px 12px;text-align:right;white-space:nowrap}
-.pm th:first-child,.pm td:first-child{text-align:left}
-.pm thead tr:first-child th{font-size:12.5px;color:var(--ink);font-weight:600;border-bottom:1px solid var(--rule-2)}
-.pm thead tr:last-child th{font-size:11.5px;color:var(--ink-3);font-weight:500;border-bottom:1px solid var(--rule)}
-.pm td{border-top:1px solid var(--rule-2)}
-.pm .grp{border-left:1px solid var(--rule)}
-.pm .na{color:var(--ink-3)}
-.pm tr.tot td{font-weight:600;border-top:1px solid var(--rule)}
-.pmnote{font-size:12px;color:var(--ink-3);margin:6px 0 0;max-width:110ch}
 .pt td.fp{min-width:150px}
 .fpl+.fpl{margin-top:8px}
 .fpv{display:flex;align-items:baseline;gap:4px;white-space:nowrap}
@@ -320,11 +302,9 @@ footer{margin-top:28px;padding-top:14px;border-top:1px solid var(--rule);font-si
   <p class="dek" style="max-width:92ch">Every contract the Board has reviewed, oldest approval first. Open a row for approval history, terms and sources.</p>
   <div class="tabs" role="tablist" aria-label="Pipeline views">
     <button role="tab" id="t-projects" data-tab="projects" aria-selected="true" aria-controls="tab-projects">Projects</button>
-    <button role="tab" id="t-procurement" data-tab="procurement" aria-selected="false" aria-controls="tab-procurement">Procurement averages</button>
     <button role="tab" id="t-model" data-tab="model" aria-selected="false" aria-controls="tab-model">Arrival model</button>
     <button role="tab" id="t-checks" data-tab="data-checks" aria-selected="false" aria-controls="tab-checks">Data checks</button>
   </div>
-  <div class="tabpanel" id="tab-procurement" role="tabpanel" aria-labelledby="t-procurement" hidden><div id="procsum"></div></div>
   <div class="tabpanel" id="tab-model" role="tabpanel" aria-labelledby="t-model" hidden>
     <p class="dek" style="max-width:88ch;margin:16px 0 0">Developers report commercial operation dates, and those dates move. This model takes the slippage this portfolio has already recorded and projects it forward, so the question is not when each developer says a project will arrive but when it arrives if the next amendment looks like the last one.</p>
     <div class="filters" style="margin:18px 0 6px">
@@ -417,11 +397,11 @@ footer{margin-top:28px;padding-top:14px;border-top:1px solid var(--rule);font-si
         <li>Rates and a site supplied by the project owner also closed four gaps: the Guayama Solar Energy battery at $25,500/MW-month through year five and $21,250 thereafter, San Juan Solar at $0.145/kWh, Xzerta Energy Volt in Hatillo, and Xzerta-Tec Solar I's March 2021 approval confirmed against the Board's own record rather than inferred.</li>
         <li>LUMA's Table 7 carries 18 projects. Every one is matched here, and each cell names the LUMA row, developer and capacity it was matched to so the match can be checked. Projects absent from Table 7 read "Not in Table 7" rather than being left blank — among them Pattern Barceloneta Solar, since LUMA lists only the Barceloneta storage contract.</li>
         <li>Four of LUMA's rows disagree with the contract record and are flagged in place: Salinas repeats the Jobos capacities, Vega Baja reads 49 MW against the Board's 60 MW, CIRO One tracks phase 1 only, and San Germán still carries its original date.</li>
-        <li><b>Every storage contract is shown as a capacity price in $/MW-month</b>, so the batteries can be compared with one another. Two are written per kWh of discharge instead: the AES Salinas and Jobos energy storage agreements, at $0.2418 and $0.242/kWh. For those the capacity price is derived from the contract ceiling, $1,658.1M over 25 years and 175 MW giving about $31,583/MW-month, and $1,053.5M over 25 years and 110 MW giving about $31,924/MW-month. Both are marked "derived" on the row. Because they are term averages rather than year-one rates, they are excluded from the procurement averages.</li>
+        <li><b>Every storage contract is shown as a capacity price in $/MW-month</b>, so the batteries can be compared with one another. The AES Salinas and Jobos energy storage agreements are written per kWh of discharge in the tracker, at $0.2418 and $0.242/kWh; both are carried here at the confirmed $23,696/MW-month with a 2% escalator.</li>
         <li>Two projects have no separate storage price to show at all: Coamo and YFN Yabucoa bundle the battery into a single blended energy rate with the solar. Genera's six batteries and the Guayama Solar Energy battery carry no rate, the first because they are not power purchase agreements and the second because none was supplied.</li>
         <li>Rates for the submissions still under review are the figures supplied with the project list, not approved terms: Emerald II Helios $33,750/MW-month over six hours, Montalva storage $29,325/MW-month over five hours, Yabucoa Energy and Xzerta Energy Volt $15,500/MW-month, Montalva solar $0.1245/kWh and Coquí storage $23,500/MW-month. They are submitted terms, not approved ones.</li>
         <li>Peaker capacities and the Costa Sur approval come from the project owner, not from LUMA's report, which gives only the 244 MW program total and no per-site split. Its milestone table also differs on timing, showing Costa Sur at Q3 2027 and Jobos and Daguao as pending decommissioning authorisation, against the owner's Q4 2027 to Q1 2028, Q2 2028 and Q2 to Q3 2028.</li>
-        <li>Gothams carries a fuel-indexed rate rather than a fixed one, so it is excluded from the procurement averages, which compare fixed year-one prices.</li>
+        <li>Gothams carries a fuel-indexed rate rather than a fixed one: $0.188/kWh tied to the Title Transfer Facility index, so it is not comparable with the fixed prices elsewhere in the table.</li>
         <li>Two environmental inspections required in the next six months — Costa Sur by November 5, 2026 and Palo Seco by April 2027 — are reported as unfunded in Genera's approved budget, as is the Aguirre 2 overhaul that would restore 115 MW.</li>
         <li>The Board flagged the Coquí pricing itself: eight of the eleven projects exceed the ~$157/MWh target portfolio weighted average LCOE, the highest reaching about $200/MWh, and the highest-priced contract is roughly 29% above the highest-priced Tranche 1 solar project. Approval rests on PREPA and the Energy Bureau enforcing the portfolio pricing mechanism.</li>
         <li>Interconnection studies were not complete when either accelerated-evaluation contract was approved. LUMA told the Board it cannot certify available interconnection capacity until they are, which puts the ITC deadlines of July 4, 2026 for construction start and December 31, 2027 for placed-in-service at risk.</li>
@@ -520,7 +500,7 @@ footer{margin-top:28px;padding-top:14px;border-top:1px solid var(--rule);font-si
       <li>Genera's four replacement peaker sites and its six batteries are PREPA-owned programs rather than power purchase agreements, so they carry no contracted rate. The peakers are counted as under review because their EPC contract has not yet gone to the Board.</li>
       <li>Deliberately excluded: roughly 1,230 MW of rooftop solar (June 2025) and customer-sited generators, neither of which the system operator dispatches, and projects approved only by PREPA or the Energy Bureau but not yet reviewed by the Board.</li>
       <li>Coquí Power's eleven sites appear as 22 rows, one per contract, because the solar PPOAs are approved while the companion storage ESSAs are still under Board review.</li>
-      <li>Projects under Board review are drawn with a dashed outline, listed in the table and excluded from every approved-capacity total, including the headline figures, the approval-year chart and the procurement averages.</li>
+      <li>Projects under Board review are drawn with a dashed outline, listed in the table and excluded from every approved-capacity total, including the headline figures and the arrival model.</li>
       <li>Now included, after the November 2026 reconciliation: Coquí Power's 22 accelerated-procurement contracts (523 MW solar and 599 MW storage, July 2026), the Yabucoa and Naguabo Energy Park batteries (80 MW each, June 2026) and the Infinigen Isabela battery (50 MW, May 2025).</li>
       <li>Still excluded because the tracker marks them under Board review rather than approved: Putnam's CIRO BESS (90 MW), CIRO One X (25 MW), CIRO Two battery (35 MW) and Guayama battery (25 MW), and Xzerta Energy Volt (60 MW).</li>
       <li>Genera's six battery projects (430 MW) are a Genera PR initiative, not power purchase agreements: PREPA owns the batteries at its existing plants and pays no contracted rate. They are included because PREPA's tracker lists Board approval in January 2025; status comes from Genera's September 2026 progress report, which gives construction milestones but no COD.</li>
@@ -1798,60 +1778,6 @@ function renderCodChart(){
   });
 }
 
-// ---------- procurement averages (solar and storage) ----------
-function procRows(){
-  // one record per solar or storage component of an active project, with its year-one rate where comparable
-  const recs = [];
-  PROJECTS.filter(live).forEach(p=>{
-    p.comps.forEach(c=>{
-      if(c.f!=="solar" && c.f!=="bess") return;
-      let rate=null;
-      if(p.fp){
-        if(c.f==="solar"){ const f=p.fp.find(f=>f.u==="kWh"&&(!f.l||f.l==="PV")); if(f) rate=f.v; }
-        else { const f=p.fp.find(f=>f.u==="MWmo" && !f.derived); if(f) rate=f.v; }
-      }
-      recs.push({proc:p.proc, o:p.procO, f:c.f, mw:c.mw, rate, genera:!!p.genera});
-    });
-  });
-  return recs;
-}
-function agg(rs){
-  const priced = rs.filter(r=>r.rate!=null);
-  const w = d3.sum(priced,r=>r.mw);
-  return { n:rs.length, mw:d3.sum(rs,r=>r.mw), avg: rs.length? d3.sum(rs,r=>r.mw)/rs.length : null,
-           rate: w? d3.sum(priced,r=>r.rate*r.mw)/w : null, priced:priced.length,
-           genera: rs.length>0 && rs.every(r=>r.genera) };
-}
-const fK = v => "$"+v.toFixed(4);
-const fM = v => "$"+Math.round(v).toLocaleString("en-US");
-function renderProcSum(){
-  const recs = procRows();
-  const S = agg(recs.filter(r=>r.f==="solar")), B = agg(recs.filter(r=>r.f==="bess"));
-  const Bp = agg(recs.filter(r=>r.f==="bess"&&!r.genera));
-  const procs = d3.groups(recs,r=>r.proc).sort((a,b)=>a[1][0].o-b[1][0].o);
-  const cell = (a,u) => !a.n ? `<td class="grp na">—</td><td class="na">—</td><td class="na">—</td>`
-    : `<td class="grp">${a.n}</td><td>${fmt(a.avg)} MW</td><td>${a.genera?'<span class="na">No PPA</span>':a.rate==null?'<span class="na">Not reported</span>':(u==="k"?fK(a.rate):fM(a.rate))+(a.priced<a.n?`<span class="na"> (${a.priced} of ${a.n})</span>`:"")}</td>`;
-  document.getElementById("procsum").innerHTML = `
-   <div class="psum">
-    <div class="ptile"><h3><span class="sw" style="background:var(--f-solar)"></span>Solar PV procurements</h3>
-      <div class="figs"><div class="fig"><b>${fmt(S.avg)} MW</b><span>average project size (${S.n} projects, ${fmt(S.mw)} MW)</span></div>
-      <div class="fig"><b>${fK(S.rate)}<small style="font-size:13px;font-weight:500;color:var(--ink-3)">/kWh</small></b><span>average year-one rate, capacity-weighted</span></div></div>
-      <div class="basis">Rate based on ${S.priced} of ${S.n} solar projects with a reported $/kWh price.</div></div>
-    <div class="ptile"><h3><span class="sw" style="background:var(--f-bess)"></span>Battery storage procurements</h3>
-      <div class="figs"><div class="fig"><b>${fmt(B.avg)} MW</b><span>average project size (${B.n} projects, ${fmt(B.mw)} MW)</span></div>
-      <div class="fig"><b>${fM(Bp.rate)}<small style="font-size:13px;font-weight:500;color:var(--ink-3)">/MW-month</small></b><span>average capacity rate, capacity-weighted</span></div></div>
-      <div class="basis">Rate based on ${Bp.priced} of ${B.n} storage projects with a $/MW-month price; Genera's PREPA-owned batteries have no rate.</div></div>
-   </div>
-   <div class="pmwrap"><table class="pm"><thead>
-     <tr><th>Procurement</th><th colspan="3" class="grp" style="text-align:center">Solar PV</th><th colspan="3" class="grp" style="text-align:center">Battery storage</th></tr>
-     <tr><th></th><th class="grp">Projects</th><th>Average size</th><th>Average rate ($/kWh)</th><th class="grp">Projects</th><th>Average size</th><th>Average rate ($/MW-month)</th></tr>
-   </thead><tbody>
-     ${procs.map(([k,rs])=>`<tr><td>${esc(k)}</td>${cell(agg(rs.filter(r=>r.f==="solar")),"k")}${cell(agg(rs.filter(r=>r.f==="bess")),"m")}</tr>`).join("")}
-     <tr class="tot"><td>All procurements</td>${cell(S,"k")}${(()=>{ const t={...B, rate:Bp.rate, priced:Bp.priced, genera:false}; return cell(t,"m"); })()}</tr>
-   </tbody></table></div>
-   <p class="pmnote">Active (non-revoked) projects only; a solar-plus-storage project counts once in each technology. Rates are year-one fixed payments before escalators, weighted by contracted MW. Storage priced in $/kWh (AES Salinas and Jobos) and storage bundled into a single solar rate (Coamo, YFN) count toward average size but not the storage rate. Thermal projects are excluded.</p>`;
-}
-
 // ---------- fixed payment cell ----------
 const FPU = { kWh:{max:0.25, v:"--f-solar", l:"Energy price, $/kWh"}, MWmo:{max:30000, v:"--f-bess", l:"Storage capacity price, $/MW-month"} };
 function fpFmt(f){ return f.u==="kWh" ? `${f.approx?"≈":""}$${f.v.toFixed(4)}/kWh` : `$${f.v.toLocaleString("en-US",{maximumFractionDigits:2})}/MW-month`; }
@@ -2047,7 +1973,7 @@ function renderModel(){
     </div></div>`;
 }
 
-const TABS = {projects:"tab-projects", procurement:"tab-procurement", model:"tab-model", "data-checks":"tab-checks"};
+const TABS = {projects:"tab-projects", model:"tab-model", "data-checks":"tab-checks"};
 function showTab(name, push){
   if(!TABS[name]) name="projects";
   document.querySelectorAll(".tabs button").forEach(b=>b.setAttribute("aria-selected", b.dataset.tab===name));
@@ -2069,7 +1995,7 @@ document.getElementById("slipRange").addEventListener("input",e=>{
 });
 document.getElementById("inclReview").addEventListener("change",e=>{ mstate.review=e.target.checked; renderModel(); });
 window.addEventListener("hashchange",()=>{ const h=location.hash.slice(1); if(TABS[h]) showTab(h); });
-function render(){ drawShade(); drawMarkers(); renderPanel(); renderProgress(); renderApprovalTotals(); renderProcSum(); renderTable(); renderModel(); if(lastMuni!==state.muni){ lastMuni=state.muni; zoomTo(); } }
+function render(){ drawShade(); drawMarkers(); renderPanel(); renderProgress(); renderApprovalTotals(); renderTable(); renderModel(); if(lastMuni!==state.muni){ lastMuni=state.muni; zoomTo(); } }
 
 const sel = document.getElementById("muniSelect");
 muniNames.forEach(n=>{ const o=document.createElement("option"); o.value=n; o.textContent=n; sel.appendChild(o); });
