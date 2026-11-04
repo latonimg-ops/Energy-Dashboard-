@@ -73,9 +73,13 @@ h1{font-size:clamp(24px,3.2vw,36px);line-height:1.12;font-weight:700;letter-spac
 .kpi .sub{font-size:12.5px;color:var(--ink-2);margin-top:7px;line-height:1.45}
 .kpi.accent .val{color:var(--fomb)}
 .kpi .spacer{flex:1}
-.kpibar{display:flex;align-items:center;gap:9px;height:22px;border-radius:5px;background:var(--rule-2);overflow:hidden;margin:11px 0 8px}
-.kpibar i{display:block;height:100%;background:var(--fomb);border-radius:5px;flex:none}
-.kpibar-t{font-size:12.5px;font-weight:700;color:var(--ink);font-variant-numeric:proportional-nums;white-space:nowrap}
+.kpirows{display:grid;gap:6px;margin:10px 0 2px}
+.kpirow{display:grid;grid-template-columns:74px minmax(0,1fr) 42px;gap:9px;align-items:center;font-size:12.5px}
+.kpirow-l{display:inline-flex;align-items:center;gap:6px;color:var(--ink-2)}
+.kpirow-l i{width:9px;height:9px;border-radius:2px;flex:none}
+.kpirow-b{height:14px;border-radius:4px;background:var(--rule-2);overflow:hidden}
+.kpirow-b i{display:block;height:100%;border-radius:4px}
+.kpirow-v{text-align:right;font-weight:700;color:var(--ink);font-variant-numeric:proportional-nums}
 .segbar{display:flex;gap:2px;height:26px;margin:11px 0 8px}
 .segbar i{border-radius:4px;font-size:11.5px;font-weight:700;font-style:normal;display:flex;align-items:center;padding-left:7px;overflow:hidden;white-space:nowrap;font-variant-numeric:proportional-nums}
 .seglegend{display:flex;flex-wrap:wrap;gap:3px 13px;font-size:12px;color:var(--ink-2)}
@@ -296,9 +300,9 @@ footer{margin-top:28px;padding-top:14px;border-top:1px solid var(--rule);font-si
 <header>
   <div>
     <h1>Puerto Rico power generation, municipality by municipality</h1>
-    <p class="dek">What Puerto Rico has on the grid today, what the Financial Oversight and Management Board has approved to add since 2021, how much of that has actually arrived, and when the rest realistically will. Built from EIA's generator inventory, PREPA's project tracker, LUMA's monthly filings and the Board's own approval letters.</p>
+    <p class="dek">What Puerto Rico has on the grid today, what the Financial Oversight and Management Board has approved to add since 2021, how much of that has actually arrived, and when the rest realistically will. Capacity and availability come from LUMA's daily availability report; the pipeline from PREPA's tracker, LUMA's monthly filings and the Board's own approval letters.</p>
   </div>
-  <div class="asof">Compiled September 15, 2026<br>Reconciled November 3, 2026 against PREPA's July 2026<br>tracker and LUMA's October 2026 report</div>
+  <div class="asof">Grid capacity and availability as of <b>October 24, 2026</b><br>Pipeline reconciled November 3, 2026 against PREPA's July 2026<br>tracker, LUMA's October 2026 report and the Board's letters</div>
   <div class="kpis" id="figures"></div>
 </header>
 
@@ -379,6 +383,7 @@ footer{margin-top:28px;padding-top:14px;border-top:1px solid var(--rule);font-si
           <tr><td>Aguirre temporary generation rate</td><td>$0.224/kWh, full term (tracker)</td><td>$0.160/kWh excluding fuel (Board)</td></tr>
           <tr><td>Energiza COD</td><td>Oct 26, 2029 (approved)</td><td>Oct 30, 2030 (developer, after losing the turbine slot)</td></tr>
         </tbody></table></div></div>
+      <div class="chk warn"><h3>What the availability report shows</h3><ul><li>Parsed from the Data tab of LUMA's Daily Availability Report for <b>October 24, 2026</b>: 115 units, <b>6,460.1 MW of nameplate</b> and <b>3,091.5 MW available</b>, or 47.9%. Every block subtotal reconciles exactly to the subtotals printed on the sheet. EcoEléctrica and AES are taken from the gross block, not the net one.</li><li><b>2,853.6 MW across 67 units carried nameplate and delivered nothing</b> that day, including Aguirre 1 (450 MW), Costa Sur 5 (410 MW), all four San Juan steam units (400 MW) and both Palo Seco 1 and 2 (170 MW).</li><li>Against a forecast peak of 2,727 MW the system held <b>111.6 MW of reserves against 675 MW required</b>. The report puts its own availability rate at 45.7%, which excludes solar, wind and landfill gas from supply.</li><li>Fuel is assigned by unit name, since the report does not state it: San Juan 5 and 6 and the TM units are treated as gas on the basis of the New Fortress LNG supply, Costa Sur 5 and 6 as gas, EcoEléctrica as gas, AES as coal, the San Juan, Palo Seco and Aguirre steam units as heavy fuel oil, and all peaking and combined-cycle turbines as distillate. That puts the fleet at 53% oil and 34% gas. EIA codes the San Juan and Aguirre combined cycles as distillate instead, which would move about 1,070 MW from gas to oil. This remains the least settled figure on the page.</li></ul></div>
       <div class="chk fix"><h3>The existing fleet, rebuilt from the primary filing</h3><ul>
         <li>The asset list previously rested on the WRI Global Power Plant Database and on EIA figures taken from a third-party summary. It is now built directly from <b>EIA-860M, September 2026</b>: 105 generators across 38 plants in the Electric Utility and independent power producer sectors, 5,704.0 MW of nameplate and 5,167.4 MW of net summer capacity, plus the two landfill-gas sites and the 350 MW of FEMA temporary units EIA does not carry. Total <b>6,058.8 MW nameplate, 5,522.2 MW net summer</b>.</li>
         <li>This resolved all four discrepancies the old list flagged against its own sources. Costa Sur is 1,032 MW, not 862: EIA still carries units 3 and 4, commissioned in 1962 and 1963. Palo Seco is 728 MW, not 582, for the same reason. EcoEléctrica, at 580 MW, is now covered by the plant's own EIA record.</li>
@@ -496,7 +501,8 @@ footer{margin-top:28px;padding-top:14px;border-top:1px solid var(--rule);font-si
   <div>
     <h3>How to read the numbers</h3>
     <ul>
-      <li>The asset list is rebuilt from the primary filing: EIA's Preliminary Monthly Electric Generator Inventory (EIA-860M), September 2026 release, Puerto Rico sheet. Every plant carries both <b>nameplate</b> and <b>net summer capacity</b>, EIA's own measure of what a unit can actually deliver in summer conditions. The two differ by 537 MW across the fleet, and the gap is not spread evenly: Palo Seco alone accounts for 249 MW of it. Net summer capacity is the figure to use against the Energy Bureau's 700–850 MW adequacy shortfall.</li>
+      <li><b>Two capacity sources, used for different jobs.</b> The headline figures come from LUMA's Daily Availability Report of October 24, 2026, which gives nameplate and actual available capacity for all 115 units the operator dispatches, but carries no locations. The map and the municipality drill-down come from EIA-860M, which has coordinates but no availability and a slightly different roster, so its total (6,058.8 MW) does not match the availability report's (6,460.1 MW). The difference is mostly gross versus net ratings for EcoEléctrica and AES, the Mobile­Pac and TM units, and small distributed solar that EIA lists and LUMA does not dispatch.</li>
+      <li>The asset list for the map is rebuilt from the primary filing: EIA's Preliminary Monthly Electric Generator Inventory (EIA-860M), September 2026 release, Puerto Rico sheet. Every plant carries both <b>nameplate</b> and <b>net summer capacity</b>, EIA's own measure of what a unit can actually deliver in summer conditions. The two differ by 537 MW across the fleet, and the gap is not spread evenly: Palo Seco alone accounts for 249 MW of it. Net summer capacity is the figure to use against the Energy Bureau's 700–850 MW adequacy shortfall.</li>
       <li>Each plant is placed by EIA's own coordinates, and its municipality is derived by testing those coordinates against the Census boundary file rather than being read off the project name.</li>
       <li>Thermal units are shown by primary fuel. Costa Sur 5–6 and San Juan 5–6 burn natural gas with oil backup; Cambalache 2–3 and several other units have gas conversions in progress.</li>
       <li>Current status and expected commercial operation date (COD) come from two documents: PREPA's Appendix A, Renewable Generation Projects Tracker (July 2026), which compiles developer-reported updates, and LUMA's October 2026 Collaborative Report (Energy Bureau case NEPR-MI-2024-0005, September 2026 data), whose Table 7 tracks interconnection progress. Where they disagree the contracted figure is shown and the other value is noted on the row and in the Data checks tab. The six LUMA ASAP battery projects instead reflect LUMA's ASAP quarterly report for July to September 2026 (Energy Bureau case NEPR-MI-2024-0002, filed October 30, 2026), which redacts participant names; projects were matched by capacity and approval dates. Where the tracker gives an amended COD, that date is shown; the original date and reason appear in the row detail. Capacities in the tracker that differ from Board records are noted in the status, not substituted.</li>
@@ -548,6 +554,7 @@ const css = v => getComputedStyle(document.documentElement).getPropertyValue(v).
 const fc = f => css(FUEL[f].v);
 
 const SRC = {
+  dar:{t:"LUMA, Daily Availability Report, October 24, 2026 (document provided). Data tab: nameplate and available capacity by unit"},
   eia860m:{t:"U.S. EIA, Preliminary Monthly Electric Generator Inventory (EIA-860M), September 2026 release, Operating_PR sheet", u:"https://www.eia.gov/electricity/data/eia860m/"},
   eia:{t:"EIA plant inventory as summarized by Mapscaping, May 2026 (superseded by EIA-860M)", u:"https://mapscaping.com/puerto-rico-power-plants/"},
   crs:{t:"Congressional Research Service, R45023, Repair or Rebuild: Options for Electric Power in Puerto Rico", u:"https://www.congress.gov/crs-product/R45023"},
@@ -1322,43 +1329,77 @@ function techParts(list){
   const by = {}; list.forEach(p=>p.comps.forEach(c=>by[c.f]=(by[c.f]||0)+c.mw));
   return TECH.filter(([f])=>by[f]).map(([f,l])=>({l, mw:by[f], c:fc(f)}));
 }
+// ---------- LUMA Daily Availability Report, October 24, 2026 ----------
+// Parsed from the Data tab: nameplate (column D) and available (column E) for every unit.
+// ECO and AES are taken from the GROSS block, not the net one. Block subtotals reconcile
+// exactly to the subtotals printed on the sheet.
+const DAR = {
+  asOf:"2026-10-24", units:115,
+  np:6460.1, av:3091.5,
+  zeroNp:2853.6, zeroN:67,          // nameplate carrying no availability at all
+  peak:2727, reqReserves:675, reserves:111.6, firmAv:2838.6,
+  byFuel:{
+ "gas":{np:2166.0, av:1305.0, n:23},
+ "bunker":{np:1902.0, av:537.0, n:10},
+ "diesel":{np:1530.5, av:499.0, n:47},
+ "coal":{np:508.0, av:477.0, n:2},
+ "solar":{np:147.1, av:147.1, n:7},
+ "wind":{np:102.0, av:101.0, n:3},
+ "hydro":{np:99.7, av:20.6, n:21},
+ "lfg":{np:4.8, av:4.8, n:2}
+  }
+};
+
 function renderFigures(){
-  const ex = d3.sum(ASSETS,a=>a.mw);
-  const ns = d3.sum(ASSETS,a=>d3.sum(a.units,u=>u.ns==null?u.mw:u.ns));
   const priv = d3.sum(ASSETS.filter(a=>a.sector==="private"),a=>a.mw);
-  const gap = ex-ns;
-  const fuelMW = {}; ASSETS.forEach(a=>a.units.forEach(u=>fuelMW[u.f]=(fuelMW[u.f]||0)+u.mw));
-  const g = ks => d3.sum(ks,k=>fuelMW[k]||0);
+  const exAsset = d3.sum(ASSETS,a=>a.mw);
+  const avPct = DAR.av/DAR.np*100;
+  const asOf = fmtD(DAR.asOf);
+  const G = {oil:["bunker","diesel"], gas:["gas"], coal:["coal"], ren:["solar","wind","hydro","lfg"]};
+  const sum = (ks,k) => d3.sum(ks,f=>(DAR.byFuel[f]||{})[k]||0);
   const exParts = [
-    {l:"Oil", mw:g(["bunker","diesel"]), c:fc("bunker")},
-    {l:"Gas", mw:g(["gas"]), c:fc("gas")},
-    {l:"Coal", mw:g(["coal"]), c:fc("coal")},
-    {l:"Renewable and storage", mw:g(["solar","wind","hydro","bess","lfg"]), c:fc("wind")}
+    {l:"Oil", mw:sum(G.oil,"np"), c:fc("bunker")},
+    {l:"Gas", mw:sum(G.gas,"np"), c:fc("gas")},
+    {l:"Coal", mw:sum(G.coal,"np"), c:fc("coal")},
+    {l:"Renewable", mw:sum(G.ren,"np"), c:fc("wind")}
   ].filter(x=>x.mw>0);
+
   const ap = PROJECTS.filter(live), rv = PROJECTS.filter(x=>x.status==="review");
   const apMW = d3.sum(ap,x=>x.mw), rvMW = d3.sum(rv,x=>x.mw);
+  const t = techTotals(ap);
   const onMW = d3.sum(ap.filter(x=>x.online),x=>x.mw);
   const pct = apMW? onMW/apMW*100 : 0;
+  const miniBar = (label,col,on,total)=>{
+    const pc = total? on/total*100 : 0;
+    return `<div class="kpirow"><span class="kpirow-l"><i style="background:var(${col})"></i>${label}</span>
+      <span class="kpirow-b"><i style="width:${Math.max(pc,0.8)}%;background:var(${col})"></i></span>
+      <span class="kpirow-v">${pc.toFixed(1)}%</span></div>`;
+  };
+
   document.getElementById("figures").innerHTML = `
     <div class="kpi hero">
       <div class="lab">On the grid — nameplate</div>
-      ${kpiNum(ex,"MW")}
-      <div class="sub">Installed across ${ASSETS.length} utility-scale assets · ${Math.round(priv/ex*100)}% privately owned</div>
-      ${segBlock(exParts, ex)}
+      ${kpiNum(DAR.np,"MW")}
+      <div class="sub">${DAR.units} units in LUMA's availability report of ${asOf} · ${Math.round(priv/exAsset*100)}% privately owned</div>
+      ${segBlock(exParts, DAR.np)}
     </div>
     <div class="kpi">
       <div class="lab">Operational now</div>
-      ${kpiNum(ns,"MW")}
-      <div class="sub">Net summer capacity, EIA's rating of what the fleet can actually deliver. <b style="color:var(--ink)">${fmt(gap)} MW</b> below nameplate, ${fmt(249)} MW of it at Palo Seco, where unit 4 is rated at zero.</div>
+      ${kpiNum(DAR.av,"MW")}
+      <div class="sub"><b style="color:var(--ink)">${avPct.toFixed(0)}% of nameplate</b> was available on ${asOf}. ${fmt(DAR.zeroNp)} MW across ${DAR.zeroN} units carried capacity but delivered nothing.</div>
+      <div class="spacer"></div>
+      <div class="seglegend" style="border-top:1px solid var(--rule-2);padding-top:9px">
+        <span>Peak demand that day <b style="color:var(--ink)">${fmt(DAR.peak)} MW</b></span>
+        <span>Reserves <b style="color:var(--st-pause)">${fmt(DAR.reserves)} MW</b> against ${fmt(DAR.reqReserves)} MW required</span></div>
     </div>
     <div class="kpi accent">
       <div class="lab">Approved by the Oversight Board since 2021</div>
       ${kpiNum(apMW,"MW")}
-      <div class="sub">A further ${fmt(rvMW)} MW is still before the Board</div>
+      <div class="sub">${fmt(onMW)} MW online, ${pct.toFixed(1)}% of it · a further ${fmt(rvMW)} MW still before the Board</div>
       <div class="spacer"></div>
-      <div class="kpibar" role="img" aria-label="${pct.toFixed(1)} percent of approved capacity is online">
-        <i style="width:${Math.max(pct,0.8)}%"></i><span class="kpibar-t">${pct.toFixed(1)}% online</span></div>
-      <div class="seglegend"><span>Only <b style="color:var(--ink)">${fmt(onMW)} MW</b> of it has reached the grid</span></div>
+      <div class="kpirows">
+        ${TECHG.map(([f,l,c])=>miniBar(l,c,t[f].on,t[f].ap)).join("")}
+      </div>
     </div>`;
 }
 
