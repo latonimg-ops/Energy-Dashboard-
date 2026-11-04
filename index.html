@@ -243,6 +243,7 @@ table.pt{width:100%;border-collapse:collapse;font-size:13.5px;min-width:1620px}
 .lprog{height:4px;border-radius:2px;background:var(--rule-2);margin:5px 0 4px;width:110px;overflow:hidden}
 .lprog i{display:block;height:100%;border-radius:2px}
 .codx{color:var(--ink-3);font-size:12.5px;margin-top:2px}
+.codsrc{color:var(--ink-3);font-size:11px;margin-top:6px;padding-top:5px;border-top:1px solid var(--rule-2)}
 .passed{display:inline-block;margin-top:4px;font-size:11.5px;font-weight:600;color:var(--warn);background:var(--warn-soft);padding:1px 7px;border-radius:999px}
 .underrev{color:var(--st-review);font-weight:600}
 .stagekey{display:flex;flex-wrap:wrap;gap:6px 10px;margin:4px 0 10px;font-size:12px;color:var(--ink-3);align-items:center}
@@ -1402,14 +1403,15 @@ function inkOn(hex){
   const f = i => { const v = parseInt(c.substr(i,2),16)/255; return v<=.04045 ? v/12.92 : Math.pow((v+.055)/1.055,2.4); };
   return (0.2126*f(0)+0.7152*f(2)+0.0722*f(4)) > 0.34 ? "#15202A" : "#FFFFFF";
 }
-const kpiNum = (v,u) => `<div class="val">${fmt(v)}<u>${u}</u></div>`;
+const fmt0 = n => Math.round(n).toLocaleString("en-US");
+const kpiNum = (v,u) => `<div class="val">${fmt0(v)}<u>${u}</u></div>`;
 // one whole split into parts: thin bar + legend, shares printed inside wide enough blocks
 function segBlock(parts, total){
   const bar = parts.map(x=>{
     const share = x.mw/total;
     return `<i style="width:${share*100}%;background:${x.c}" title="${x.l}: ${fmt(x.mw)} MW, ${(share*100).toFixed(1)}%"></i>`;
   }).join("");
-  const leg = parts.map(x=>`<span><i style="background:${x.c}"></i>${x.l} ${fmt(x.mw)} MW <b class="pctv">${(x.mw/total*100).toFixed(1)}%</b></span>`).join("");
+  const leg = parts.map(x=>`<span><i style="background:${x.c}"></i>${x.l} ${fmt0(x.mw)} MW <b class="pctv">${Math.round(x.mw/total*100)}%</b></span>`).join("");
   return `<div class="spacer"></div>
     <div class="segbar" role="img" aria-label="${parts.map(x=>`${x.l} ${fmt(x.mw)} megawatts`).join(", ")}">${bar}</div>
     <div class="seglegend">${leg}</div>`;
@@ -1463,7 +1465,7 @@ function renderFigures(){
     const pc = total? on/total*100 : 0;
     return `<div class="kpirow"><span class="kpirow-l"><i style="background:var(${col})"></i>${label}</span>
       <span class="kpirow-b"><i style="width:${Math.max(pc,0.8)}%;background:var(${col})"></i></span>
-      <span class="kpirow-v">${pc.toFixed(1)}%</span></div>`;
+      <span class="kpirow-v">${Math.round(pc)}%</span></div>`;
   };
 
   document.getElementById("figures").innerHTML = `
@@ -1476,14 +1478,14 @@ function renderFigures(){
     <div class="kpi">
       <div class="lab">Operational now</div>
       ${kpiNum(av,"MW")}
-      <div class="sub"><b style="color:var(--ink)">${avPct.toFixed(0)}% of nameplate</b> available on ${asOf} · ${fmt(zeroMW)} MW across ${zero.length} units delivered nothing</div>
+      <div class="sub"><b style="color:var(--ink)">${Math.round(avPct)}% of nameplate</b> available on ${asOf} · ${fmt0(zeroMW)} MW across ${zero.length} units delivered nothing</div>
       ${segBlock(tally("ns"), av)}
     </div>
     <div class="kpi accent">
       <div class="lab">Approved by the Oversight Board since 2021</div>
       ${kpiNum(apMW,"MW")}
-      <div class="sub">A further ${fmt(rvMW)} MW is still before the Board</div>
-      <div class="onlinebig"><b>${pct.toFixed(1)}%</b><span>online<br><b>${fmt(onMW)} MW</b> of it</span></div>
+      <div class="sub">A further ${fmt0(rvMW)} MW is still before the Board</div>
+      <div class="onlinebig"><b>${Math.round(pct)}%</b><span>online<br><b>${fmt0(onMW)} MW</b> of it</span></div>
       <div class="kpirows">${TECHG.map(([f,l,c])=>miniBar(l,c,t[f].on,t[f].ap)).join("")}</div>
     </div>`;
 }
@@ -1801,9 +1803,9 @@ function amendCell(p){
         ? `<div style="font-size:12.5px;line-height:1.35">${esc(c.a)}</div>`
         : `<div class="codd">${esc(c.a)}</div>`);
   const brief = c.f
-    ? `<div class="codx" style="margin-top:5px"><b style="color:var(--ink)">${esc(c.f)}</b><br>Executive Briefing, Oct 31 2026</div>`
-    : `<div class="codx" style="margin-top:5px">Not in the October 2026 briefing</div>`;
-  return head + brief;
+    ? `<div class="codx" style="margin-top:5px"><b style="color:var(--ink)">${esc(c.f)}</b> <span style="color:var(--ink-3)">P3A deck</span></div>`
+    : `<div class="codx" style="margin-top:5px">Not in the P3A deck</div>`;
+  return head + brief + `<div class="codsrc">Source: Appendix A and P3A deck</div>`;
 }
 function lumaCell(p){
   const L = p.luma;
@@ -1893,7 +1895,7 @@ function renderTable(){
       <td><span class="nm">${esc(p.name)}</span></td>
       <td><span class="proc"${p.procC?` style="--pc:var(${PROC_FAM[p.procC].v})"`:""}>${esc(p.proc)}</span>${p.procX?`<div class="procx">${esc(p.procX)}</div>`:""}</td>
       <td>${p.muni?`<a href="#" data-goto="${esc(p.muni)}">${esc(p.muni)}</a>`:`<span style="color:var(--ink-3)">Site not disclosed</span>`}</td>
-      <td>${p.comps.map(c=>`<span style="white-space:nowrap"><span class="sw" style="background:var(${FUEL[c.f].v});margin-right:5px;vertical-align:-1px"></span>${FUEL[c.f].label}${p.comps.length>1?" "+fmt(c.mw):""}</span>`).join("<br>")}</td>
+      <td>${p.comps.map(c=>`<span style="white-space:nowrap"><span class="sw" style="background:var(${FUEL[c.f].v});margin-right:5px;vertical-align:-1px"></span>${FUEL[c.f].label}${p.comps.length>1?` <span style="color:var(--ink-2)">${fmt(c.mw)} MW</span>`:""}</span>`).join("<br>")}</td>
       <td class="num"><b>${fmt(p.mw)}</b></td>
       <td>${p.status==="review"?'<span class="underrev">Under FOMB review</span>':p.dateUnknown?"Not located":(p.appr[0].mo?fmtM(p.first):(p.appr[0].approx?"c. ":"")+fmtD(p.first))}${p.status==="review"?"":`<div style="color:var(--ink-3);font-size:12.5px">${esc(p.appr[0].a)}${p.appr.length>1?`; ${p.appr.length-1} later action${p.appr.length>2?"s":""}`:""}</div>`}</td>
       <td class="cod">${origCell(p)}</td>
