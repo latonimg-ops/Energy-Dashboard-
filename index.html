@@ -1802,16 +1802,18 @@ function origCell(p){
 function amendCell(p){
   const c = p.cods;
   if(!c) return `<span style="color:var(--ink-3)">Not in Appendix A</span>`;
-  const unchanged = !c.aD || (c.oD && c.aD===c.oD);
-  const head = unchanged
-    ? `<div style="color:var(--ink-3)">Not applicable</div>`
-    : (/;| after |anniversary/.test(c.a)
-        ? `<div style="font-size:12.5px;line-height:1.35">${esc(c.a)}</div>`
-        : `<div class="codd">${esc(c.a)}</div>`);
-  const brief = c.f
-    ? `<div class="codx" style="margin-top:5px"><b style="color:var(--ink)">${esc(c.f)}</b> <span style="color:var(--ink-3)">P3A deck</span></div>`
-    : `<div class="codx" style="margin-top:5px">Not in the P3A deck</div>`;
-  return head + brief + `<div class="codsrc">Source: Appendix A and P3A deck</div>`;
+  const amended = c.aD && (!c.oD || c.aD!==c.oD);
+  let head;
+  if(amended){
+    head = /;| after |anniversary/.test(c.a)
+      ? `<div style="font-size:12.5px;line-height:1.35">${esc(c.a)}</div>`
+      : `<div class="codd">${esc(c.a)}</div>`;
+  } else if(c.fD){
+    head = `<div class="codd">${esc(c.f)}</div>`;   // no Appendix A amendment; the deck's date stands
+  } else {
+    head = `<div style="color:var(--ink-3)">Not applicable</div>`;
+  }
+  return head + `<div class="codsrc">Source: Appendix A and P3A deck</div>`;
 }
 function behindCell(p){
   if(p.status==="review") return `<span style="color:var(--ink-3)">No approval yet</span>`;
