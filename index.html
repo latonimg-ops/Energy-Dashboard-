@@ -1613,7 +1613,7 @@ function fuelKV(parts){
   return `<div class="kv">${parts.map(([f,v])=>`<span class="sw" style="background:var(${FUEL[f].v})"></span><span class="l">${FUEL[f].label}</span><span class="v">${fmt(v)} MW</span>`).join("")}</div>`;
 }
 const srcItem = s => s.u ? `<a href="${s.u}" target="_blank" rel="noopener">${esc(s.t)}</a>` : esc(s.t);
-function srcLinks(keys){ return `<div class="src">Sources: ${keys.map(k=>srcItem(SRC[k])).join("; ")}</div>`; }
+function srcLinks(keys){ if(!keys||!keys.length) return ""; return `<div class="src">Sources: ${keys.map(k=>srcItem(SRC[k])).join("; ")}</div>`; }
 function statusTag(p){
   if(p.status==="revoked") return `<span class="tag rev">Revoked</span>`;
   if(p.status==="review") return `<span class="tag review">Under Board review</span>`;
@@ -1624,12 +1624,17 @@ function statusTag(p){
 function projTip(p){
   const c = p.cods;
   const rate = p.genera ? "No PPA rate" : (p.fp ? p.fp.map(f=>`${f.l?esc(f.l)+" ":""}${fpFmt(f)}`).join("<br>") : "Rate not reported");
-  let dl = "No commercial operation date";
-  if(c){
+  let dl = "COD not received";
+  if(p.codPending){
+    dl = "COD not received";
+  } else if(c){
+    // the same waterfall the table uses: P3A deck, then the Appendix A amendment, then LUMA
     const amended = c.aD && (!c.oD || c.aD!==c.oD);
-    if(amended) dl = `Amended COD: ${esc(c.a)}`;
-    else if(c.o) dl = `Original COD: ${esc(c.o)}`;
-  } else if(p.codD) dl = `Expected COD: ${fmtD(p.codD)}`;
+    const pick = c.f ? [c.f,"Amended COD"] : (amended ? [c.a,"Amended COD"] : (c.l ? [c.l,"Amended COD"] : (c.o ? [c.o,"Original COD"] : null)));
+    if(pick) dl = `${pick[1]}: ${esc(pick[0])}`;
+    else dl = "No commercial operation date";
+  } else if(p.codD){ dl = `COD: ${fmtD(p.codD)}`; }
+  else { dl = "No commercial operation date"; }
   return `<b>${esc(p.name)}</b><br>${fmt(p.mw)} MW<br>${rate}<br>${dl}`;
 }
 function compText(p){ return p.comps.map(c=>`${FUEL[c.f].label} ${fmt(c.mw)} MW${c.mwh?` / ${fmt(c.mwh)} MWh`:""}`).join(" + "); }
@@ -1657,7 +1662,7 @@ function projDetail(p){
     <dt>Capacity</dt><dd>${compText(p)}${p.comps.some(c=>c.n)?`<br><span style="color:var(--ink-3)">${p.comps.filter(c=>c.n).map(c=>esc(c.n)).join("; ")}</span>`:""}</dd>
     <dt>Current status</dt><dd>${esc(p.cs)}${p.con||p.ix?`<br><span style="color:var(--ink-3)">${p.con?`In construction: ${esc(p.con)}`:""}${p.con&&p.ix?"; ":""}${p.ix?`Interconnection study complete: ${esc(p.ix)}`:""}</span>`:""}</dd>
     <dt>Fixed payment</dt><dd>${p.genera?"Not applicable: Genera initiative for PREPA, not a PPA":p.fp?p.fp.map(f=>`${f.l?esc(f.l)+": ":""}${fpFmt(f)}${f.esc?", "+esc(f.esc.toLowerCase()):""}${f.cap?`, capped at $${f.cap}/kWh`:""}${f.n?` <span style="color:var(--ink-3)">(${esc(f.n)})</span>`:""}`).join("<br>"):"Not reported"}</dd>
-    <dt>Expected COD</dt><dd>${esc(p.cod)}${p.codN?`<br><span style="color:var(--ink-3)">${esc(p.codN)}</span>`:""}</dd>
+    <dt>Commercial operation date</dt><dd>${p.codPending?`<span style="color:var(--ink-3)">Not received</span>`:`${esc(p.cod)}${p.codN?`<br><span style="color:var(--ink-3)">${esc(p.codN)}</span>`:""}`}</dd>
     <dt>Regulatory note</dt><dd>${esc(p.statusText)}</dd>
     ${p.terms?`<dt>Terms</dt><dd>${esc(p.terms)}</dd>`:""}
     ${p.note?`<dt>Note</dt><dd>${esc(p.note)}</dd>`:""}</dl>
@@ -1797,7 +1802,7 @@ PROJECTS.forEach(p=>{
 });
 function stagePill(p){ const s=STAGES[p.stage]; return `<span class="stg ${p.stage==='rev'?'revoked':''}" style="--c:var(${s.v})">${s.l}</span>`; }
 function origCell(p){
-  if(p.codPending) return `<span style="color:var(--ink-3)">Not received yet</span>`;
+  if(p.codPending) return `<span style="color:var(--ink-3)">Not received</span>`;
   const c = p.cods;
   if(!c) return `<span style="color:var(--ink-3)">Not in Appendix A</span>`;
   return c.oD && !/;| after |anniversary/.test(c.o)
@@ -1805,7 +1810,7 @@ function origCell(p){
     : `<div style="color:var(--ink);font-size:12.5px;line-height:1.35">${esc(c.o)}</div>`;
 }
 function amendCell(p){
-  if(p.codPending) return `<span style="color:var(--ink-3)">Not received yet</span>`;
+  if(p.codPending) return `<span style="color:var(--ink-3)">Not received</span>`;
   const c = p.cods;
   if(!c) return `<span style="color:var(--ink-3)">Not in Appendix A</span>`;
   const amended = c.aD && (!c.oD || c.aD!==c.oD);
