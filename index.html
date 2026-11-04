@@ -56,6 +56,19 @@ h1{font-size:clamp(24px,3.2vw,36px);line-height:1.12;font-weight:700;letter-spac
 .asof{color:var(--ink-3);font-size:13px;text-align:right;white-space:nowrap}
 .secttl{font-size:24px;letter-spacing:-.01em;margin:0 0 4px}
 .progress{margin:26px 0 0}
+.sched-sect{margin-top:30px}
+.yearbars.sched{height:200px;gap:14px;margin-top:16px}
+.yearbars.sched .yb{cursor:default}
+.yearbars.sched .yb .yv{font-weight:600;color:var(--ink)}
+.yearbars.sched .yb.none{margin-left:20px;padding-left:20px;border-left:1px dashed var(--rule)}
+.yearbars.sched .yb.none .col{opacity:.82}
+.yearbars.sched .yb.none .yl{color:var(--ink-3);font-style:italic}
+.yearbars.sched .yb.none .yv{color:var(--ink-2)}
+.schedkey{display:flex;flex-wrap:wrap;gap:6px 16px;margin-top:30px;font-size:12.5px;color:var(--ink-2);align-items:center}
+.schedkey span{display:inline-flex;align-items:center;gap:6px}
+.schedkey i{width:10px;height:10px;border-radius:2px;display:inline-block;flex:none}
+.schednotes{margin-top:12px;font-size:13px;color:var(--ink-2);max-width:92ch}
+.schednotes p{margin:6px 0;line-height:1.5}
 .pgrid{display:grid;gap:10px;margin:14px 0 0}
 .prow{display:grid;grid-template-columns:120px minmax(0,1fr) auto;gap:14px;align-items:center;font-size:13.5px}
 .prow .pl{display:inline-flex;align-items:center;gap:7px;color:var(--ink);font-weight:600}
@@ -289,15 +302,13 @@ footer{margin-top:28px;padding-top:14px;border-top:1px solid var(--rule);font-si
 <body>
 <div class="wrap">
 <header>
-  <div>
-    <h1>Puerto Rico Generation Portfolio</h1>
-    
-  </div>
+  <div><h1>Puerto Rico Generation Portfolio</h1></div>
   <div class="asof">Last updated November 4, 2026</div>
   <div class="kpis" id="figures"></div>
 </header>
 
 <section class="progress" id="progressSection"></section>
+<section class="progress sched-sect" id="scheduleSection"></section>
 
 
 <section class="pipeline" id="pipeline">
@@ -340,6 +351,7 @@ footer{margin-top:28px;padding-top:14px;border-top:1px solid var(--rule);font-si
         <li>Fuel is assigned by unit name, because the availability report does not state it. San Juan 5 and 6, the TM units, Costa Sur 5 and 6 and EcoEl&eacute;ctrica are treated as gas, AES as coal, the San Juan, Palo Seco and Aguirre steam units as heavy fuel oil, and every peaking and combined-cycle turbine as distillate. EIA codes the San Juan and Aguirre combined cycles as distillate instead, which would move about 1,070 MW from gas to oil; this is the least settled figure on the page.</li>
         <li>Construction stage is read from what the source documents report on site, not from any single progress percentage. LUMA's Table 7 publishes an interconnection-progress figure for 18 of these projects; it is held in the data but not shown, because the report gives no basis for it and it does not track the construction the status column describes.</li>
         <li>Commercial operation dates resolve through one waterfall: the Appendix A amendment first, then the P3A executive briefing of October 31, 2026, then LUMA's October 2026 collaborative report, then the original COD. Every cell names the document that supplied the date it shows. Quarters are taken at the quarter end.</li>
+        <li>The delivery chart places each approved contract in the year of the date the waterfall resolved to. It is a schedule, not a forecast: no slippage is added. Contracts with no date in any source are shown in a separate column rather than dropped, and a contract whose date has already passed stays in its contracted year and is called out beneath the chart.</li>
         <li>Days since approval counts from the first Board approval, with the position against a base case of commercial operation 24 months after approval underneath it.</li>
         <li>Project capacity is the contracted amount in the most recent Board letter or regulatory record. Storage is shown in MW of power, with MWh where disclosed, and is always priced as a capacity rate in dollars per MW-month so the batteries can be compared with one another.</li>
         <li>Energy prices are shown to two decimal places. Several contracts round to the same figure as a result, including the AES Salinas and Jobos solar rates, which both read $0.10/kWh against $0.1042 and $0.1038 in the tracker.</li>
@@ -395,14 +407,14 @@ footer{margin-top:28px;padding-top:14px;border-top:1px solid var(--rule);font-si
           <tr><td>Solaner ASAP battery stage</td><td>EPC not started (LUMA ASAP, Sept 2026)</td><td>In construction (tracker, July 2026)</td></tr>
         </tbody></table></div></div>
       <div class="chk warn"><h3>What the availability report shows</h3><ul><li>Parsed from the Data tab of LUMA's Daily Availability Report for <b>October 24, 2026</b>: 115 units, <b>6,460.1 MW of nameplate</b> and <b>3,091.5 MW available</b>, or 47.9%. Every block subtotal reconciles exactly to the subtotals printed on the sheet. EcoEléctrica and AES are taken from the gross block, not the net one.</li><li><b>2,853.6 MW across 67 units carried nameplate and delivered nothing</b> that day, including Aguirre 1 (450 MW), Costa Sur 5 (410 MW), all four San Juan steam units (400 MW) and both Palo Seco 1 and 2 (170 MW).</li><li>Against a forecast peak of 2,727 MW the system held <b>111.6 MW of reserves against 675 MW required</b>. The report puts its own availability rate at 45.7%, which excludes solar, wind and landfill gas from supply.</li><li>Fuel is assigned by unit name, since the report does not state it: San Juan 5 and 6 and the TM units are treated as gas on the basis of the New Fortress LNG supply, Costa Sur 5 and 6 as gas, EcoEléctrica as gas, AES as coal, the San Juan, Palo Seco and Aguirre steam units as heavy fuel oil, and all peaking and combined-cycle turbines as distillate. That puts the fleet at 53% oil and 34% gas. EIA codes the San Juan and Aguirre combined cycles as distillate instead, which would move about 1,070 MW from gas to oil. This remains the least settled figure on the page.</li></ul></div>
-      <div class="chk fix"><h3>The existing fleet, rebuilt from the primary filing</h3><ul>
+      <div class="chk fix"><h3>The existing fleet, rebuilt from the primary filing</h3><p style="margin:0 0 8px;color:var(--ink-3)"><b>Superseded.</b> This records the EIA-860M rebuild that replaced the original WRI-based list. The page now takes capacity and availability from LUMA's Daily Availability Report instead &mdash; 6,460.1 MW across 115 units at 33 plants &mdash; and keeps EIA only for plant coordinates. The totals below are the EIA step, not what the page shows.</p><ul>
         <li>The asset list previously rested on the WRI Global Power Plant Database and on EIA figures taken from a third-party summary. It is now built directly from <b>EIA-860M, September 2026</b>: 105 generators across 38 plants in the Electric Utility and independent power producer sectors, 5,704.0 MW of nameplate and 5,167.4 MW of net summer capacity, plus the two landfill-gas sites and the 350 MW of FEMA temporary units EIA does not carry. Total <b>6,058.8 MW nameplate, 5,522.2 MW net summer</b>.</li>
         <li>This resolved all four discrepancies the old list flagged against its own sources. Costa Sur is 1,032 MW, not 862: EIA still carries units 3 and 4, commissioned in 1962 and 1963. Palo Seco is 728 MW, not 582, for the same reason. EcoEléctrica, at 580 MW, is now covered by the plant's own EIA record.</li>
         <li><b>CIRO One Salinas is no longer counted as existing capacity.</b> It is commissioning, not in commercial operation, and EIA does not list it as operating. That removes a roughly 140 MW double-count with the approved pipeline.</li>
         <li><b>Palo Seco unit 4 carries 216 MW of nameplate and zero net summer capacity in EIA's record</b>, against LUMA's report of 180 MW of actual output in September 2026. Both figures are shown; the discrepancy is unresolved.</li>
         <li>EIA's planned inventory for Puerto Rico contains <b>22.2 MW</b>. None of the Board-approved pipeline has reached the stage at which EIA records a generator as planned.</li>
       </ul></div>
-      <div class="chk warn"><h3>What the rebuild changed, and one unresolved conflict</h3>
+      <div class="chk warn"><h3>What the rebuild changed, and one unresolved conflict</h3><p style="margin:0 0 8px;color:var(--ink-3)"><b>Superseded, except the conflict.</b> The fuel comparison below is between the original list and EIA-860M. The current fuel split is assigned by unit name from the availability report, as the Method tab sets out. The combined-cycle coding conflict in the last paragraph is unchanged and still open.</p>
         <p class="cnote" style="margin:0 0 8px">The fuel mix moved more than the total did. EIA codes each generator by its reported primary energy source, and on that basis the fleet is far more oil-bound than the previous list showed.</p>
         <div class="ctabw"><table class="ctab"><thead><tr><th>Fuel</th><th>Previous list</th><th>EIA-860M</th></tr></thead><tbody>
           <tr><td>Fuel oil No. 6</td><td>1,732 MW</td><td>2,080.7 MW</td></tr>
@@ -425,7 +437,7 @@ footer{margin-top:28px;padding-top:14px;border-top:1px solid var(--rule);font-si
       <div class="chk gap"><h3>Open items</h3><ul>
         <li><b>The tracker's Power Expectations row is stale.</b> It still lists the 400 MW Aguirre contract as active and executed on June 10, 2026, but the Board revoked its approval on August 14, 2026, and LUMA's October 2026 report refers to "the contract cancellation of one provider". The page keeps it revoked.</li>
         <li>The 100 MW Yabucoa Energy Park solar PPOA is confirmed as a Go Green contract under Tranche 1, so LUMA's Table 7 simply does not carry it. It is separate from the 100 MW Yabucoa Energy battery submitted under the accelerated evaluation process, and both are counted.</li>
-        <li>Only one project now has no disclosed site: the Xzerta Energy Volt battery, which is therefore not drawn on the map.</li>
+        <li>Every approved and under-review project now has a municipality and is drawn on the map. The last one without a site, the Xzerta Energy Volt battery, was placed in Hatillo by the project owner. On the grid side only the 1 MW Bechara wind unit is unmapped, having no EIA record to take coordinates from.</li>
         <li><b>Nine conflicts were settled by the project owner and have left the table above.</b> The larger Pattern capacities (120 and 100 MW) are correct; Vega Baja is 60 MW and Infinigen Horizon 20 MW; LUMA's Salinas row does repeat the Jobos capacities; Esmeralda is 79.5 MW; the developer names shown are right; the higher AES solar rates are the ones to use; Power Expectations is priced at $0.224/kWh for the full term; and Energiza's commercial operation date is October 30, 2030.</li>
         <li>The AES energy storage agreements were amended to raise capacity by <b>10 MW to 110 MW at Jobos</b> and by <b>75 MW to 175 MW at Salinas</b>, with no change to the 25-year terms or the maximum payable amounts. Both batteries are priced at <b>$23,696/MW-month</b> with a 2% escalator, which replaces the figure previously derived from the contract ceilings.</li>
         <li>Rates and a site supplied by the project owner also closed four gaps: the Guayama Solar Energy battery at $25,500/MW-month through year five and $21,250 thereafter, San Juan Solar at $0.145/kWh, Xzerta Energy Volt in Hatillo, and Xzerta-Tec Solar I's March 2021 approval confirmed against the Board's own record rather than inferred.</li>
@@ -478,7 +490,7 @@ footer{margin-top:28px;padding-top:14px;border-top:1px solid var(--rule);font-si
         <th class="num"><button data-sort="mw">Capacity (MW)</button></th>
         <th><button data-sort="date">First Board approval</button></th>
         <th><button data-sort="cod">Original COD</button><div style="font-weight:400;color:var(--ink-3);font-size:11.5px">Appendix A</div></th>
-        <th><button data-sort="codluma">Amended COD</button><div style="font-weight:400;color:var(--ink-3);font-size:11.5px">Appendix A, then the Oct 2026 briefing</div></th>
+        <th><button data-sort="codluma">Amended COD</button><div style="font-weight:400;color:var(--ink-3);font-size:11.5px">Appendix A, then the P3A briefing, then LUMA</div></th>
         <th><button data-sort="behind">Days since approval</button><div style="font-weight:400;color:var(--ink-3);font-size:11.5px">and where that sits against 24 months</div></th>
         <th>Current status</th>
         <th><button data-sort="fp">Fixed payment</button><div style="font-weight:400;color:var(--ink-3);font-size:11.5px">$/kWh or $/MW-month</div></th>
@@ -1693,7 +1705,7 @@ function renderPanel(){
       ${stackBar(apParts,d3.sum(apParts,d=>d[1]))}${fuelKV(apParts)}
       <div style="font-size:13px;margin:12px 0 4px;color:var(--ink-2)">Leading municipalities for approved capacity</div>
       <div class="kv">${topAp.map(([m,v])=>`<span></span><a class="l" href="#" data-goto="${esc(m)}">${esc(m)}</a><span class="v">${fmt(v)} MW</span>`).join("")}</div>
-      <p class="note" style="margin:12px 0">${PROJECTS.filter(p=>!p.muni).length} approved projects have no disclosed site and appear only in the table below.</p>`;
+      ${(()=>{const n=PROJECTS.filter(p=>!p.muni).length; return n?`<p class="note" style="margin:12px 0">${n} approved project${n>1?"s have":" has"} no disclosed site and appear${n>1?"":"s"} only in the table below.</p>`:"";})()}`;
   } else {
     const m = state.muni;
     const as = ASSETS.filter(a=>a.muni===m).sort((a,b)=>b.mw-a.mw);
@@ -1748,6 +1760,58 @@ function renderProgress(){
     </div>
 `;
 }
+// ---------- when the approved capacity is contracted to arrive ----------
+// Dates only, straight from the COD waterfall. No slippage is modelled here; that is the
+// arrival model's job. A contract with no date anywhere in the waterfall gets its own column,
+// because 793 MW of approved capacity with no date is a finding, not a rounding error.
+function scheduleData(){
+  const ap = PROJECTS.filter(live);
+  const dated = ap.filter(p=>p.codD), undated = ap.filter(p=>!p.codD);
+  const years = dated.map(p=>+p.codD.slice(0,4));
+  const lo = Math.min.apply(null, years), hi = Math.max.apply(null, years);
+  const rows = [];
+  for(let y=lo; y<=hi; y++){
+    const ps = dated.filter(p=>+p.codD.slice(0,4)===y);
+    const by = {}; ps.forEach(p=>p.comps.forEach(c=>by[c.f]=(by[c.f]||0)+c.mw));
+    rows.push({k:String(y), label:String(y), by, tot:d3.sum(ps,p=>p.mw), n:ps.length, past:y<TODAY_Y});
+  }
+  const uby = {}; undated.forEach(p=>p.comps.forEach(c=>uby[c.f]=(uby[c.f]||0)+c.mw));
+  rows.push({k:"none", label:"No date", by:uby, tot:d3.sum(undated,p=>p.mw), n:undated.length, none:true});
+  const lapsed = dated.filter(p=>p.codD < TODAY && !p.online);
+  return {rows, lapsedN:lapsed.length, lapsedMW:d3.sum(lapsed,p=>p.mw), lapsed,
+          undatedN:undated.length, undatedMW:d3.sum(undated,p=>p.mw)};
+}
+function renderSchedule(){
+  const el = document.getElementById("scheduleSection"); if(!el) return;
+  const S = scheduleData();
+  const max = d3.max(S.rows,r=>r.tot)||1;
+  const bar = r => {
+    const parts = TECHG.filter(([f])=>r.by[f]);
+    return `<div class="yb sb${r.none?" none":""}" data-k="${r.k}">
+      <span class="yv">${Math.round(r.tot).toLocaleString("en-US")}</span>
+      <span class="col" style="height:${Math.max(r.tot/max*150,3)}px">${parts.map(([f,l,c])=>`<i style="height:${r.by[f]/r.tot*100}%;background:var(${c})"></i>`).join("")}</span>
+      <span class="yl">${r.label}</span></div>`;
+  };
+  el.innerHTML = `
+    <h2 class="secttl">When the rest is contracted to arrive</h2>
+    <p class="dek" style="max-width:92ch">Megawatts by the commercial operation date in the contracts themselves, not a forecast. Hover a column for the technology breakdown.</p>
+    <div class="yearbars sched">${S.rows.map(bar).join("")}</div>
+    <div class="schedkey">${TECHG.map(([f,l,c])=>`<span><i style="background:var(${c})"></i>${l}</span>`).join("")}</div>
+    <div class="schednotes">
+      ${S.lapsedN?`<p><b>${S.lapsedN} contract${S.lapsedN===1?"":"s"}, ${Math.round(S.lapsedMW).toLocaleString("en-US")} MW, passed the date in the contract and is not online.</b> ${S.lapsed.map(p=>esc(p.name)+" ("+STAGES[p.stage].l.toLowerCase()+")").join(", ")}.</p>`:""}
+      <p><b>${Math.round(S.undatedMW).toLocaleString("en-US")} MW across ${S.undatedN} approved contracts carries no date in any source</b> &mdash; ${Math.round(S.undatedMW/d3.sum(PROJECTS.filter(live),p=>p.mw)*100)}% of everything the Board has approved, and it cannot be placed on this chart at all.</p>
+    </div>`;
+  const byK = Object.fromEntries(S.rows.map(r=>[r.k,r]));
+  el.querySelectorAll(".sb").forEach(node=>{
+    const r = byK[node.dataset.k];
+    const lines = TECHG.filter(([f])=>r.by[f])
+      .map(([f,l,c])=>`<span style="display:inline-block;width:8px;height:8px;border-radius:2px;background:var(${c});margin-right:5px"></span>${l}: ${fmt(r.by[f])} MW`).join("<br>");
+    const head = r.none ? `<b>No commercial operation date</b>` : `<b>${r.label} &mdash; ${fmt(r.tot)} MW due</b>`;
+    const tip = `${head}<br>${r.n} contract${r.n===1?"":"s"}${r.none?`, ${fmt(r.tot)} MW`:""}<br>${lines}`;
+    node.addEventListener("mousemove", ev=>showTip(ev, tip));
+    node.addEventListener("mouseleave", hideTip);
+  });
+}
 function renderApprovalTotals(){
   const years = d3.range(2021, 2027);
   const data = years.map(y=>{
@@ -1773,7 +1837,7 @@ const STAGES = {
   review:{l:"Under Board review", v:"--st-review", d:"Submitted; no Board determination yet"},
   rev:{l:"Revoked", v:"--revoked", d:"Board approval withdrawn"}
 };
-const TODAY = "2026-11-03";
+const TODAY = "2026-11-04", TODAY_Y = +TODAY.slice(0,4);   // the page's "as of"; also the header date
 PROJECTS.forEach(p=>{
   const c = p.con || "";
   p.stage = p.status==="revoked" ? "rev"
@@ -2081,7 +2145,7 @@ document.getElementById("slipRange").addEventListener("input",e=>{
 });
 document.getElementById("inclReview").addEventListener("change",e=>{ mstate.review=e.target.checked; renderModel(); });
 window.addEventListener("hashchange",()=>{ const h=location.hash.slice(1); if(TABS[h]) showTab(h); });
-function render(){ drawShade(); drawMarkers(); renderPanel(); renderProgress(); renderApprovalTotals(); renderTable(); renderModel(); if(lastMuni!==state.muni){ lastMuni=state.muni; zoomTo(); } }
+function render(){ drawShade(); drawMarkers(); renderPanel(); renderProgress(); renderSchedule(); renderApprovalTotals(); renderTable(); renderModel(); if(lastMuni!==state.muni){ lastMuni=state.muni; zoomTo(); } }
 
 const sel = document.getElementById("muniSelect");
 muniNames.forEach(n=>{ const o=document.createElement("option"); o.value=n; o.textContent=n; sel.appendChild(o); });
