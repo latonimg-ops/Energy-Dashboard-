@@ -289,9 +289,9 @@ footer{margin-top:28px;padding-top:14px;border-top:1px solid var(--rule);font-si
 <header>
   <div>
     <h1>Puerto Rico Generation Portfolio</h1>
-    <p class="dek">What is on the grid, what the Oversight Board has approved to add, and how much of it has arrived.</p>
+    
   </div>
-  <div class="asof">Grid capacity and availability as of <b>October 24, 2026</b><br>Pipeline reconciled November 3, 2026 against PREPA's July 2026<br>tracker, LUMA's October 2026 report and the Board's letters</div>
+  <div class="asof">Last updated November 4, 2026</div>
   <div class="kpis" id="figures"></div>
 </header>
 
@@ -305,6 +305,7 @@ footer{margin-top:28px;padding-top:14px;border-top:1px solid var(--rule);font-si
     <button role="tab" id="t-projects" data-tab="projects" aria-selected="true" aria-controls="tab-projects">Projects</button>
     <button role="tab" id="t-model" data-tab="model" aria-selected="false" aria-controls="tab-model">Arrival model</button>
     <button role="tab" id="t-checks" data-tab="data-checks" aria-selected="false" aria-controls="tab-checks">Data checks</button>
+    <button role="tab" id="t-method" data-tab="method" aria-selected="false" aria-controls="tab-method">Method</button>
   </div>
   <div class="tabpanel" id="tab-model" role="tabpanel" aria-labelledby="t-model" hidden>
     <p class="dek" style="max-width:88ch;margin:16px 0 0">Developers report commercial operation dates, and those dates move. This model takes the slippage this portfolio has already recorded and projects it forward, so the question is not when each developer says a project will arrive but when it arrives if the next amendment looks like the last one.</p>
@@ -326,6 +327,35 @@ footer{margin-top:28px;padding-top:14px;border-top:1px solid var(--rule);font-si
     <div id="arrivalChart"></div>
     <div id="modelTable"></div>
     <div id="slipEvidence"></div>
+  </div>
+  <div class="tabpanel" id="tab-method" role="tabpanel" aria-labelledby="t-method" hidden>
+    <div class="caveats" style="margin-top:20px">
+    <div>
+      <h3>How to read the numbers</h3>
+      <ul>
+        <li>Capacity and availability both come from LUMA's Daily Availability Report of October 24, 2026: 115 units at 33 plants, 6,460 MW of nameplate and 3,092 MW available. The same figures drive the headline tiles, the map and the municipality panel, so the page carries one capacity total throughout. EIA-860M supplies only the coordinates that place each plant, and each municipality is derived by testing those coordinates against the Census boundary file rather than read off a plant name.</li>
+        <li>Nameplate is what a unit is rated at; available is what the operator reported it could actually deliver that day. The two differ by 3,369 MW across the fleet, and 2,854 MW of that sits in 67 units that delivered nothing at all.</li>
+        <li>Fuel is assigned by unit name, because the availability report does not state it. San Juan 5 and 6, the TM units, Costa Sur 5 and 6 and EcoEl&eacute;ctrica are treated as gas, AES as coal, the San Juan, Palo Seco and Aguirre steam units as heavy fuel oil, and every peaking and combined-cycle turbine as distillate. EIA codes the San Juan and Aguirre combined cycles as distillate instead, which would move about 1,070 MW from gas to oil; this is the least settled figure on the page.</li>
+        <li>Commercial operation dates resolve through one waterfall: the Appendix A amendment first, then the P3A executive briefing of October 31, 2026, then LUMA's October 2026 collaborative report, then the original COD. Every cell names the document that supplied the date it shows. Quarters are taken at the quarter end.</li>
+        <li>Days since approval counts from the first Board approval, with the position against a base case of commercial operation 24 months after approval underneath it.</li>
+        <li>Project capacity is the contracted amount in the most recent Board letter or regulatory record. Storage is shown in MW of power, with MWh where disclosed, and is always priced as a capacity rate in dollars per MW-month so the batteries can be compared with one another.</li>
+        <li>Energy prices are shown to two decimal places. Several contracts round to the same figure as a result, including the AES Salinas and Jobos solar rates, which both read $0.10/kWh against $0.1042 and $0.1038 in the tracker.</li>
+      </ul>
+    </div>
+    <div>
+      <h3>What is and isn't included</h3>
+      <ul>
+        <li>Included on the grid side: every generating unit the system operator dispatches &mdash; PREPA's plants run by Genera PR, the hydro PREPA retains, the coal and gas independents, the FEMA-funded temporary units at San Juan and Palo Seco, and the utility-scale renewables under contract.</li>
+        <li>The 1 MW Bechara wind unit appears in the availability report with no corresponding EIA record, so it has no coordinates and is not drawn on the map.</li>
+        <li>Excluded because the system operator does not dispatch them: roughly 1,230 MW of rooftop solar, behind-the-meter industrial cogeneration, and customer-sited generators.</li>
+        <li>The approved pipeline counts contracts the Oversight Board has approved since 2021. Capacity still before the Board is listed in the table and drawn on the map with a dashed outline, but excluded from every approved total, including the headline figures and the arrival model.</li>
+        <li>Coqu&iacute; Power's eleven sites appear as 22 rows, one per contract: the eleven solar PPOAs were approved in July 2026 while the eleven companion storage contracts remain under Board review.</li>
+        <li>Genera's six batteries and four peaker sites are PREPA-owned programmes rather than power purchase agreements, so they carry no contracted rate. Only the Costa Sur peakers are approved, in January 2025; the other three sites reached the Board in October 2026 and are counted as under review.</li>
+        <li>The Board's November 28, 2025 conditional approval of the Genera&ndash;NFE multisite gas supply agreement is a fuel contract, so it is noted here rather than mapped.</li>
+        <li>Genera PR's parent, New Fortress Energy, closed a restructuring on September 11, 2026 that shifts control to creditors; operator labels reflect the contract, not that change.</li>
+      </ul>
+    </div>
+    </div>
   </div>
   <div class="tabpanel" id="tab-checks" role="tabpanel" aria-labelledby="t-checks" hidden>
     <div class="checks">
@@ -485,36 +515,6 @@ footer{margin-top:28px;padding-top:14px;border-top:1px solid var(--rule);font-si
 </section>
 
 <section class="caveats">
-  <div>
-    <h3>How to read the numbers</h3>
-    <ul>
-      <li><b>One capacity source.</b> Every megawatt on this page, in the headline figures, the map and the municipality panel alike, comes from LUMA's Daily Availability Report of October 24, 2026: 115 units at 33 plants, 6,460.1 MW of nameplate and 3,091.5 MW available. EIA-860M is now used only for geography, supplying the coordinates that let each plant be placed and its municipality derived.</li>
-      <li>Rebuilding on the availability report recovered <b>EcoEléctrica's 566 MW</b>, which the earlier EIA-based list had dropped: EIA classes the plant as industrial cogeneration, so it fell outside the electric-utility and independent-producer filter used to build that list. One unit, the 1 MW Bechara wind turbine, appears in LUMA's report with no EIA record, so it has no location and is not drawn on the map.</li>
-      <li>The asset list for the map is rebuilt from the primary filing: EIA's Preliminary Monthly Electric Generator Inventory (EIA-860M), September 2026 release, Puerto Rico sheet. Every plant carries both <b>nameplate</b> and <b>net summer capacity</b>, EIA's own measure of what a unit can actually deliver in summer conditions. The two differ by 537 MW across the fleet, and the gap is not spread evenly: Palo Seco alone accounts for 249 MW of it. Net summer capacity is the figure to use against the Energy Bureau's 700–850 MW adequacy shortfall.</li>
-      <li>Each plant is placed by EIA's own coordinates, and its municipality is derived by testing those coordinates against the Census boundary file rather than being read off the project name.</li>
-      <li>Thermal units are shown by primary fuel. Costa Sur 5–6 and San Juan 5–6 burn natural gas with oil backup; Cambalache 2–3 and several other units have gas conversions in progress.</li>
-      <li>Current status and expected commercial operation date (COD) come from two documents: PREPA's Appendix A, Renewable Generation Projects Tracker (July 2026), which compiles developer-reported updates, and LUMA's October 2026 Collaborative Report (Energy Bureau case NEPR-MI-2024-0005, September 2026 data), whose Table 7 tracks interconnection progress. Where they disagree the contracted figure is shown and the other value is noted on the row and in the Data checks tab. The six LUMA ASAP battery projects instead reflect LUMA's ASAP quarterly report for July to September 2026 (Energy Bureau case NEPR-MI-2024-0002, filed October 30, 2026), which redacts participant names; projects were matched by capacity and approval dates. Where the tracker gives an amended COD, that date is shown; the original date and reason appear in the row detail. Capacities in the tracker that differ from Board records are noted in the status, not substituted.</li>
-      <li>Project capacity is the contracted amount in the most recent Board letter or regulatory record found. Storage is shown in MW of power, with MWh where disclosed.</li>
-      <li>Where a project's site is not disclosed in public filings, it appears in the table as "Site not disclosed" and is not drawn on the map. Projects with a known municipality are placed near its center, not at the exact site.</li>
-    </ul>
-  </div>
-  <div>
-    <h3>What is and isn't included</h3>
-    <ul>
-      <li>Included: every generator EIA-860M classes in the Electric Utility or independent power producer sectors, which is EIA's own definition of bulk supply. That covers PREPA's plants (thermal operated by Genera PR, hydro retained by PREPA), the coal and gas independents, and utility-scale renewables. The two landfill-gas sites are added back by hand because EIA classes their owner as commercial although they sell to PREPA.</li>
-      <li>Excluded by that rule: 680 MW of industrial combined heat and power and about 90 MW of other commercial and industrial generation, all of which serves its host facility rather than the grid.</li>
-      <li>The FEMA-funded temporary units at San Juan (200 MW) and Palo Seco (150 MW) appear in no EIA inventory at all. They are included on operator-reported capacity and flagged as such, because they are physically generating.</li>
-      <li>Genera's four replacement peaker sites and its six batteries are PREPA-owned programs rather than power purchase agreements, so they carry no contracted rate. The peakers are counted as under review because their EPC contract has not yet gone to the Board.</li>
-      <li>Deliberately excluded: roughly 1,230 MW of rooftop solar (June 2025) and customer-sited generators, neither of which the system operator dispatches, and projects approved only by PREPA or the Energy Bureau but not yet reviewed by the Board.</li>
-      <li>Coquí Power's eleven sites appear as 22 rows, one per contract, because the solar PPOAs are approved while the companion storage ESSAs are still under Board review.</li>
-      <li>Projects under Board review are drawn with a dashed outline, listed in the table and excluded from every approved-capacity total, including the headline figures and the arrival model.</li>
-      <li>Now included, after the November 2026 reconciliation: Coquí Power's 22 accelerated-procurement contracts (523 MW solar and 599 MW storage, July 2026), the Yabucoa and Naguabo Energy Park batteries (80 MW each, June 2026) and the Infinigen Isabela battery (50 MW, May 2025).</li>
-      <li>Still excluded because the tracker marks them under Board review rather than approved: Putnam's CIRO BESS (90 MW), CIRO One X (25 MW), CIRO Two battery (35 MW) and Guayama battery (25 MW), and Xzerta Energy Volt (60 MW).</li>
-      <li>Genera's six battery projects (430 MW) are a Genera PR initiative, not power purchase agreements: PREPA owns the batteries at its existing plants and pays no contracted rate. They are included because PREPA's tracker lists Board approval in January 2025; status comes from Genera's September 2026 progress report, which gives construction milestones but no COD.</li>
-      <li>The Board's November 28, 2025 conditional approval of the Genera–NFE multisite gas supply agreement is a fuel contract, so it is noted here rather than mapped.</li>
-      <li>Genera PR's parent, New Fortress Energy, closed a restructuring on September 11, 2026 that shifts control to creditors; operator labels reflect the contract, not that change.</li>
-    </ul>
-  </div>
   <div style="grid-column:1/-1">
     <h3>Sources</h3>
     <ol class="srcs" id="srcList"></ol>
@@ -1736,7 +1736,6 @@ function renderProgress(){
   };
   document.getElementById("progressSection").innerHTML = `
     <h2 class="secttl">How much of the approved pipeline is actually online</h2>
-    <p class="dek" style="max-width:88ch">Of the ${fmt(apMW)} MW the Oversight Board has approved since 2021, this is what has reached the grid, by technology.</p>
     <div class="pgrid">
       ${TECHG.map(([f,l,c])=>row(l,c,t[f].on,t[f].ap)).join("")}
       <div class="prow" style="border-top:1px solid var(--rule);padding-top:10px;margin-top:2px">
@@ -1744,7 +1743,7 @@ function renderProgress(){
         <span class="ptrack"><i style="width:${Math.max(onMW/apMW*100,0.6)}%;background:var(--fomb)"></i></span>
         <span class="pv"><b>${fmt(onMW)}</b> of ${fmt(apMW)} MW · <b>${(onMW/apMW*100).toFixed(1)}%</b></span></div>
     </div>
-    <p class="tlabel" style="margin:12px 0 0;max-width:88ch">${onNames.length? `The only approved capacity on the grid is ${onNames.join(" and ")}, a Tranche 0 contract that synchronised in November 2025 and is still running compliance tests ahead of commercial operation. Nothing else has arrived.` : "No approved capacity has reached the grid."}</p>`;
+`;
 }
 function renderApprovalTotals(){
   const years = d3.range(2021, 2027);
@@ -2057,7 +2056,7 @@ function renderModel(){
     </div></div>`;
 }
 
-const TABS = {projects:"tab-projects", model:"tab-model", "data-checks":"tab-checks"};
+const TABS = {projects:"tab-projects", model:"tab-model", "data-checks":"tab-checks", method:"tab-method"};
 function showTab(name, push){
   if(!TABS[name]) name="projects";
   document.querySelectorAll(".tabs button").forEach(b=>b.setAttribute("aria-selected", b.dataset.tab===name));
