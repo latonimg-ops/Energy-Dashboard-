@@ -395,6 +395,12 @@ footer{margin-top:28px;padding-top:14px;border-top:1px solid var(--rule);font-si
         <li><b>Nine conflicts were settled by the project owner and have left the table above.</b> The larger Pattern capacities (120 and 100 MW) are correct; Vega Baja is 60 MW and Infinigen Horizon 20 MW; LUMA's Salinas row does repeat the Jobos capacities; Esmeralda is 79.5 MW; the developer names shown are right; the higher AES solar rates are the ones to use; Power Expectations is priced at $0.224/kWh for the full term; and Energiza's commercial operation date is October 30, 2030.</li>
         <li>The AES energy storage agreements were amended to raise capacity by <b>10 MW to 110 MW at Jobos</b> and by <b>75 MW to 175 MW at Salinas</b>, with no change to the 25-year terms or the maximum payable amounts. Both batteries are priced at <b>$23,696/MW-month</b> with a 2% escalator, which replaces the figure previously derived from the contract ceilings.</li>
         <li>Rates and a site supplied by the project owner also closed four gaps: the Guayama Solar Energy battery at $25,500/MW-month through year five and $21,250 thereafter, San Juan Solar at $0.145/kWh, Xzerta Energy Volt in Hatillo, and Xzerta-Tec Solar I's March 2021 approval confirmed against the Board's own record rather than inferred.</li>
+        <li><b>The commercial operation dates now come from two columns of Appendix A and one deck.</b> Original COD and Amended &amp; Approved COD are taken straight from the tracker; where the amended date matches the original, or none was issued, the column reads “Not applicable”. Beneath it sits the date in the Executive Briefing to the Governor and the Board of October 31, 2026, which supplies a date for <b>30 projects</b> and is treated as the operative one, replacing LUMA's Table 7 in that role.</li>
+        <li>The briefing gives commercial operation dates for Genera's six batteries and four peaker sites for the first time: Cambalache December 2026, Vega Baja March 2027, Costa Sur June 2027, Aguirre and Yabucoa September 2027 and Palo Seco June 2028 for the batteries; Costa Sur and Yabucoa March 2028 and Jobos and Daguao September 2028 for the peakers. None of these had a date in Appendix A.</li>
+        <li><b>Two conflicts the briefing introduces.</b> It puts Energiza in operation in December 2030, against the October 30, 2030 confirmed earlier; the briefing date is carried here. And its own slides disagree on the peakers, the summary table giving Costa Sur March 2028 and Yabucoa March 2028 where the map on the next page shows June 2028 and September 2027; the summary table is used.</li>
+        <li>The briefing also lists the battery contracts' prices in cents per kilowatt-hour, but the figures match the dollars-per-MW-month rates almost exactly — .23¢ against $23,546, .26¢ against $26,900, .33¢ against $33,750. That is a unit slip in the deck, so the MW-month figures are kept. The AES storage agreements are the exception: their 24¢ genuinely is per kilowatt-hour.</li>
+        <li>The briefing puts Genera's batteries at 530 MW installed and 430 MW usable, and splits the usable capacity differently across the six sites than Appendix A splits the nameplate. The Appendix A figures are kept, since both sum to 430 MW and only Appendix A states a per-site nameplate.</li>
+        <li>Energy prices are shown to two decimal places, matching how the briefing quotes them in whole cents. Several contracts round to the same figure as a result: the AES Salinas and Jobos solar rates both read $0.10/kWh, against $0.1042 and $0.1038 in the tracker.</li>
         <li>LUMA's Table 7 carries 18 projects. Every one is matched here, and each cell names the LUMA row, developer and capacity it was matched to so the match can be checked. Projects absent from Table 7 read "Not in Table 7" rather than being left blank — among them Pattern Barceloneta Solar, since LUMA lists only the Barceloneta storage contract.</li>
         <li>Four of LUMA's rows disagree with the contract record and are flagged in place: Salinas repeats the Jobos capacities, Vega Baja reads 49 MW against the Board's 60 MW, CIRO One tracks phase 1 only, and San Germán still carries its original date.</li>
         <li><b>Every storage contract is shown as a capacity price in $/MW-month</b>, so the batteries can be compared with one another. The AES Salinas and Jobos energy storage agreements are written per kWh of discharge in the tracker, at $0.2418 and $0.242/kWh; both are carried here at the confirmed $23,696/MW-month with a 2% escalator.</li>
@@ -437,8 +443,8 @@ footer{margin-top:28px;padding-top:14px;border-top:1px solid var(--rule);font-si
         <th>Technology and fuel</th>
         <th class="num"><button data-sort="mw">Capacity (MW)</button></th>
         <th><button data-sort="date">First Board approval</button></th>
-        <th><button data-sort="cod">Expected COD</button><div style="font-weight:400;color:var(--ink-3);font-size:11.5px">operative date</div></th>
-        <th><button data-sort="codluma">Amended COD</button><div style="font-weight:400;color:var(--ink-3);font-size:11.5px">LUMA Table 7, Oct 2026</div></th>
+        <th><button data-sort="cod">Original COD</button><div style="font-weight:400;color:var(--ink-3);font-size:11.5px">Appendix A</div></th>
+        <th><button data-sort="codluma">Amended COD</button><div style="font-weight:400;color:var(--ink-3);font-size:11.5px">Appendix A, then the Oct 2026 briefing</div></th>
         <th><button data-sort="behind">Days since approval</button><div style="font-weight:400;color:var(--ink-3);font-size:11.5px">and where that sits against 24 months</div></th>
         <th>Current status</th>
         <th><button data-sort="fp">Fixed payment</button><div style="font-weight:400;color:var(--ink-3);font-size:11.5px">$/kWh or $/MW-month</div></th>
@@ -535,6 +541,7 @@ const css = v => getComputedStyle(document.documentElement).getPropertyValue(v).
 const fc = f => css(FUEL[f].v);
 
 const SRC = {
+  brief:{t:"Energy Czar and Public-Private Partnerships Authority, Executive Briefing for the Governor of Puerto Rico and the Financial Oversight and Management Board, October 31, 2026 (document provided)"},
   dar:{t:"LUMA, Daily Availability Report, October 24, 2026 (document provided). Data tab: nameplate and available capacity by unit"},
   eia860m:{t:"U.S. EIA, Preliminary Monthly Electric Generator Inventory (EIA-860M), September 2026 release, Operating_PR sheet", u:"https://www.eia.gov/electricity/data/eia860m/"},
   eia:{t:"EIA plant inventory as summarized by Mapscaping, May 2026 (superseded by EIA-860M)", u:"https://mapscaping.com/puerto-rico-power-plants/"},
@@ -1309,6 +1316,63 @@ const LUMA_T7 = {
 };
 PROJECTS.forEach(p=>{ p.luma = LUMA_T7[p.id] || null; p.codLuma = p.luma ? p.luma.cod : null; });
 
+// ---------- commercial operation dates ----------
+// o/oD  original COD, Appendix A
+// a/aD  amended and approved COD, Appendix A; "Not applicable" where unchanged or none
+// f/fD  COD in the Executive Briefing to the Governor and the Board, 31 October 2026
+const CODS = {
+ "ciro1p":{o:"24 months after FNTP",oD:null,a:"Not applicable",aD:null,f:"Feb 2027",fD:"2027-02-28"},
+ "xzerta":{o:"Mar 30, 2024",oD:"2024-03-30",a:"Nov 30, 2027",aD:"2027-11-30",f:null,fD:null},
+ "solaner":{o:"Oct 1, 2026",oD:"2026-10-01",a:"Dec 20, 2027",aD:"2027-12-20",f:"Dec 2027",fD:"2027-12-31"},
+ "pattern-pv":{o:"Nov 30, 2025",oD:"2025-11-30",a:"Mar 31, 2028",aD:"2028-03-31",f:"Mar 2028",fD:"2028-03-31"},
+ "pattern-bar-bess":{o:"Mar 31, 2028",oD:"2028-03-31",a:"May 22, 2028",aD:"2028-05-22",f:"May 2028",fD:"2028-05-31"},
+ "pattern-si-bess":{o:"Mar 31, 2028",oD:"2028-03-31",a:"May 22, 2028",aD:"2028-05-22",f:"May 2028",fD:"2028-05-31"},
+ "ciro2":{o:"Second anniversary of the closing date",oD:null,a:"Second anniversary of satisfaction of conditions subsequent",aD:null,f:"Dec 2026",fD:"2026-12-31"},
+ "coamo":{o:"Dec 31, 2026",oD:"2026-12-31",a:"Apr 30, 2028",aD:"2028-04-30",f:"Apr 2028",fD:"2028-04-30"},
+ "guayama-solar":{o:"Second anniversary of the closing date",oD:null,a:"Second anniversary of satisfaction of conditions subsequent",aD:null,f:"Dec 2028",fD:"2028-12-31"},
+ "cfe-jobos":{o:"Nov 30, 2025",oD:"2025-11-30",a:"May 29, 2026",aD:"2026-05-29",f:"Mar 2027 PV, May 2027 storage",fD:"2027-05-31"},
+ "cfe-salinas":{o:"Phase 1 Nov 30, 2025; phase 2 Aug 30, 2026",oD:"2026-08-30",a:"Phase 1 May 29, 2026; phase 2 Feb 26, 2027",aD:"2027-02-26",f:"May 2027 PV, Apr 2027 storage",fD:"2027-05-31"},
+ "yep":{o:"Dec 31, 2027",oD:"2027-12-31",a:"Dec 31, 2027",aD:"2027-12-31",f:"Dec 2027",fD:"2027-12-31"},
+ "yfn":{o:"2 years after the closing date",oD:null,a:"Aug 1, 2026",aD:"2026-08-01",f:"Dec 2026",fD:"2026-12-31"},
+ "tetris":{o:"2 years after closing; closing was November 2023",oD:null,a:"Dec 31, 2027",aD:"2027-12-31",f:"Dec 2027",fD:"2027-12-31"},
+ "juncos":{o:"Sep 30, 2025",oD:"2025-09-30",a:"Not applicable",aD:null,f:"Sep 2025",fD:"2025-09-30"},
+ "naguabo-ep":{o:"Dec 31, 2027",oD:"2027-12-31",a:"Dec 31, 2027",aD:"2027-12-31",f:null,fD:null},
+ "gogreen-yab-bess":{o:"Dec 31, 2027",oD:"2027-12-31",a:"Dec 31, 2027",aD:"2027-12-31",f:null,fD:null},
+ "ponce-bess":{o:"Dec 31, 2026",oD:"2026-12-31",a:"Apr 30, 2028",aD:"2028-04-30",f:"Apr 2028",fD:"2028-04-30"},
+ "caguas-bess":{o:"Dec 31, 2026",oD:"2026-12-31",a:"Apr 30, 2028",aD:"2028-04-30",f:"Apr 2028",fD:"2028-04-30"},
+ "penuelas-bess":{o:"Dec 31, 2026",oD:"2026-12-31",a:"Apr 30, 2028",aD:"2028-04-30",f:"Apr 2028",fD:"2028-04-30"},
+ "t2-vb":{o:"Sep 30, 2027",oD:"2027-09-30",a:"Not applicable",aD:null,f:"Sep 2027",fD:"2027-09-30"},
+ "t2-marisol":{o:"2 years after closing; closing has not occurred",oD:null,a:"Not applicable",aD:null,f:"Dec 2028",fD:"2028-12-31"},
+ "t2-sj":{o:"Not stated",oD:null,a:"Not applicable",aD:null,f:"Pending",fD:null},
+ "infinigen-isabela":{o:"To be determined",oD:null,a:"Not applicable",aD:null,f:"To be determined",fD:null},
+ "asap-sanfermin":{o:"Not applicable",oD:null,a:"Not applicable",aD:null,f:null,fD:null},
+ "asap-ecoe":{o:"Not applicable",oD:null,a:"Not applicable",aD:null,f:null,fD:null},
+ "asap-horizon":{o:"Jan 1, 2028",oD:"2028-01-01",a:"Not applicable",aD:null,f:null,fD:null},
+ "asap-oriana":{o:"Jan 1, 2028",oD:"2028-01-01",a:"Not applicable",aD:null,f:null,fD:null},
+ "asap-polaris":{o:"No fixed date in the standard offer",oD:null,a:"Not applicable",aD:null,f:null,fD:null},
+ "asap-lajas":{o:"Not stated",oD:null,a:"Not applicable",aD:null,f:null,fD:null},
+ "asap-juncos":{o:"Not applicable",oD:null,a:"Not applicable",aD:null,f:null,fD:null},
+ "asap-xzerta":{o:"Jul 31, 2027",oD:"2027-07-31",a:"Not applicable",aD:null,f:null,fD:null},
+ "asap-solaner":{o:"Dec 1, 2027",oD:"2027-12-01",a:"Not applicable",aD:null,f:null,fD:null},
+ "asap-yab":{o:"Jan 1, 2028",oD:"2028-01-01",a:"Not applicable",aD:null,f:null,fD:null},
+ "gen-cambalache":{o:"Not stated",oD:null,a:"Not applicable",aD:null,f:"Dec 2026",fD:"2026-12-31"},
+ "gen-vegabaja":{o:"Not stated",oD:null,a:"Not applicable",aD:null,f:"Mar 2027",fD:"2027-03-31"},
+ "gen-paloseco":{o:"Not stated",oD:null,a:"Not applicable",aD:null,f:"Jun 2028",fD:"2028-06-30"},
+ "gen-yabucoa":{o:"Not stated",oD:null,a:"Not applicable",aD:null,f:"Sep 2027",fD:"2027-09-30"},
+ "gen-aguirre":{o:"Not stated",oD:null,a:"Not applicable",aD:null,f:"Sep 2027",fD:"2027-09-30"},
+ "gen-costasur":{o:"Not stated",oD:null,a:"Not applicable",aD:null,f:"Jun 2027",fD:"2027-06-30"},
+ "peaker-costasur":{o:"Not stated",oD:null,a:"Not applicable",aD:null,f:"Mar 2028",fD:"2028-03-31"},
+ "peaker-jobos":{o:"Not stated",oD:null,a:"Not applicable",aD:null,f:"Sep 2028",fD:"2028-09-30"},
+ "peaker-yabucoa":{o:"Not stated",oD:null,a:"Not applicable",aD:null,f:"Mar 2028",fD:"2028-03-31"},
+ "peaker-daguao":{o:"Not stated",oD:null,a:"Not applicable",aD:null,f:"Sep 2028",fD:"2028-09-30"},
+ "energiza":{o:"Jun 30, 2028",oD:"2028-06-30",a:"Oct 26, 2029",aD:"2029-10-26",f:"Dec 2030",fD:"2030-12-31"}
+};
+PROJECTS.forEach(p=>{ const c = CODS[p.id]; if(!c) return; p.cods = c;
+  const best = c.fD || c.aD || c.oD;            // the briefing is the operative date where it gives one
+  if(best){ p.codD = best; }
+  if(c.oD) p.codOrig = c.oD;
+});
+
 // ---------- derived ----------
 PROJECTS.forEach(p=>{
   p.mw = d3.sum(p.comps,c=>c.mw);
@@ -1720,6 +1784,27 @@ PROJECTS.forEach(p=>{
   else { p.behind = null; p.notDue = true; }                                   // 24 months not yet elapsed
 });
 function stagePill(p){ const s=STAGES[p.stage]; return `<span class="stg ${p.stage==='rev'?'revoked':''}" style="--c:var(${s.v})">${s.l}</span>`; }
+function origCell(p){
+  const c = p.cods;
+  if(!c) return `<span style="color:var(--ink-3)">Not in Appendix A</span>`;
+  return c.oD && !/;| after |anniversary/.test(c.o)
+    ? `<div class="codd">${esc(c.o)}</div>`
+    : `<div style="color:${c.oD?"var(--ink)":"var(--ink-3)"};font-size:12.5px;line-height:1.35">${esc(c.o)}</div>`;
+}
+function amendCell(p){
+  const c = p.cods;
+  if(!c) return `<span style="color:var(--ink-3)">Not in Appendix A</span>`;
+  const unchanged = !c.aD || (c.oD && c.aD===c.oD);
+  const head = unchanged
+    ? `<div style="color:var(--ink-3)">Not applicable</div>`
+    : (/;| after |anniversary/.test(c.a)
+        ? `<div style="font-size:12.5px;line-height:1.35">${esc(c.a)}</div>`
+        : `<div class="codd">${esc(c.a)}</div>`);
+  const brief = c.f
+    ? `<div class="codx" style="margin-top:5px"><b style="color:var(--ink)">${esc(c.f)}</b><br>Executive Briefing, Oct 31 2026</div>`
+    : `<div class="codx" style="margin-top:5px">Not in the October 2026 briefing</div>`;
+  return head + brief;
+}
 function lumaCell(p){
   const L = p.luma;
   if(!L) return `<span style="color:var(--ink-3)">Not in Table 7</span>`;
@@ -1780,14 +1865,14 @@ function renderCodChart(){
 
 // ---------- fixed payment cell ----------
 const FPU = { kWh:{max:0.25, v:"--f-solar", l:"Energy price, $/kWh"}, MWmo:{max:30000, v:"--f-bess", l:"Storage capacity price, $/MW-month"} };
-function fpFmt(f){ return f.u==="kWh" ? `${f.approx?"≈":""}$${f.v.toFixed(4)}/kWh` : `$${f.v.toLocaleString("en-US",{maximumFractionDigits:2})}/MW-month`; }
+function fpFmt(f){ return f.u==="kWh" ? `${f.approx?"≈":""}$${f.v.toFixed(2)}/kWh` : `$${f.v.toLocaleString("en-US",{maximumFractionDigits:0})}/MW-month`; }
 function fpCell(p){
   if(p.genera) return `<span style="color:var(--ink-2)">Not applicable</span><div class="fpm">Genera initiative for PREPA; no PPA or fixed payment</div>`;
   if(!p.fp) return `<span style="color:var(--ink-3)">Not reported</span>`;
   return p.fp.map(f=>{
     const U = FPU[f.u];
     const isStor = f.u==="MWmo" || /storage/i.test(f.l||"");
-    const num = f.u==="kWh" ? `${f.approx?"≈":""}$${f.v.toFixed(4)}` : `${f.derived?"≈":""}$${Math.round(f.v).toLocaleString("en-US")}`;
+    const num = f.u==="kWh" ? `${f.approx?"≈":""}$${f.v.toFixed(2)}` : `${f.derived?"≈":""}$${Math.round(f.v).toLocaleString("en-US")}`;
     const meta = [f.esc, f.cap?`cap $${f.cap}`:null].filter(Boolean).join(" · ");
     return `<div class="fpl"><div class="fpv">${f.l?`<span class="lab">${esc(f.l)}</span>`:""}<b>${num}</b><span class="u">${f.u==="kWh"?"/kWh":"/MW-mo"}</span>${f.derived?`<span class="u" style="color:var(--warn)">derived</span>`:""}</div>
       <div class="fpbar" title="${esc(U.l)}"><i style="width:${Math.min(100,f.v/U.max*100)}%;background:var(${isStor?"--f-bess":U.v})${f.derived?";opacity:.7":""}"></i></div>
@@ -1800,7 +1885,7 @@ function renderTable(){
   document.getElementById("prockey").innerHTML = Object.values(PROC_FAM).map(f=>`<span class="proc" style="--pc:var(${f.v})">${f.l}</span>`).join("");
   let rows = PROJECTS.filter(p=>(state.showRevoked||shown(p)) && (state.year==null||p.year===state.year) && (state.tech==="all"||p.tech===state.tech));
   const {k,dir} = state.sort;
-  const val = p => k==="name"?p.name : k==="proc"?(p.procO+100+"|"+p.first) : k==="muni"?(p.muni||"~") : k==="mw"?p.mw : k==="cod"?(p.codD||"9999") : k==="behind"?(p.dateUnknown||!p.baseCod?-1e9:(NOW-new Date(p.first+"T12:00:00"))) : k==="codluma"?(p.codLuma&&p.codLuma!=="na"?p.codLuma:"9999") : k==="fp"?(p.fp?(p.fp[0].u==="kWh"?p.fp[0].v:1000+p.fp[0].v/1000):1e9) : p.first;
+  const val = p => k==="name"?p.name : k==="proc"?(p.procO+100+"|"+p.first) : k==="muni"?(p.muni||"~") : k==="mw"?p.mw : k==="cod"?((p.cods&&p.cods.oD)||"9999") : k==="behind"?(p.dateUnknown||!p.baseCod?-1e9:(NOW-new Date(p.first+"T12:00:00"))) : k==="codluma"?((p.cods&&(p.cods.fD||p.cods.aD))||"9999") : k==="fp"?(p.fp?(p.fp[0].u==="kWh"?p.fp[0].v:1000+p.fp[0].v/1000):1e9) : p.first;
   rows.sort((a,b)=>{ const x=val(a),y=val(b); return (typeof x==="number"? x-y : String(x).localeCompare(String(y),"es"))*dir; });
   const tb = document.querySelector("#ptable tbody");
   tb.innerHTML = rows.map(p=>`
@@ -1811,8 +1896,8 @@ function renderTable(){
       <td>${p.comps.map(c=>`<span style="white-space:nowrap"><span class="sw" style="background:var(${FUEL[c.f].v});margin-right:5px;vertical-align:-1px"></span>${FUEL[c.f].label}${p.comps.length>1?" "+fmt(c.mw):""}</span>`).join("<br>")}</td>
       <td class="num"><b>${fmt(p.mw)}</b></td>
       <td>${p.status==="review"?'<span class="underrev">Under FOMB review</span>':p.dateUnknown?"Not located":(p.appr[0].mo?fmtM(p.first):(p.appr[0].approx?"c. ":"")+fmtD(p.first))}${p.status==="review"?"":`<div style="color:var(--ink-3);font-size:12.5px">${esc(p.appr[0].a)}${p.appr.length>1?`; ${p.appr.length-1} later action${p.appr.length>2?"s":""}`:""}</div>`}</td>
-      <td class="cod">${codCell(p)}</td>
-      <td class="cod">${lumaCell(p)}</td>
+      <td class="cod">${origCell(p)}</td>
+      <td class="cod">${amendCell(p)}</td>
       <td class="cod">${behindCell(p)}</td>
       <td class="cs"><div class="stagerow">${stagePill(p)}${p.status==="conditional"?statusTag(p):""}${p.genera?`<span class="tag gen">Genera initiative · not a PPA</span>`:""}</div><div class="csx clamp">${esc(p.cs)}</div></td>
       <td class="fp">${fpCell(p)}</td>
