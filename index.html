@@ -402,8 +402,8 @@ footer{margin-top:28px;padding-top:14px;border-top:1px solid var(--rule);font-si
         <li>The briefing also lists the battery contracts' prices in cents per kilowatt-hour, but the figures match the dollars-per-MW-month rates almost exactly — .23¢ against $23,546, .26¢ against $26,900, .33¢ against $33,750. That is a unit slip in the deck, so the MW-month figures are kept. The AES storage agreements are the exception: their 24¢ genuinely is per kilowatt-hour.</li>
         <li>The briefing puts Genera's batteries at 530 MW installed and 430 MW usable, and splits the usable capacity differently across the six sites than Appendix A splits the nameplate. The Appendix A figures are kept, since both sum to 430 MW and only Appendix A states a per-site nameplate.</li>
         <li>Energy prices are shown to two decimal places, matching how the briefing quotes them in whole cents. Several contracts round to the same figure as a result: the AES Salinas and Jobos solar rates both read $0.10/kWh, against $0.1042 and $0.1038 in the tracker.</li>
-        <li>LUMA's Table 7 carries 18 projects. Every one is matched here, and each cell names the LUMA row, developer and capacity it was matched to so the match can be checked. Projects absent from Table 7 read "Not in Table 7" rather than being left blank — among them Pattern Barceloneta Solar, since LUMA lists only the Barceloneta storage contract.</li>
-        <li>Four of LUMA's rows disagree with the contract record and are flagged in place: Salinas repeats the Jobos capacities, Vega Baja reads 49 MW against the Board's 60 MW, CIRO One tracks phase 1 only, and San Germán still carries its original date.</li>
+        <li>LUMA's Table 7 carries 18 projects, each matched here by row name, developer and capacity. Its commercial operation dates are superseded by Appendix A and the P3A deck, but its <b>interconnection progress</b> is kept and shown as a tag in the status column: <b>14 of the 18 report zero progress</b>, one is complete, and the rest sit between 50 and 75 per cent.</li>
+        <li>Four of LUMA's rows disagree with the contract record: Salinas repeats the Jobos capacities, Vega Baja reads 49 MW against the Board's 60 MW, CIRO One tracks phase 1 only, and San Germán carries the original date. None of those now drives a figure on this page.</li>
         <li><b>Every storage contract is shown as a capacity price in $/MW-month</b>, so the batteries can be compared with one another. The AES Salinas and Jobos energy storage agreements are written per kWh of discharge in the tracker, at $0.2418 and $0.242/kWh; both are carried here at the confirmed $23,696/MW-month with a 2% escalator.</li>
         <li>Two projects have no separate storage price to show at all: Coamo and YFN Yabucoa bundle the battery into a single blended energy rate with the solar. Genera's six batteries and the Guayama Solar Energy battery carry no rate, the first because they are not power purchase agreements and the second because none was supplied.</li>
         <li>Rates for the submissions still under review are the figures supplied with the project list, not approved terms: Emerald II Helios $33,750/MW-month over six hours, Montalva storage $29,325/MW-month over five hours, Yabucoa Energy and Xzerta Energy Volt $15,500/MW-month, Montalva solar $0.1245/kWh and Coquí storage $23,500/MW-month. They are submitted terms, not approved ones.</li>
@@ -1315,7 +1315,7 @@ const LUMA_T7 = {
  "t2-vb":             {row:"Vega Baja", ipp:"CS-UR", desc:"49 MW BESS", pct:0, cod:"na", note:"LUMA lists 49 MW against the Board's 60 MW"},
  "infinigen-isabela": {row:"Isabela", ipp:"Infinigen", desc:"50 MW BESS", pct:0, cod:"na"}
 };
-PROJECTS.forEach(p=>{ p.luma = LUMA_T7[p.id] || null; p.codLuma = p.luma ? p.luma.cod : null; });
+PROJECTS.forEach(p=>{ p.luma = LUMA_T7[p.id] || null; });
 
 // ---------- commercial operation dates ----------
 // o/oD  original COD, Appendix A
@@ -1398,11 +1398,6 @@ const state = {muni:null, shade:"existing", showAssets:true, showProj:true, labe
 
 // ---------- header figures ----------
 // ink that stays legible on a filled block
-function inkOn(hex){
-  const c = hex.replace("#",""); if(c.length<6) return "#fff";
-  const f = i => { const v = parseInt(c.substr(i,2),16)/255; return v<=.04045 ? v/12.92 : Math.pow((v+.055)/1.055,2.4); };
-  return (0.2126*f(0)+0.7152*f(2)+0.0722*f(4)) > 0.34 ? "#15202A" : "#FFFFFF";
-}
 const fmt0 = n => Math.round(n).toLocaleString("en-US");
 const kpiNum = (v,u) => `<div class="val">${fmt0(v)}<u>${u}</u></div>`;
 // one whole split into parts: thin bar + legend, shares printed inside wide enough blocks
@@ -1818,15 +1813,6 @@ function amendCell(p){
     : `<div class="codx" style="margin-top:5px">Not in the P3A deck</div>`;
   return head + brief + `<div class="codsrc">Source: Appendix A and P3A deck</div>`;
 }
-function lumaCell(p){
-  const L = p.luma;
-  if(!L) return `<span style="color:var(--ink-3)">Not in Table 7</span>`;
-  const head = L.cod==="na"
-    ? `<div style="color:var(--ink-2)">Not available</div>`
-    : `<div class="codd">${fmtM(L.cod+"-01")}</div>${p.codD && p.codD.slice(0,7)!==L.cod?`<div class="codx" style="color:var(--warn)">Differs from the operative date</div>`:""}`;
-  const pc = L.pct>=75?"var(--st-test)":L.pct>0?"var(--st-build)":"var(--ink-3)";
-  return `${head}<div class="codx"><b style="color:${pc}">${L.pct}% progress</b> · matched to \u201c${esc(L.row)}\u201d (${esc(L.ipp)}, ${esc(L.desc)})${L.note?`<div style="color:var(--warn);margin-top:2px">${esc(L.note)}</div>`:""}</div>`;
-}
 function behindCell(p){
   if(p.status==="review") return `<span style="color:var(--ink-3)">No approval yet</span>`;
   if(p.dateUnknown || !p.baseCod) return `<span style="color:var(--ink-3)">—</span>`;
@@ -1845,12 +1831,6 @@ function behindCell(p){
     <div class="codx" style="color:${col}">${sub}</div>`;
 }
 
-function codCell(p){
-  const main = p.codD ? fmtD(p.codD) : esc(p.cod||"Not reported");
-  const past = p.codD && p.codD < TODAY && p.status!=="revoked" && p.stage!=="test";
-  const base = p.baseCod ? `<div class="codx">Base case ${fmtM(p.baseCod.toISOString().slice(0,10))}</div>` : "";
-  return `<div class="codd">${main}</div>${base}${past?`<span class="passed">Date has passed</span>`:""}`;
-}
 
 function renderCodChart(){
   const ps = PROJECTS.filter(p=>live(p));
@@ -1912,7 +1892,7 @@ function renderTable(){
       <td class="cod">${origCell(p)}</td>
       <td class="cod">${amendCell(p)}</td>
       <td class="cod">${behindCell(p)}</td>
-      <td class="cs"><div class="stagerow">${stagePill(p)}${p.status==="conditional"?statusTag(p):""}${p.genera?`<span class="tag gen">Genera initiative · not a PPA</span>`:""}</div><div class="csx clamp">${esc(p.cs)}</div></td>
+      <td class="cs"><div class="stagerow">${stagePill(p)}${p.status==="conditional"?statusTag(p):""}${p.genera?`<span class="tag gen">Genera initiative · not a PPA</span>`:""}${p.luma?`<span class="tag" style="border-color:${p.luma.pct>=75?"var(--st-test)":p.luma.pct>0?"var(--st-build)":"var(--ink-3)"};color:${p.luma.pct>=75?"var(--st-test)":p.luma.pct>0?"var(--st-build)":"var(--ink-2)"}" title="LUMA interconnection progress, Table 7, October 2026">${p.luma.pct}% interconnected</span>`:""}</div><div class="csx clamp">${esc(p.cs)}</div></td>
       <td class="fp">${fpCell(p)}</td>
     </tr>
     ${state.openRow===p.id?`<tr class="detail"><td colspan="11"><div class="dgrid"><div>${projDetail(p)}</div></div></td></tr>`:""}`).join("");
@@ -1965,12 +1945,15 @@ const asD = d => new Date(d+"T12:00:00");
 const monthsBetween = (a,b) => (asD(b)-asD(a))/MONTH;
 const addMonths = (d,m) => { const x=asD(d); x.setMonth(x.getMonth()+Math.round(m)); return x; };
 const SLIP = (()=>{
-  const obs = PROJECTS.filter(p=>p.codOrig && p.codD)
-    .map(p=>({name:p.name, stage:p.stage, from:p.codOrig, to:p.codD, slip:monthsBetween(p.codOrig,p.codD)}))
+  // Only contracts Appendix A records as amended: a never-amended contract has not
+  // demonstrated zero slip, it has simply not come up for amendment yet.
+  const obs = PROJECTS.filter(p=>p.cods && p.cods.oD && p.cods.aD && p.cods.aD!==p.cods.oD)
+    .map(p=>({name:p.name, stage:p.stage, from:p.cods.oD, to:p.cods.aD, slip:monthsBetween(p.cods.oD,p.cods.aD)}))
     .sort((a,b)=>a.slip-b.slip);
+  const never = PROJECTS.filter(p=>p.cods && p.cods.oD && (!p.cods.aD || p.cods.aD===p.cods.oD) && live(p)).length;
   const v = obs.map(o=>o.slip);
   const q = f => { if(!v.length) return 0; const i=(v.length-1)*f, lo=Math.floor(i), hi=Math.ceil(i); return v[lo]+(v[hi]-v[lo])*(i-lo); };
-  return {obs, n:v.length, p50:q(.5), p90:q(.9), mean:d3.mean(v)||0, max:v[v.length-1]||0};
+  return {obs, never, n:v.length, p50:q(.5), p90:q(.9), mean:d3.mean(v)||0, max:v[v.length-1]||0};
 })();
 const SCEN = {
   reported:{l:"Developer dates", m:()=>0,  x:"Every reported date taken at face value"},
@@ -2063,11 +2046,11 @@ function renderModel(){
   // --- evidence ---
   document.getElementById("slipEvidence").innerHTML = `
     <div class="checks" style="margin-top:28px"><div class="chk warn"><h3>What the model rests on</h3>
-      <p class="cnote" style="margin:0 0 10px">PREPA's tracker records an original and an amended commercial operation date for ${SLIP.n} of these contracts. Comparing the two gives the slippage already recorded on this portfolio — a median of <b>${SLIP.p50.toFixed(0)} months</b>, a mean of ${SLIP.mean.toFixed(0)}, and a worst case of ${SLIP.max.toFixed(0)}. The model adds that same movement to the dates reported today.</p>
+      <p class="cnote" style="margin:0 0 10px">Appendix A records an amended commercial operation date for ${SLIP.n} of these contracts. Comparing it with the original gives the slippage recorded whenever an amendment has actually been issued; a further ${SLIP.never} approved contracts have never been amended and are left out, since not coming up for amendment is not evidence of arriving on time — a median of <b>${SLIP.p50.toFixed(0)} months</b>, a mean of ${SLIP.mean.toFixed(0)}, and a worst case of ${SLIP.max.toFixed(0)}. The model adds that same movement to the dates reported today.</p>
       <div class="ctabw"><table class="ctab"><thead><tr><th>Project</th><th>Original COD</th><th>Reported now</th><th>Slip</th></tr></thead><tbody>
         ${SLIP.obs.slice().reverse().map(o=>`<tr><td>${esc(o.name)}</td><td>${fmtD(o.from)}</td><td>${fmtD(o.to)}</td><td>${o.slip>0?"+"+o.slip.toFixed(0)+" months":"unchanged"}</td></tr>`).join("")}
       </tbody></table></div>
-      <p class="cnote">Three limits worth holding onto. The sample is ${SLIP.n} contracts, small enough that one Xzerta at ${SLIP.max.toFixed(0)} months moves the tail on its own. Slippage already recorded is not evidence that the same amount remains ahead, so the median case should be read as "the next amendment resembles the last one", not as a forecast. And projects with no firm date — ${A.undatedN} of them, ${fmt(A.undatedMW)} MW — are left out entirely rather than given an assumed date, so every bar here understates the pipeline.</p>
+      <p class="cnote">Three limits worth holding onto. The sample is ${SLIP.n} amendments, small enough that one Xzerta at ${SLIP.max.toFixed(0)} months moves the tail on its own. Slippage already recorded is not evidence that the same amount remains ahead, so the median case should be read as "the next amendment resembles the last one", not as a forecast. And projects with no firm date — ${A.undatedN} of them, ${fmt(A.undatedMW)} MW — are left out entirely rather than given an assumed date, so every bar here understates the pipeline.</p>
     </div></div>`;
 }
 
