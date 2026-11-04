@@ -89,7 +89,7 @@ h1{font-size:clamp(24px,3.2vw,36px);line-height:1.12;font-weight:700;letter-spac
 .segbar i{border-radius:4px;font-size:11.5px;font-weight:700;font-style:normal;display:flex;align-items:center;padding-left:7px;overflow:hidden;white-space:nowrap;font-variant-numeric:proportional-nums}
 .seglegend{display:flex;flex-wrap:wrap;gap:3px 13px;font-size:12px;color:var(--ink-2)}
 .seglegend span{display:inline-flex;align-items:center;gap:5px}
-.pctv{color:var(--fomb);font-weight:700;font-variant-numeric:proportional-nums}
+.pctv{color:var(--ink);font-weight:700;font-variant-numeric:proportional-nums}
 .seglegend i{width:9px;height:9px;border-radius:2px;display:inline-block;flex:none}
 
 .toolbar{display:flex;flex-wrap:wrap;gap:10px 22px;align-items:center;padding:14px 0}
@@ -317,7 +317,7 @@ footer{margin-top:28px;padding-top:14px;border-top:1px solid var(--rule);font-si
 
 <section class="pipeline" id="pipeline">
   <h2 class="secttl">Every project, and how far behind it is</h2>
-  <p class="dek" style="max-width:92ch">Contracts reviewed under the Board's Contract Review Policy (PROMESA §204(b)(2)), sorted by how far the reported commercial operation date sits beyond a base case of 24 months from approval. Open a row for approval history, contract terms and sources.</p>
+  <p class="dek" style="max-width:92ch">Every contract the Board has reviewed, oldest approval first. Open a row for approval history, terms and sources.</p>
   <div class="tabs" role="tablist" aria-label="Pipeline views">
     <button role="tab" id="t-projects" data-tab="projects" aria-selected="true" aria-controls="tab-projects">Projects</button>
     <button role="tab" id="t-procurement" data-tab="procurement" aria-selected="false" aria-controls="tab-procurement">Procurement averages</button>
@@ -459,7 +459,7 @@ footer{margin-top:28px;padding-top:14px;border-top:1px solid var(--rule);font-si
         <th><button data-sort="date">First Board approval</button></th>
         <th><button data-sort="cod">Expected COD</button><div style="font-weight:400;color:var(--ink-3);font-size:11.5px">operative date</div></th>
         <th><button data-sort="codluma">Amended COD</button><div style="font-weight:400;color:var(--ink-3);font-size:11.5px">LUMA Table 7, Oct 2026</div></th>
-        <th><button data-sort="behind">Days delayed</button><div style="font-weight:400;color:var(--ink-3);font-size:11.5px">vs 24 months from FOMB approval</div></th>
+        <th><button data-sort="behind">Days since approval</button><div style="font-weight:400;color:var(--ink-3);font-size:11.5px">and where that sits against 24 months</div></th>
         <th>Current status</th>
         <th><button data-sort="fp">Fixed payment</button><div style="font-weight:400;color:var(--ink-3);font-size:11.5px">$/kWh or $/MW-month</div></th>
       </tr></thead>
@@ -471,7 +471,7 @@ footer{margin-top:28px;padding-top:14px;border-top:1px solid var(--rule);font-si
 
 <section class="mapsection" id="mapsection">
   <h2 class="secttl">Where it all sits</h2>
-  <p class="dek" style="max-width:88ch">Every generating asset on the grid and every Board-approved or pending project, by municipality. Shade the map by what exists today or by what has been approved, and click any municipality to drill in.</p>
+  <p class="dek" style="max-width:88ch">Click any municipality to drill in.</p>
 <div class="toolbar" role="group" aria-label="Map controls">
   <div><span class="tlabel">Shade municipalities by</span>
     <span class="seg" id="shadeSeg">
@@ -1751,15 +1751,22 @@ function lumaCell(p){
 }
 function behindCell(p){
   if(p.status==="review") return `<span style="color:var(--ink-3)">No approval yet</span>`;
-  if(p.status==="revoked") return `<span style="color:var(--ink-3)">Approval revoked</span>`;
-  if(p.notDue) return `<div style="color:var(--ink-3)">Not yet due</div><div class="codx">Base case ${fmtM(p.baseCod.toISOString().slice(0,10))}</div>`;
-  if(p.behind==null) return `<span style="color:var(--ink-3)">—</span>`;
-  const d=p.behind, mo=Math.round(Math.abs(d)/30.44);
-  const late = d>0;
-  const col = !late ? "var(--st-test)" : d>365 ? "var(--st-pause)" : "var(--warn)";
-  return `<div class="codd" style="color:${col}">${late?"+":"\u2212"}${Math.abs(d).toLocaleString("en-US")} days</div>
-    <div class="codx">${late?`${mo} months past`:`${mo} months inside`} 24 months from approval${p.behindEst?", and no date is reported":""}</div>`;
+  if(p.dateUnknown || !p.baseCod) return `<span style="color:var(--ink-3)">—</span>`;
+  const since = Math.round((NOW - new Date(p.first+"T12:00:00"))/DAY);
+  const yrs = (since/365.25).toFixed(1);
+  let sub, col = "var(--ink-2)";
+  if(p.status==="revoked"){ sub = "Approval revoked"; }
+  else if(p.notDue){ sub = `Inside 24 months; base case ${fmtM(p.baseCod.toISOString().slice(0,10))}`; col = "var(--st-test)"; }
+  else if(p.behind!=null && p.behind>0){
+    const mo = Math.round(p.behind/30.44);
+    sub = `${mo} month${mo===1?"":"s"} past the 24-month mark${p.behindEst?", with no date reported":""}`;
+    col = p.behind>365 ? "var(--st-pause)" : "var(--warn)";
+  } else { sub = "Within 24 months of approval"; col = "var(--st-test)"; }
+  return `<div class="codd">${since.toLocaleString("en-US")} days</div>
+    <div class="codx">${yrs} years since approval</div>
+    <div class="codx" style="color:${col}">${sub}</div>`;
 }
+
 function codCell(p){
   const main = p.codD ? fmtD(p.codD) : esc(p.cod||"Not reported");
   const past = p.codD && p.codD < TODAY && p.status!=="revoked" && p.stage!=="test";
@@ -1867,7 +1874,7 @@ function renderTable(){
   document.getElementById("prockey").innerHTML = Object.values(PROC_FAM).map(f=>`<span class="proc" style="--pc:var(${f.v})">${f.l}</span>`).join("");
   let rows = PROJECTS.filter(p=>(state.showRevoked||shown(p)) && (state.year==null||p.year===state.year) && (state.tech==="all"||p.tech===state.tech));
   const {k,dir} = state.sort;
-  const val = p => k==="name"?p.name : k==="proc"?(p.procO+100+"|"+p.first) : k==="muni"?(p.muni||"~") : k==="mw"?p.mw : k==="cod"?(p.codD||"9999") : k==="behind"?(p.behind==null?-1e9:p.behind) : k==="codluma"?(p.codLuma&&p.codLuma!=="na"?p.codLuma:"9999") : k==="fp"?(p.fp?(p.fp[0].u==="kWh"?p.fp[0].v:1000+p.fp[0].v/1000):1e9) : p.first;
+  const val = p => k==="name"?p.name : k==="proc"?(p.procO+100+"|"+p.first) : k==="muni"?(p.muni||"~") : k==="mw"?p.mw : k==="cod"?(p.codD||"9999") : k==="behind"?(p.dateUnknown||!p.baseCod?-1e9:(NOW-new Date(p.first+"T12:00:00"))) : k==="codluma"?(p.codLuma&&p.codLuma!=="na"?p.codLuma:"9999") : k==="fp"?(p.fp?(p.fp[0].u==="kWh"?p.fp[0].v:1000+p.fp[0].v/1000):1e9) : p.first;
   rows.sort((a,b)=>{ const x=val(a),y=val(b); return (typeof x==="number"? x-y : String(x).localeCompare(String(y),"es"))*dir; });
   const tb = document.querySelector("#ptable tbody");
   tb.innerHTML = rows.map(p=>`
@@ -1875,7 +1882,7 @@ function renderTable(){
       <td><span class="nm">${esc(p.name)}</span></td>
       <td><span class="proc"${p.procC?` style="--pc:var(${PROC_FAM[p.procC].v})"`:""}>${esc(p.proc)}</span>${p.procX?`<div class="procx">${esc(p.procX)}</div>`:""}</td>
       <td>${p.muni?`<a href="#" data-goto="${esc(p.muni)}">${esc(p.muni)}</a>`:`<span style="color:var(--ink-3)">Site not disclosed</span>`}</td>
-      <td>${p.comps.map(c=>`<span style="white-space:nowrap"><span class="sw" style="background:var(${FUEL[c.f].v});margin-right:5px;vertical-align:-1px"></span>${FUEL[c.f].label} ${fmt(c.mw)}</span>`).join("<br>")}</td>
+      <td>${p.comps.map(c=>`<span style="white-space:nowrap"><span class="sw" style="background:var(${FUEL[c.f].v});margin-right:5px;vertical-align:-1px"></span>${FUEL[c.f].label}${p.comps.length>1?" "+fmt(c.mw):""}</span>`).join("<br>")}</td>
       <td class="num"><b>${fmt(p.mw)}</b></td>
       <td>${p.status==="review"?'<span class="underrev">Under FOMB review</span>':p.dateUnknown?"Not located":(p.appr[0].mo?fmtM(p.first):(p.appr[0].approx?"c. ":"")+fmtD(p.first))}${p.status==="review"?"":`<div style="color:var(--ink-3);font-size:12.5px">${esc(p.appr[0].a)}${p.appr.length>1?`; ${p.appr.length-1} later action${p.appr.length>2?"s":""}`:""}</div>`}</td>
       <td class="cod">${codCell(p)}</td>
