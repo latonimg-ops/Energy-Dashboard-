@@ -1320,9 +1320,12 @@ PROJECTS.forEach(p=>{ p.luma = LUMA_T7[p.id] || null; });
 // ---------- commercial operation dates ----------
 // o/oD  original COD, Appendix A
 // a/aD  amended and approved COD, Appendix A; "Not applicable" where unchanged or none
-// f/fD  COD in the Executive Briefing to the Governor and the Board, 31 October 2026
+// f/fD  COD in the P3A Executive Briefing to the Governor and the Board, 31 October 2026
+// l/lD  COD in LUMA's October 2026 collaborative report, the last resort in the waterfall
+// Waterfall for the operative date: Appendix A amendment, then the P3A deck, then the
+// collaborative report, then the original COD.
 const CODS = {
- "ciro1p":{o:"24 months after full notice to proceed",oD:null,a:"Not applicable",aD:null,f:null,fD:null},
+ "ciro1p":{o:"Mar 31, 2026",oD:"2026-03-31",a:"Not applicable",aD:null,f:null,fD:null,l:"Feb 2027",lD:"2027-02-28"},
  "xzerta":{o:"Mar 30, 2024",oD:"2024-03-30",a:"Nov 30, 2027",aD:"2027-11-30",f:null,fD:null},
  "solaner":{o:"Oct 1, 2026",oD:"2026-10-01",a:"Dec 20, 2027",aD:"2027-12-20",f:"Dec 2027",fD:"2027-12-31"},
  "pattern-pv":{o:"Nov 30, 2025",oD:"2025-11-30",a:"Mar 31, 2028",aD:"2028-03-31",f:"Mar 2028",fD:"2028-03-31"},
@@ -1337,7 +1340,7 @@ const CODS = {
  "yfn":{o:"2 years after the closing date",oD:null,a:"Aug 1, 2026",aD:"2026-08-01",f:"Dec 2026",fD:"2026-12-31"},
  "tetris":{o:"2 years after closing; closing was November 2023",oD:null,a:"Dec 31, 2027",aD:"2027-12-31",f:"Dec 2027",fD:"2027-12-31"},
  "juncos":{o:"Sep 30, 2025",oD:"2025-09-30",a:"Not applicable",aD:null,f:"Sep 2025",fD:"2025-09-30"},
- "naguabo-ep":{o:"Dec 31, 2027",oD:"2027-12-31",a:"Dec 31, 2027",aD:"2027-12-31",f:null,fD:null},
+ "naguabo-ep":{o:"Dec 31, 2027",oD:"2027-12-31",a:"Dec 31, 2027",aD:"2027-12-31",f:null,fD:null,l:"Dec 2028",lD:"2028-12-31"},
  "gogreen-yab-bess":{o:"Dec 31, 2027",oD:"2027-12-31",a:"Dec 31, 2027",aD:"2027-12-31",f:null,fD:null},
  "ponce-bess":{o:"Dec 31, 2026",oD:"2026-12-31",a:"Apr 30, 2028",aD:"2028-04-30",f:"Apr 2028",fD:"2028-04-30"},
  "caguas-bess":{o:"Dec 31, 2026",oD:"2026-12-31",a:"Apr 30, 2028",aD:"2028-04-30",f:"Apr 2028",fD:"2028-04-30"},
@@ -1346,16 +1349,16 @@ const CODS = {
  "t2-marisol":{o:"2 years after closing; closing has not occurred",oD:null,a:"Not applicable",aD:null,f:"Dec 2028",fD:"2028-12-31"},
  "t2-sj":{o:"Not stated",oD:null,a:"Not applicable",aD:null,f:"Pending",fD:null},
  "infinigen-isabela":{o:"To be determined",oD:null,a:"Not applicable",aD:null,f:"To be determined",fD:null},
- "asap-sanfermin":{o:"Not applicable",oD:null,a:"Not applicable",aD:null,f:null,fD:null},
- "asap-ecoe":{o:"Not applicable",oD:null,a:"Not applicable",aD:null,f:null,fD:null},
- "asap-horizon":{o:"Jan 1, 2028",oD:"2028-01-01",a:"Not applicable",aD:null,f:null,fD:null},
- "asap-oriana":{o:"Jan 1, 2028",oD:"2028-01-01",a:"Not applicable",aD:null,f:null,fD:null},
- "asap-polaris":{o:"No fixed date in the standard offer",oD:null,a:"Not applicable",aD:null,f:null,fD:null},
- "asap-lajas":{o:"Not stated",oD:null,a:"Not applicable",aD:null,f:null,fD:null},
- "asap-juncos":{o:"Not applicable",oD:null,a:"Not applicable",aD:null,f:null,fD:null},
- "asap-xzerta":{o:"Jul 31, 2027",oD:"2027-07-31",a:"Not applicable",aD:null,f:null,fD:null},
- "asap-solaner":{o:"Dec 1, 2027",oD:"2027-12-01",a:"Not applicable",aD:null,f:null,fD:null},
- "asap-yab":{o:"Jan 1, 2028",oD:"2028-01-01",a:"Not applicable",aD:null,f:null,fD:null},
+ "asap-sanfermin":{o:"Not applicable",oD:null,a:"Not applicable",aD:null,f:null,fD:null,l:"Q4 2027",lD:"2027-12-31"},
+ "asap-ecoe":{o:"Not applicable",oD:null,a:"Not applicable",aD:null,f:null,fD:null,l:"Q4 2027",lD:"2027-12-31"},
+ "asap-horizon":{o:"Jan 1, 2028",oD:"2028-01-01",a:"Not applicable",aD:null,f:null,fD:null,l:"Q4 2027",lD:"2027-12-31"},
+ "asap-oriana":{o:"Jan 1, 2028",oD:"2028-01-01",a:"Not applicable",aD:null,f:null,fD:null,l:"Q4 2027",lD:"2027-12-31"},
+ "asap-polaris":{o:"No fixed date in the standard offer",oD:null,a:"Not applicable",aD:null,f:null,fD:null,l:"Q3 2027",lD:"2027-09-30"},
+ "asap-lajas":{o:"Not stated",oD:null,a:"Not applicable",aD:null,f:null,fD:null,l:"Q4 2027",lD:"2027-12-31"},
+ "asap-juncos":{o:"Not applicable",oD:null,a:"Not applicable",aD:null,f:null,fD:null,l:"Q4 2028",lD:"2028-12-31"},
+ "asap-xzerta":{o:"Jul 31, 2027",oD:"2027-07-31",a:"Not applicable",aD:null,f:null,fD:null,l:"Q1 2029",lD:"2029-03-31"},
+ "asap-solaner":{o:"Dec 1, 2027",oD:"2027-12-01",a:"Not applicable",aD:null,f:null,fD:null,l:"Q2 2027",lD:"2027-06-30"},
+ "asap-yab":{o:"Jan 1, 2028",oD:"2028-01-01",a:"Not applicable",aD:null,f:null,fD:null,l:"Q4 2027",lD:"2027-12-31"},
  "gen-cambalache":{o:"Not stated",oD:null,a:"Not applicable",aD:null,f:"Dec 2026",fD:"2026-12-31"},
  "gen-vegabaja":{o:"Not stated",oD:null,a:"Not applicable",aD:null,f:"Mar 2027",fD:"2027-03-31"},
  "gen-paloseco":{o:"Not stated",oD:null,a:"Not applicable",aD:null,f:"Jun 2028",fD:"2028-06-30"},
@@ -1368,9 +1371,11 @@ const CODS = {
  "peaker-daguao":{o:"Not stated",oD:null,a:"Not applicable",aD:null,f:"Sep 2028",fD:"2028-09-30"},
  "energiza":{o:"Jun 30, 2028",oD:"2028-06-30",a:"Oct 26, 2029",aD:"2029-10-26",f:"Dec 2030",fD:"2030-12-31"}
 };
+const CODSRC = ["Appendix A amendment","P3A deck","LUMA collaborative report"];
 PROJECTS.forEach(p=>{ const c = CODS[p.id]; if(!c) return; p.cods = c;
-  const best = c.fD || c.aD || c.oD;            // the briefing is the operative date where it gives one
-  if(best){ p.codD = best; }
+  const pick = [[c.aD,c.a,0],[c.fD,c.f,1],[c.lD,c.l,2]].find(x=>x[0]);
+  if(pick){ p.codD = pick[0]; p.codWhich = pick[2]; }
+  else if(c.oD){ p.codD = c.oD; }
   if(c.oD) p.codOrig = c.oD;
 });
 
@@ -1803,17 +1808,13 @@ function amendCell(p){
   const c = p.cods;
   if(!c) return `<span style="color:var(--ink-3)">Not in Appendix A</span>`;
   const amended = c.aD && (!c.oD || c.aD!==c.oD);
-  let head;
-  if(amended){
-    head = /;| after |anniversary/.test(c.a)
-      ? `<div style="font-size:12.5px;line-height:1.35">${esc(c.a)}</div>`
-      : `<div class="codd">${esc(c.a)}</div>`;
-  } else if(c.fD){
-    head = `<div class="codd">${esc(c.f)}</div>`;   // no Appendix A amendment; the deck's date stands
-  } else {
-    head = `<div style="color:var(--ink-3)">Not applicable</div>`;
-  }
-  return head + `<div class="codsrc">Source: Appendix A and P3A deck</div>`;
+  const pick = amended ? [c.a,0] : (c.fD ? [c.f,1] : (c.lD ? [c.l,2] : null));
+  const head = !pick
+    ? `<div style="color:var(--ink-3)">Not applicable</div>`
+    : (/;| after |anniversary/.test(pick[0])
+        ? `<div style="font-size:12.5px;line-height:1.35">${esc(pick[0])}</div>`
+        : `<div class="codd">${esc(pick[0])}</div>`);
+  return head + `<div class="codsrc">Source: ${pick?esc(CODSRC[pick[1]]):"Appendix A"}</div>`;
 }
 function behindCell(p){
   if(p.status==="review") return `<span style="color:var(--ink-3)">No approval yet</span>`;
