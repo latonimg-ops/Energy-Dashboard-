@@ -245,7 +245,6 @@ table.pt{width:100%;border-collapse:collapse;font-size:13.5px;min-width:1620px}
 .lprog{height:4px;border-radius:2px;background:var(--rule-2);margin:5px 0 4px;width:110px;overflow:hidden}
 .lprog i{display:block;height:100%;border-radius:2px}
 .codx{color:var(--ink-3);font-size:12.5px;margin-top:2px}
-.codsrc{color:var(--ink-3);font-size:11px;margin-top:6px;padding-top:5px;border-top:1px solid var(--rule-2)}
 .passed{display:inline-block;margin-top:4px;font-size:11.5px;font-weight:600;color:var(--warn);background:var(--warn-soft);padding:1px 7px;border-radius:999px}
 .underrev{color:var(--st-review);font-weight:600}
 .stagekey{display:flex;flex-wrap:wrap;gap:6px 10px;margin:4px 0 10px;font-size:12px;color:var(--ink-3);align-items:center}
@@ -299,12 +298,11 @@ footer{margin-top:28px;padding-top:14px;border-top:1px solid var(--rule);font-si
 
 <section class="pipeline" id="pipeline">
   <h2 class="secttl">Every project, and how far behind it is</h2>
-  <p class="dek" style="max-width:92ch">Every contract the Board has reviewed, oldest approval first. Open a row for approval history, terms and sources.</p>
   <div class="tabs" role="tablist" aria-label="Pipeline views">
     <button role="tab" id="t-projects" data-tab="projects" aria-selected="true" aria-controls="tab-projects">Projects</button>
     <button role="tab" id="t-model" data-tab="model" aria-selected="false" aria-controls="tab-model" data-internal>Arrival model</button>
     <button role="tab" id="t-checks" data-tab="data-checks" aria-selected="false" aria-controls="tab-checks" data-internal>Data checks</button>
-    <button role="tab" id="t-method" data-tab="method" aria-selected="false" aria-controls="tab-method">Method</button>
+    <button role="tab" id="t-method" data-tab="method" aria-selected="false" aria-controls="tab-method" data-internal>Method</button>
   </div>
   <div class="tabpanel" id="tab-model" role="tabpanel" aria-labelledby="t-model" hidden>
     <p class="dek" style="max-width:88ch;margin:16px 0 0">Developers report commercial operation dates, and those dates move. This model takes the slippage this portfolio has already recorded and projects it forward, so the question is not when each developer says a project will arrive but when it arrives if the next amendment looks like the last one.</p>
@@ -474,8 +472,8 @@ footer{margin-top:28px;padding-top:14px;border-top:1px solid var(--rule);font-si
         <th>Technology and fuel</th>
         <th class="num"><button data-sort="mw">Capacity (MW)</button></th>
         <th><button data-sort="date">First Board approval</button></th>
-        <th><button data-sort="cod">Original COD</button><div style="font-weight:400;color:var(--ink-3);font-size:11.5px">Appendix A</div></th>
-        <th><button data-sort="codluma">Amended COD</button><div style="font-weight:400;color:var(--ink-3);font-size:11.5px">Appendix A, then the P3A briefing, then LUMA</div></th>
+        <th><button data-sort="cod">Original COD</button></th>
+        <th><button data-sort="codluma">Amended COD</button></th>
         <th><button data-sort="behind">Days since approval</button><div style="font-weight:400;color:var(--ink-3);font-size:11.5px">and where that sits against 24 months</div></th>
         <th>Current status</th>
         <th><button data-sort="fp">Fixed payment</button><div style="font-weight:400;color:var(--ink-3);font-size:11.5px">$/kWh or $/MW-month</div></th>
@@ -1164,16 +1162,16 @@ const PROJECTS = [
   terms:"$15,500/MW-month", fpOwn:[{v:15500,u:"MWmo",n:"Submitted rate, pending review"}],
   note:"A separate contract from the Board-approved 80 MW Go Green Yabucoa battery: this one comes through the accelerated evaluation procurement, the Go Green battery through Tranche 1. Both are counted.",
   src:["collab"], cs:"Submitted under the accelerated evaluation process; awaiting an Oversight Board determination. LUMA (October 2026): after system impact and facility site assessments the developer must supply a new Power System Simulator model and execute pending contracts.", cod:"Jul 31, 2028", codD:"2028-07-31", codN:"LUMA gives July 2028", con:"No", ix:"Not stated"},
- {id:"rev-emerald2", name:"Emerald II Helios storage", dev:"Helios", muni:"Hatillo", program:"Accelerated procurement (EO 2025-047)", own:true,
+ {id:"rev-emerald2", codPending:true, name:"Emerald II Helios storage", dev:"Helios", muni:"Hatillo", program:"Accelerated procurement (EO 2025-047)", own:true,
   comps:[{f:"bess",mw:25,mwh:150}], status:"review", statusText:"Under Oversight Board review; 6-hour duration (25 MW / 150 MWh)",
   appr:[{d:"2026-07-01", mo:true, a:"Under Board review", w:"Submitted under the accelerated evaluation process; no determination issued"}], dateUnknown:true,
   terms:"$33,750/MW-month, six-hour storage", fpOwn:[{v:33750,u:"MWmo",n:"Submitted rate, pending review"}], src:[],
   cs:"Submitted under the accelerated evaluation process; awaiting an Oversight Board determination.", cod:"Not available", codD:null, con:"No", ix:"Not stated"},
- {id:"rev-montalva-pv", name:"Montalva solar", dev:"Montalva", muni:"Guánica", program:"Accelerated procurement (EO 2025-047)", own:true,
+ {id:"rev-montalva-pv", codPending:true, name:"Montalva solar", dev:"Montalva", muni:"Guánica", program:"Accelerated procurement (EO 2025-047)", own:true,
   comps:[{f:"solar",mw:80}], status:"review", statusText:"Under Oversight Board review; not counted as approved capacity",
   appr:[{d:"2026-07-01", mo:true, a:"Under Board review", w:"Submitted under the accelerated evaluation process; no determination issued"}], dateUnknown:true,
   terms:"$0.1245/kWh", fpOwn:[{v:0.1245,u:"kWh",n:"Submitted rate, pending review"}], src:[], cs:"Submitted under the accelerated evaluation process; awaiting an Oversight Board determination.", cod:"Not available", codD:null, con:"No", ix:"Not stated"},
- {id:"rev-montalva-bess", name:"Montalva storage", dev:"Montalva", muni:"Guánica", program:"Accelerated procurement (EO 2025-047)", own:true,
+ {id:"rev-montalva-bess", codPending:true, name:"Montalva storage", dev:"Montalva", muni:"Guánica", program:"Accelerated procurement (EO 2025-047)", own:true,
   comps:[{f:"bess",mw:80,mwh:400}], status:"review", statusText:"Under Oversight Board review; 5-hour duration (80 MW / 400 MWh)",
   appr:[{d:"2026-07-01", mo:true, a:"Under Board review", w:"Submitted under the accelerated evaluation process; no determination issued"}], dateUnknown:true,
   terms:"$29,325/MW-month, five-hour storage", fpOwn:[{v:29325,u:"MWmo",n:"Submitted rate, pending review"}], src:[],
@@ -1371,9 +1369,11 @@ const CODS = {
  "peaker-daguao":{o:"Not stated",oD:null,a:"Not applicable",aD:null,f:"Sep 2028",fD:"2028-09-30"},
  "energiza":{o:"Jun 30, 2028",oD:"2028-06-30",a:"Oct 26, 2029",aD:"2029-10-26",f:"Dec 2030",fD:"2030-12-31"}
 };
-const CODSRC = ["Appendix A amendment","P3A deck","LUMA collaborative report"];
+// Waterfall order for the operative date: the P3A presentation to the Board first, then the
+// Appendix A amendment, then LUMA's collaborative report, then the original COD.
 PROJECTS.forEach(p=>{ const c = CODS[p.id]; if(!c) return; p.cods = c;
-  const pick = [[c.aD,c.a,0],[c.fD,c.f,1],[c.lD,c.l,2]].find(x=>x[0]);
+  const amended = c.aD && (!c.oD || c.aD!==c.oD);
+  const pick = [[c.fD,c.f,1], amended?[c.aD,c.a,0]:null, [c.lD,c.l,2]].find(x=>x&&x[0]);
   if(pick){ p.codD = pick[0]; p.codWhich = pick[2]; }
   else if(c.oD){ p.codD = c.oD; }
   if(c.oD) p.codOrig = c.oD;
@@ -1472,7 +1472,6 @@ function renderFigures(){
     <div class="kpi hero">
       <div class="lab">On the grid — nameplate</div>
       ${kpiNum(ex,"MW")}
-      <div class="sub">${d3.sum(ASSETS,a=>a.units.length)} units across ${ASSETS.length} plants, as reported on ${asOf} · ${Math.round(priv/ex*100)}% privately owned</div>
       ${segBlock(tally("mw"), ex)}
     </div>
     <div class="kpi">
@@ -1484,7 +1483,6 @@ function renderFigures(){
     <div class="kpi accent">
       <div class="lab">Approved by the Oversight Board since 2021</div>
       ${kpiNum(apMW,"MW")}
-      <div class="sub">A further ${fmt0(rvMW)} MW is still before the Board</div>
       <div class="onlinebig"><b>${Math.round(pct)}%</b><span>online<br><b>${fmt0(onMW)} MW</b> of it</span></div>
       <div class="kpirows">${TECHG.map(([f,l,c])=>miniBar(l,c,t[f].on,t[f].ap)).join("")}</div>
     </div>`;
@@ -1797,6 +1795,7 @@ PROJECTS.forEach(p=>{
 });
 function stagePill(p){ const s=STAGES[p.stage]; return `<span class="stg ${p.stage==='rev'?'revoked':''}" style="--c:var(${s.v})">${s.l}</span>`; }
 function origCell(p){
+  if(p.codPending) return `<span style="color:var(--ink-3)">Not received yet</span>`;
   const c = p.cods;
   if(!c) return `<span style="color:var(--ink-3)">Not in Appendix A</span>`;
   return c.oD && !/;| after |anniversary/.test(c.o)
@@ -1804,16 +1803,17 @@ function origCell(p){
     : `<div style="color:var(--ink);font-size:12.5px;line-height:1.35">${esc(c.o)}</div>`;
 }
 function amendCell(p){
+  if(p.codPending) return `<span style="color:var(--ink-3)">Not received yet</span>`;
   const c = p.cods;
   if(!c) return `<span style="color:var(--ink-3)">Not in Appendix A</span>`;
   const amended = c.aD && (!c.oD || c.aD!==c.oD);
-  const pick = amended ? [c.a,0] : (c.fD ? [c.f,1] : (c.lD ? [c.l,2] : null));
+  const pick = c.fD ? [c.f,1] : (amended ? [c.a,0] : (c.lD ? [c.l,2] : null));
   const head = !pick
     ? `<div style="color:var(--ink-3)">Not applicable</div>`
     : (/;| after |anniversary/.test(pick[0])
         ? `<div style="font-size:12.5px;line-height:1.35">${esc(pick[0])}</div>`
         : `<div class="codd">${esc(pick[0])}</div>`);
-  return head + `<div class="codsrc">Source: ${pick?esc(CODSRC[pick[1]]):"Appendix A"}</div>`;
+  return head;
 }
 function behindCell(p){
   if(p.status==="review") return `<span style="color:var(--ink-3)">No approval yet</span>`;
