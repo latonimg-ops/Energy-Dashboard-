@@ -412,6 +412,8 @@ footer{margin-top:28px;padding-top:14px;border-top:1px solid var(--rule);font-si
         <li>Only one project now has no disclosed site: the Xzerta Energy Volt battery, which is therefore not drawn on the map.</li>
         <li>LUMA's Table 7 carries 18 projects. Every one is matched here, and each cell names the LUMA row, developer and capacity it was matched to so the match can be checked. Projects absent from Table 7 read "Not in Table 7" rather than being left blank — among them Pattern Barceloneta Solar, since LUMA lists only the Barceloneta storage contract.</li>
         <li>Four of LUMA's rows disagree with the contract record and are flagged in place: Salinas repeats the Jobos capacities, Vega Baja reads 49 MW against the Board's 60 MW, CIRO One tracks phase 1 only, and San Germán still carries its original date.</li>
+        <li><b>Every storage contract is shown as a capacity price in $/MW-month</b>, so the batteries can be compared with one another. Two are written per kWh of discharge instead: the AES Salinas and Jobos energy storage agreements, at $0.2418 and $0.242/kWh. For those the capacity price is derived from the contract ceiling, $1,658.1M over 25 years and 175 MW giving about $31,583/MW-month, and $1,053.5M over 25 years and 110 MW giving about $31,924/MW-month. Both are marked "derived" on the row. Because they are term averages rather than year-one rates, they are excluded from the procurement averages.</li>
+        <li>Two projects have no separate storage price to show at all: Coamo and YFN Yabucoa bundle the battery into a single blended energy rate with the solar. Genera's six batteries and the Guayama Solar Energy battery carry no rate, the first because they are not power purchase agreements and the second because none was supplied.</li>
         <li>Rates for the submissions still under review are the figures supplied with the project list, not approved terms: Emerald II Helios $33,750/MW-month over six hours, Montalva storage $29,325/MW-month over five hours, Yabucoa Energy and Xzerta Energy Volt $15,500/MW-month, Montalva solar $0.1245/kWh and Coquí storage $23,500/MW-month. They are submitted terms, not approved ones.</li>
         <li>Peaker capacities and the Costa Sur approval come from the project owner, not from LUMA's report, which gives only the 244 MW program total and no per-site split. Its milestone table also differs on timing, showing Costa Sur at Q3 2027 and Jobos and Daguao as pending decommissioning authorisation, against the owner's Q4 2027 to Q1 2028, Q2 2028 and Q2 to Q3 2028.</li>
         <li>Gothams carries a fuel-indexed rate rather than a fixed one, so it is excluded from the procurement averages, which compare fixed year-one prices.</li>
@@ -440,7 +442,7 @@ footer{margin-top:28px;padding-top:14px;border-top:1px solid var(--rule);font-si
   </div>
   <div class="prockey" aria-label="Procurement route key">Procurement:<span id="prockey" style="display:contents"></span></div>
   <div class="stagekey" aria-label="Project stage key">Stage:<span id="stagekey" style="display:contents"></span><span>Status text is truncated in the table; open a row for the full update.</span></div>
-  <div class="fpkey"><span>Fixed payment bars compare like with like:</span><span><i style="background:var(--f-solar)"></i>energy price, scaled to $0.25/kWh</span><span><i style="background:var(--f-bess)"></i>storage capacity price, scaled to $30,000/MW-month</span><span>Year-one rates from the July 2026 tracker; ASAP batteries use the standard-offer rate.</span></div>
+  <div class="fpkey"><span>Fixed payment bars compare like with like:</span><span><i style="background:var(--f-solar)"></i>energy price, scaled to $0.25/kWh</span><span><i style="background:var(--f-bess)"></i>storage capacity price, scaled to $30,000/MW-month</span><span>Year-one rates from the July 2026 tracker; ASAP batteries use the standard-offer rate. Storage is always shown as a capacity price in $/MW-month; where a contract is written per kWh the capacity price is derived and marked.</span></div>
   <div class="tablewrap">
     <table class="pt" id="ptable">
       <thead><tr>
@@ -1180,9 +1182,11 @@ const ASAP_FP = [{v:16000,u:"MWmo",esc:"No escalator",n:"$20,600 if tax credits 
 const FP = {
  "ciro1p":[{v:0.0989,u:"kWh",esc:"+2%/yr",cap:"0.141"}],
  "xzerta":[{v:0.099,u:"kWh",esc:"+1%/yr"}],
- "cfe-salinas":[{v:0.1042,u:"kWh",l:"PV",esc:"+2%/yr"},{v:0.2418,u:"kWh",l:"Storage",esc:"+2%/yr"}],
- "cfe-jobos":[{v:0.1038,u:"kWh",l:"PV",esc:"+2%/yr"},{v:0.242,u:"kWh",l:"Storage",esc:"+2%/yr"}],
- "coamo":[{v:0.10003,u:"kWh",esc:"+2%/yr",cap:"0.15",n:"Covers PV and storage"}],
+ "cfe-salinas":[{v:0.1042,u:"kWh",l:"PV",esc:"+2%/yr"},
+   {v:31583,u:"MWmo",l:"Storage",esc:"+2%/yr",derived:true,n:"Implied capacity price: the $1,658.1M ESSA ceiling over 25 years and 175 MW. The contract itself is priced at $0.2418/kWh discharged"}],
+ "cfe-jobos":[{v:0.1038,u:"kWh",l:"PV",esc:"+2%/yr"},
+   {v:31924,u:"MWmo",l:"Storage",esc:"+2%/yr",derived:true,n:"Implied capacity price: the $1,053.5M ESSA ceiling over 25 years and 110 MW. The contract itself is priced at $0.242/kWh discharged"}],
+ "coamo":[{v:0.10003,u:"kWh",l:"PV + storage",esc:"+2%/yr",cap:"0.15",n:"A single energy rate covers the 100 MW solar and the 55 MW battery; the contract sets no separate storage capacity price",bundled:true}],
  "penuelas-bess":[{v:28669.75,u:"MWmo",esc:"+2%/yr"}],
  "ponce-bess":[{v:27236.95,u:"MWmo",esc:"+2%/yr"}],
  "caguas-bess":[{v:28524.36,u:"MWmo",esc:"+2%/yr"}],
@@ -1194,7 +1198,7 @@ const FP = {
  "guayama-solar":[{v:0.1005,u:"kWh",esc:"+2%/yr",cap:"0.1338",n:"$0.0869 base plus $0.0136 interconnection cost recovery"}],
  "yep":[{v:0.1397,u:"kWh",n:"Tracker prints $13.97/kWh; read as 13.97¢",flag:true}],
  "solaner":[{v:0.12,u:"kWh",esc:"+2%/yr"}],
- "yfn":[{v:0.1469,u:"kWh",esc:"+2%/yr",cap:"0.157"}],
+ "yfn":[{v:0.1469,u:"kWh",l:"PV + storage",esc:"+2%/yr",cap:"0.157",n:"The 14.45 MW battery is integrated with the solar farm and carries no separate capacity price",bundled:true}],
  "tetris":[{v:0.1385,u:"kWh",esc:"+1%/yr"}],
  "energiza":[{v:0.12,u:"kWh",approx:true,n:"Approximate all-in; capacity payment plus pass-through fuel and O&M"}],
  "t2-marisol":[{v:0.153,u:"kWh"}],
@@ -1715,7 +1719,7 @@ function procRows(){
       let rate=null;
       if(p.fp){
         if(c.f==="solar"){ const f=p.fp.find(f=>f.u==="kWh"&&(!f.l||f.l==="PV")); if(f) rate=f.v; }
-        else { const f=p.fp.find(f=>f.u==="MWmo"); if(f) rate=f.v; }
+        else { const f=p.fp.find(f=>f.u==="MWmo" && !f.derived); if(f) rate=f.v; }
       }
       recs.push({proc:p.proc, o:p.procO, f:c.f, mw:c.mw, rate, genera:!!p.genera});
     });
@@ -1767,10 +1771,11 @@ function fpCell(p){
   if(!p.fp) return `<span style="color:var(--ink-3)">Not reported</span>`;
   return p.fp.map(f=>{
     const U = FPU[f.u];
-    const num = f.u==="kWh" ? `${f.approx?"≈":""}$${f.v.toFixed(4)}` : `$${Math.round(f.v).toLocaleString("en-US")}`;
+    const isStor = f.u==="MWmo" || /storage/i.test(f.l||"");
+    const num = f.u==="kWh" ? `${f.approx?"≈":""}$${f.v.toFixed(4)}` : `${f.derived?"≈":""}$${Math.round(f.v).toLocaleString("en-US")}`;
     const meta = [f.esc, f.cap?`cap $${f.cap}`:null].filter(Boolean).join(" · ");
-    return `<div class="fpl"><div class="fpv">${f.l?`<span class="lab">${esc(f.l)}</span>`:""}<b>${num}</b><span class="u">${f.u==="kWh"?"/kWh":"/MW-mo"}</span></div>
-      <div class="fpbar" title="${esc(U.l)}"><i style="width:${Math.min(100,f.v/U.max*100)}%;background:var(${U.v})"></i></div>
+    return `<div class="fpl"><div class="fpv">${f.l?`<span class="lab">${esc(f.l)}</span>`:""}<b>${num}</b><span class="u">${f.u==="kWh"?"/kWh":"/MW-mo"}</span>${f.derived?`<span class="u" style="color:var(--warn)">derived</span>`:""}</div>
+      <div class="fpbar" title="${esc(U.l)}"><i style="width:${Math.min(100,f.v/U.max*100)}%;background:var(${isStor?"--f-bess":U.v})${f.derived?";opacity:.7":""}"></i></div>
       ${meta||f.n?`<div class="fpm">${esc(meta)}${meta&&f.n?"<br>":""}${f.n?`<span class="${f.flag?"flag":""}">${esc(f.n)}</span>`:""}</div>`:""}</div>`;
   }).join("");
 }
