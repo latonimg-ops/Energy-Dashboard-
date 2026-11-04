@@ -1888,8 +1888,8 @@ function renderTable(){
       <td><span class="nm">${esc(p.name)}</span></td>
       <td><span class="proc"${p.procC?` style="--pc:var(${PROC_FAM[p.procC].v})"`:""}>${esc(p.proc)}</span>${p.procX?`<div class="procx">${esc(p.procX)}</div>`:""}</td>
       <td>${p.muni?`<a href="#" data-goto="${esc(p.muni)}">${esc(p.muni)}</a>`:`<span style="color:var(--ink-3)">Site not disclosed</span>`}</td>
-      <td>${p.comps.map(c=>`<span style="white-space:nowrap"><span class="sw" style="background:var(${FUEL[c.f].v});margin-right:5px;vertical-align:-1px"></span>${FUEL[c.f].label}${p.comps.length>1?` <span style="color:var(--ink-2)">${fmt(c.mw)} MW</span>`:""}</span>`).join("<br>")}</td>
-      <td class="num"><b>${fmt(p.mw)}</b></td>
+      <td>${p.comps.map(c=>`<span style="white-space:nowrap"><span class="sw" style="background:var(${FUEL[c.f].v});margin-right:5px;vertical-align:-1px"></span>${FUEL[c.f].label}</span>`).join("<br>")}</td>
+      <td class="num">${p.comps.map(c=>`<b>${fmt(c.mw)}</b>`).join("<br>")}</td>
       <td>${p.status==="review"?'<span class="underrev">Under FOMB review</span>':p.dateUnknown?"Not located":(p.appr[0].mo?fmtM(p.first):(p.appr[0].approx?"c. ":"")+fmtD(p.first))}${p.status==="review"?"":`<div style="color:var(--ink-3);font-size:12.5px">${esc(p.appr[0].a)}${p.appr.length>1?`; ${p.appr.length-1} later action${p.appr.length>2?"s":""}`:""}</div>`}</td>
       <td class="cod">${origCell(p)}</td>
       <td class="cod">${amendCell(p)}</td>
