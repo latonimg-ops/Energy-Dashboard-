@@ -197,6 +197,8 @@ table.pt{width:100%;border-collapse:collapse;font-size:13.5px;min-width:1620px}
 .tabs button{border:0;background:none;padding:9px 14px;cursor:pointer;font-size:14px;font-weight:600;color:var(--ink-3);border-bottom:2px solid transparent;margin-bottom:-1px;white-space:nowrap}
 .tabs button:hover{color:var(--ink)}
 .tabs button[aria-selected="true"]{color:var(--ink);border-bottom-color:var(--fomb)}
+/* Kept in the page and reachable by #model and #data-checks, but not offered in the tab bar. */
+.tabs button[data-internal]{display:none}
 .checks{display:grid;gap:14px;margin-top:18px}
 .chk{background:var(--panel);border:1px solid var(--rule);border-radius:10px;padding:14px 18px;font-size:13.5px}
 .chk h3{font-size:15px;margin:0 0 8px;display:flex;align-items:center;gap:8px}
@@ -303,8 +305,8 @@ footer{margin-top:28px;padding-top:14px;border-top:1px solid var(--rule);font-si
   <p class="dek" style="max-width:92ch">Every contract the Board has reviewed, oldest approval first. Open a row for approval history, terms and sources.</p>
   <div class="tabs" role="tablist" aria-label="Pipeline views">
     <button role="tab" id="t-projects" data-tab="projects" aria-selected="true" aria-controls="tab-projects">Projects</button>
-    <button role="tab" id="t-model" data-tab="model" aria-selected="false" aria-controls="tab-model">Arrival model</button>
-    <button role="tab" id="t-checks" data-tab="data-checks" aria-selected="false" aria-controls="tab-checks">Data checks</button>
+    <button role="tab" id="t-model" data-tab="model" aria-selected="false" aria-controls="tab-model" data-internal>Arrival model</button>
+    <button role="tab" id="t-checks" data-tab="data-checks" aria-selected="false" aria-controls="tab-checks" data-internal>Data checks</button>
     <button role="tab" id="t-method" data-tab="method" aria-selected="false" aria-controls="tab-method">Method</button>
   </div>
   <div class="tabpanel" id="tab-model" role="tabpanel" aria-labelledby="t-model" hidden>
@@ -348,7 +350,7 @@ footer{margin-top:28px;padding-top:14px;border-top:1px solid var(--rule);font-si
         <li>Included on the grid side: every generating unit the system operator dispatches &mdash; PREPA's plants run by Genera PR, the hydro PREPA retains, the coal and gas independents, the FEMA-funded temporary units at San Juan and Palo Seco, and the utility-scale renewables under contract.</li>
         <li>The 1 MW Bechara wind unit appears in the availability report with no corresponding EIA record, so it has no coordinates and is not drawn on the map.</li>
         <li>Excluded because the system operator does not dispatch them: roughly 1,230 MW of rooftop solar, behind-the-meter industrial cogeneration, and customer-sited generators.</li>
-        <li>The approved pipeline counts contracts the Oversight Board has approved since 2021. Capacity still before the Board is listed in the table and drawn on the map with a dashed outline, but excluded from every approved total, including the headline figures and the arrival model.</li>
+        <li>The approved pipeline counts contracts the Oversight Board has approved since 2021. Capacity still before the Board is listed in the table and drawn on the map with a dashed outline, but excluded from every approved total, including the headline figures.</li>
         <li>Coqu&iacute; Power's eleven sites appear as 22 rows, one per contract: the eleven solar PPOAs were approved in July 2026 while the eleven companion storage contracts remain under Board review.</li>
         <li>Genera's six batteries and four peaker sites are PREPA-owned programmes rather than power purchase agreements, so they carry no contracted rate. Only the Costa Sur peakers are approved, in January 2025; the other three sites reached the Board in October 2026 and are counted as under review.</li>
         <li>The Board's November 28, 2025 conditional approval of the Genera&ndash;NFE multisite gas supply agreement is a fuel contract, so it is noted here rather than mapped.</li>
