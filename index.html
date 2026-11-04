@@ -461,11 +461,10 @@ footer{margin-top:28px;padding-top:14px;border-top:1px solid var(--rule);font-si
       </span>
     </div>
     <label class="check"><input type="checkbox" id="showRevoked" checked> Include revoked approvals</label>
-    <span class="tlabel" id="tableCount"></span>
   </div>
   <div class="prockey" aria-label="Procurement route key">Procurement:<span id="prockey" style="display:contents"></span></div>
   <div class="stagekey" aria-label="Project stage key">Stage:<span id="stagekey" style="display:contents"></span><span>Status text is truncated in the table; open a row for the full update.</span></div>
-  <div class="fpkey"><span>Fixed payment bars compare like with like:</span><span><i style="background:var(--f-solar)"></i>energy price, scaled to $0.25/kWh</span><span><i style="background:var(--f-bess)"></i>storage capacity price, scaled to $30,000/MW-month</span><span>Year-one rates from the July 2026 tracker; ASAP batteries use the standard-offer rate. Storage is always shown as a capacity price in $/MW-month; where a contract is written per kWh the capacity price is derived and marked.</span></div>
+  <div class="fpkey"><span>Fixed payment bars compare like with like:</span><span><i style="background:var(--f-solar)"></i>energy price, scaled to $0.25/kWh</span><span><i style="background:var(--f-bess)"></i>storage capacity price, scaled to $30,000/MW-month</span></div>
   <div class="tablewrap">
     <table class="pt" id="ptable">
       <thead><tr>
@@ -489,7 +488,6 @@ footer{margin-top:28px;padding-top:14px;border-top:1px solid var(--rule);font-si
 
 <section class="mapsection" id="mapsection">
   <h2 class="secttl">Where it all sits</h2>
-  <p class="dek" style="max-width:88ch">Click any municipality to drill in.</p>
 <div class="toolbar" role="group" aria-label="Map controls">
   <div><span class="tlabel">Shade municipalities by</span>
     <span class="seg" id="shadeSeg">
@@ -1902,10 +1900,6 @@ function renderTable(){
       <td class="fp">${fpCell(p)}</td>
     </tr>
     ${state.openRow===p.id?`<tr class="detail"><td colspan="11"><div class="dgrid"><div>${projDetail(p)}</div></div></td></tr>`:""}`).join("");
-  const sum = d3.sum(rows.filter(live),p=>p.mw);
-  const rev = d3.sum(rows.filter(p=>p.status==="review"),p=>p.mw);
-  document.getElementById("tableCount").textContent =
-    `${rows.length} project${rows.length===1?"":"s"}; ${fmt(sum)} MW approved` + (rev?`, ${fmt(rev)} MW under review`:"");
   tb.querySelectorAll("tr.main").forEach(tr=>{
     const toggle=()=>{ const id=tr.dataset.id; state.openRow = state.openRow===id?null:id; renderTable(); drawMarkers(); if(state.muni) renderPanel(); };
     tr.onclick=e=>{ if(e.target.closest("a")) return; toggle(); };
