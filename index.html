@@ -73,7 +73,11 @@ h1{font-size:clamp(24px,3.2vw,36px);line-height:1.12;font-weight:700;letter-spac
 .kpi .sub{font-size:12.5px;color:var(--ink-2);margin-top:7px;line-height:1.45}
 .kpi.accent .val{color:var(--fomb)}
 .kpi .spacer{flex:1}
-.kpirows{display:grid;gap:6px;margin:10px 0 2px}
+.onlinebig{display:flex;align-items:center;gap:11px;margin:12px 0 10px;padding-top:11px;border-top:1px solid var(--rule-2)}
+.onlinebig b{font-size:40px;font-weight:700;letter-spacing:-.02em;line-height:1;color:var(--fomb);font-variant-numeric:proportional-nums}
+.onlinebig span{font-size:12.5px;color:var(--ink-2);line-height:1.35}
+.onlinebig span b{font-size:14px;color:var(--ink)}
+.kpirows{display:grid;gap:6px;margin:2px 0 2px}
 .kpirow{display:grid;grid-template-columns:74px minmax(0,1fr) 42px;gap:9px;align-items:center;font-size:12.5px}
 .kpirow-l{display:inline-flex;align-items:center;gap:6px;color:var(--ink-2)}
 .kpirow-l i{width:9px;height:9px;border-radius:2px;flex:none}
@@ -501,7 +505,8 @@ footer{margin-top:28px;padding-top:14px;border-top:1px solid var(--rule);font-si
   <div>
     <h3>How to read the numbers</h3>
     <ul>
-      <li><b>Two capacity sources, used for different jobs.</b> The headline figures come from LUMA's Daily Availability Report of October 24, 2026, which gives nameplate and actual available capacity for all 115 units the operator dispatches, but carries no locations. The map and the municipality drill-down come from EIA-860M, which has coordinates but no availability and a slightly different roster, so its total (6,058.8 MW) does not match the availability report's (6,460.1 MW). The difference is mostly gross versus net ratings for EcoEléctrica and AES, the Mobile­Pac and TM units, and small distributed solar that EIA lists and LUMA does not dispatch.</li>
+      <li><b>One capacity source.</b> Every megawatt on this page, in the headline figures, the map and the municipality panel alike, comes from LUMA's Daily Availability Report of October 24, 2026: 115 units at 33 plants, 6,460.1 MW of nameplate and 3,091.5 MW available. EIA-860M is now used only for geography, supplying the coordinates that let each plant be placed and its municipality derived.</li>
+      <li>Rebuilding on the availability report recovered <b>EcoEléctrica's 566 MW</b>, which the earlier EIA-based list had dropped: EIA classes the plant as industrial cogeneration, so it fell outside the electric-utility and independent-producer filter used to build that list. One unit, the 1 MW Bechara wind turbine, appears in LUMA's report with no EIA record, so it has no location and is not drawn on the map.</li>
       <li>The asset list for the map is rebuilt from the primary filing: EIA's Preliminary Monthly Electric Generator Inventory (EIA-860M), September 2026 release, Puerto Rico sheet. Every plant carries both <b>nameplate</b> and <b>net summer capacity</b>, EIA's own measure of what a unit can actually deliver in summer conditions. The two differ by 537 MW across the fleet, and the gap is not spread evenly: Palo Seco alone accounts for 249 MW of it. Net summer capacity is the figure to use against the Energy Bureau's 700–850 MW adequacy shortfall.</li>
       <li>Each plant is placed by EIA's own coordinates, and its municipality is derived by testing those coordinates against the Census boundary file rather than being read off the project name.</li>
       <li>Thermal units are shown by primary fuel. Costa Sur 5–6 and San Juan 5–6 burn natural gas with oil backup; Cambalache 2–3 and several other units have gas conversions in progress.</li>
@@ -600,148 +605,192 @@ const IPP = o => ({owner:o, operator:o, sector:"private"});
 
 const ASSETS = [
  {id:"aguirre", name:"Aguirre Power Complex", muni:"Salinas", lat:17.9492, lon:-66.234, ...PREPA_T, units:[
-   {u:"Fuel oil No. 6 steam (2 units, 1975)", f:"bunker", mw:900.0, ns:849.8},
-   {u:"Distillate turbines (12 units, 1972\u20131977)", f:"diesel", mw:634.0, ns:611.4}],
-   ns:1461.2,
-   note:"Largest plant on the island, and entirely oil-fired. LUMA's October 2026 report gives September 2026 output for unit 2 of 285 MW against a 450 MW nameplate, regulating between 230 and 280 MW; a March\u2013April 2027 overhaul would raise it to 400 MW but depends on a budget increase being approved.", src:["eia860m","collab"]},
- {id:"costasur", name:"Costa Sur Power Plant", muni:"Guayanilla", lat:18.003, lon:-66.7597, ...PREPA_T, units:[
-   {u:"Natural gas (2 units, 1972\u20131973)", f:"gas", mw:820.0, ns:765.6},
-   {u:"Fuel oil No. 6 steam (2 units, 1962\u20131963)", f:"bunker", mw:170.0, ns:158.9},
-   {u:"Distillate turbines (2 units, 1972)", f:"diesel", mw:42.0, ns:42.0}],
-   ns:966.5,
-   note:"Units 3\u20134 (85 MW each, commissioned 1962\u201363) remain in the operating inventory alongside the two 410 MW gas steam units. LUMA reports unit 5 ran at its full 410 MW in September 2026; a required environmental inspection due November 5, 2026 was not funded in Genera's approved budget.", src:["eia860m","collab"]},
+   {u:"Aguirre 1", f:"bunker", mw:450.0, ns:0.0},
+   {u:"Aguirre 2", f:"bunker", mw:450.0, ns:207.0},
+   {u:"Aguirre CC 1-1", f:"diesel", mw:50.0, ns:46.0},
+   {u:"Aguirre CC 1-2", f:"diesel", mw:50.0, ns:0.0},
+   {u:"Aguirre CC 1-3", f:"diesel", mw:50.0, ns:0.0},
+   {u:"Aguirre CC 1-4", f:"diesel", mw:50.0, ns:50.0},
+   {u:"Aguirre CC STM-1", f:"diesel", mw:96.0, ns:0.0},
+   {u:"Aguirre CC 2-1", f:"diesel", mw:50.0, ns:0.0},
+   {u:"Aguirre CC 2-2", f:"diesel", mw:50.0, ns:48.0},
+   {u:"Aguirre CC 2-3", f:"diesel", mw:50.0, ns:0.0},
+   {u:"Aguirre CC 2-4", f:"diesel", mw:50.0, ns:30.0},
+   {u:"Aguirre CC STM-2", f:"diesel", mw:96.0, ns:0.0},
+   {u:"Aguirre 2-1", f:"diesel", mw:21.0, ns:0.0},
+   {u:"Aguirre 2-2", f:"diesel", mw:21.0, ns:0.0}],
+   ns:381.0,
+   note:"The largest site on the island and entirely oil-fired. Unit 1 carried its full 450 MW of nameplate with no availability on October 24.", src:["dar","eia860m"]},
  {id:"sanjuan", name:"San Juan Power Plant", muni:"San Juan", lat:18.4271, lon:-66.1045, ...PREPA_T, units:[
-   {u:"Distillate turbines (4 units, 2008)", f:"diesel", mw:440.0, ns:429.4},
-   {u:"Fuel oil No. 6 steam (4 units, 1965\u20131969)", f:"bunker", mw:400.0, ns:354.5}],
-   ns:783.9,
-   note:"Carries the newest large thermal units on the island, commissioned in 2008. LUMA reports combined-cycle unit 6 at 160 MW against its 220 MW rating in September 2026, with a steam repair due to add 60 MW.", src:["eia860m","collab"]},
+   {u:"San Juan CT 5", f:"gas", mw:160.0, ns:151.0},
+   {u:"San Juan STM 5", f:"gas", mw:60.0, ns:0.0},
+   {u:"San Juan CT 6", f:"gas", mw:160.0, ns:160.0},
+   {u:"San Juan STM 6", f:"gas", mw:60.0, ns:0.0},
+   {u:"San Juan 7", f:"bunker", mw:100.0, ns:0.0},
+   {u:"San Juan 8", f:"bunker", mw:100.0, ns:0.0},
+   {u:"San Juan 9", f:"bunker", mw:100.0, ns:0.0},
+   {u:"San Juan 10", f:"bunker", mw:100.0, ns:0.0},
+   {u:"San Juan TM 1", f:"gas", mw:25.0, ns:0.0},
+   {u:"San Juan TM 2", f:"gas", mw:25.0, ns:0.0},
+   {u:"San Juan TM 3", f:"gas", mw:25.0, ns:21.0},
+   {u:"San Juan TM 4", f:"gas", mw:25.0, ns:0.0},
+   {u:"San Juan TM 5", f:"gas", mw:25.0, ns:21.0},
+   {u:"San Juan TM 6", f:"gas", mw:25.0, ns:0.0},
+   {u:"San Juan TM 7", f:"gas", mw:25.0, ns:0.0},
+   {u:"San Juan TM 8", f:"gas", mw:25.0, ns:0.0},
+   {u:"San Juan TM 9", f:"gas", mw:25.0, ns:0.0},
+   {u:"San Juan TM 10", f:"gas", mw:25.0, ns:21.0}],
+   ns:374.0,
+   note:"Carries the newest large thermal units on the island, commissioned 2008, plus the FEMA-funded TM2500s.", src:["dar","eia860m"]},
  {id:"paloseco", name:"Palo Seco Power Plant", muni:"Toa Baja", lat:18.4559, lon:-66.1484, ...PREPA_T, units:[
-   {u:"Fuel oil No. 6 steam (4 units, 1960\u20131970)", f:"bunker", mw:602.0, ns:353.4},
-   {u:"Distillate turbines (6 units, 1972\u20131973)", f:"diesel", mw:126.0, ns:126.0}],
-   ns:479.4,
-   note:"EIA carries unit 4 at 216 MW nameplate but zero net summer capacity, against LUMA's report of 180 MW of output in September 2026. Every unit here dates from 1960 to 1973. A required environmental inspection due April 2027 was not funded in the current budget.", src:["eia860m","collab"]},
+   {u:"Palo Seco 1", f:"bunker", mw:85.0, ns:0.0},
+   {u:"Palo Seco 2", f:"bunker", mw:85.0, ns:0.0},
+   {u:"Palo Seco 3", f:"bunker", mw:216.0, ns:170.0},
+   {u:"Palo Seco 4", f:"bunker", mw:216.0, ns:160.0},
+   {u:"Palo Seco 1-1", f:"diesel", mw:21.0, ns:0.0},
+   {u:"Palo Seco 1-2", f:"diesel", mw:21.0, ns:18.0},
+   {u:"Palo Seco 2-1", f:"diesel", mw:21.0, ns:0.0},
+   {u:"Palo Seco 2-2", f:"diesel", mw:21.0, ns:0.0},
+   {u:"Palo Seco 3-1", f:"diesel", mw:21.0, ns:0.0},
+   {u:"Palo Seco 3-2", f:"diesel", mw:21.0, ns:0.0},
+   {u:"Palo Seco MP 1", f:"diesel", mw:27.0, ns:25.0},
+   {u:"Palo Seco MP 2", f:"diesel", mw:27.0, ns:0.0},
+   {u:"Palo Seco MP 3", f:"diesel", mw:27.0, ns:0.0},
+   {u:"Palo Seco TM 1", f:"gas", mw:25.0, ns:0.0},
+   {u:"Palo Seco TM 2", f:"gas", mw:25.0, ns:0.0},
+   {u:"Palo Seco TM 3", f:"gas", mw:20.0, ns:0.0},
+   {u:"Palo Seco TM 4", f:"gas", mw:20.0, ns:0.0}],
+   ns:373.0,
+   note:"Every unit here dates from 1960 to 1973. On October 24 the plant held 899 MW of nameplate and 327 MW of availability.", src:["dar","eia860m"]},
+ {id:"costasur", name:"Costa Sur Power Plant", muni:"Guayanilla", lat:18.003, lon:-66.7597, ...PREPA_T, units:[
+   {u:"Costa Sur 5", f:"gas", mw:410.0, ns:0.0},
+   {u:"Costa Sur 6", f:"gas", mw:410.0, ns:365.0},
+   {u:"Costa Sur 1-1", f:"diesel", mw:21.0, ns:0.0},
+   {u:"Costa Sur 1-2", f:"diesel", mw:21.0, ns:0.0}],
+   ns:365.0,
+   note:"Unit 5 carried 410 MW of nameplate with no availability on October 24; unit 6 delivered 365 MW.", src:["dar","eia860m"]},
+ {id:"ecoelectrica", name:"EcoEl\u00e9ctrica", muni:"Pe\u00f1uelas", lat:17.981025, lon:-66.755416, ...IPP("EcoEléctrica, L.P."), units:[
+   {u:"ECO 1", f:"gas", mw:176.0, ns:176.0},
+   {u:"ECO 2", f:"gas", mw:176.0, ns:176.0},
+   {u:"ECO STEAM", f:"gas", mw:214.0, ns:214.0}],
+   ns:566.0,
+   note:"The island's LNG combined-cycle independent producer. EIA classes it as industrial cogeneration, so it falls outside the sector filter used for the map's earlier source; it is carried here from LUMA's availability report.", src:["dar","eia860m"]},
  {id:"aespr", name:"AES Puerto Rico (coal)", muni:"Guayama", lat:17.947115, lon:-66.149897, ...IPP("AES Puerto Rico LP"), units:[
-   {u:"Coal steam (2 units, 2001)", f:"coal", mw:510.0, ns:454.4}],
-   ns:454.4,
-   note:"The island's only coal plant, selling to PREPA under a power purchase agreement.", src:["eia860m"]},
+   {u:"AES 1", f:"coal", mw:254.0, ns:225.0},
+   {u:"AES 2", f:"coal", mw:254.0, ns:252.0}],
+   ns:477.0, src:["dar","eia860m"]},
  {id:"cambalache", name:"Cambalache Power Plant", muni:"Arecibo", lat:18.471, lon:-66.6969, ...PREPA_T, units:[
-   {u:"Distillate turbines (3 units, 1997)", f:"diesel", mw:247.5, ns:241.5}],
-   ns:241.5, src:["eia860m"]},
+   {u:"Cambalache 1", f:"diesel", mw:82.5, ns:0.0},
+   {u:"Cambalache 2", f:"diesel", mw:82.5, ns:76.0},
+   {u:"Cambalache 3", f:"diesel", mw:82.5, ns:75.0}],
+   ns:151.0, src:["dar","eia860m"]},
  {id:"mayaguez", name:"Mayag\u00fcez Power Plant", muni:"Mayag\u00fcez", lat:18.2186, lon:-67.1592, ...PREPA_T, units:[
-   {u:"Distillate turbines (4 units, 2009)", f:"diesel", mw:220.0, ns:220.0}],
-   ns:220.0, src:["eia860m"]},
+   {u:"Mayaguez 1A", f:"diesel", mw:27.5, ns:0.0},
+   {u:"Mayaguez 1B", f:"diesel", mw:27.5, ns:0.0},
+   {u:"Mayaguez 2A", f:"diesel", mw:27.5, ns:0.0},
+   {u:"Mayaguez 2B", f:"diesel", mw:27.5, ns:23.0},
+   {u:"Mayaguez 3A", f:"diesel", mw:27.5, ns:22.0},
+   {u:"Mayaguez 3B", f:"diesel", mw:27.5, ns:22.0},
+   {u:"Mayaguez 4A", f:"diesel", mw:27.5, ns:0.0},
+   {u:"Mayaguez 4B", f:"diesel", mw:27.5, ns:23.0}],
+   ns:90.0, src:["dar","eia860m"]},
  {id:"w-santaisabel", name:"Pattern Santa Isabel wind", muni:"Santa Isabel", lat:17.971696, lon:-66.393154, ...IPP("Pattern Operators LP"), units:[
-   {u:"Wind (1 unit, 2012)", f:"wind", mw:101.2, ns:75.0}],
-   ns:75.0,
-   note:"EIA carries 101.2 MW of nameplate against 75 MW of net summer capacity.", src:["eia860m"]},
- {id:"s-oriana", name:"Oriana Energy solar + storage", muni:"Isabela", lat:18.475032, lon:-67.046411, ...IPP("Oriana Energy LLC"), units:[
-   {u:"Solar PV (1 unit, 2016)", f:"solar", mw:45.0, ns:45.0},
-   {u:"Battery storage (1 unit, 2016)", f:"bess", mw:21.8, ns:21.8}],
-   ns:66.8, src:["eia860m"]},
- {id:"pk-jobos", name:"Jobos peakers", muni:"Guayama", lat:17.9602, lon:-66.1398, ...PREPA_T, units:[
-   {u:"Distillate turbines (2 units, 1973)", f:"diesel", mw:42.0, ns:42.0}],
-   ns:42.0, src:["eia860m"]},
+   {u:"Pattern", f:"wind", mw:75.0, ns:75.0}],
+   ns:75.0, src:["dar","eia860m"]},
+ {id:"s-oriana", name:"Oriana Energy solar", muni:"Isabela", lat:18.475032, lon:-67.046411, ...IPP("Oriana Energy LLC"), units:[
+   {u:"Oriana", f:"solar", mw:45.0, ns:45.0}],
+   ns:45.0, src:["dar","eia860m"]},
  {id:"pk-daguao", name:"Daguao peakers", muni:"Ceiba", lat:18.2364, lon:-65.6656, ...PREPA_T, units:[
-   {u:"Distillate turbines (2 units, 1972)", f:"diesel", mw:42.0, ns:42.0}],
-   ns:42.0, src:["eia860m"]},
+   {u:"Daguao 1-1", f:"diesel", mw:21.0, ns:0.0},
+   {u:"Daguao 1-2", f:"diesel", mw:21.0, ns:16.0}],
+   ns:16.0, src:["dar","eia860m"]},
+ {id:"pk-jobos", name:"Jobos peakers", muni:"Guayama", lat:17.9602, lon:-66.1398, ...PREPA_T, units:[
+   {u:"Jobos 1-1", f:"diesel", mw:21.0, ns:0.0},
+   {u:"Jobos 1-2", f:"diesel", mw:21.0, ns:19.0}],
+   ns:19.0, src:["dar","eia860m"]},
  {id:"pk-vegabaja", name:"Vega Baja peakers", muni:"Vega Baja", lat:18.446, lon:-66.391, ...PREPA_T, units:[
-   {u:"Distillate turbines (2 units, 1971)", f:"diesel", mw:42.0, ns:42.0}],
-   ns:42.0, src:["eia860m"]},
+   {u:"Vega Baja 1-1", f:"diesel", mw:21.0, ns:0.0},
+   {u:"Vega Baja 1-2", f:"diesel", mw:21.0, ns:0.0}],
+   ns:0.0, src:["dar","eia860m"]},
  {id:"pk-yabucoa", name:"Yabucoa peakers", muni:"Yabucoa", lat:18.047, lon:-65.864, ...PREPA_T, units:[
-   {u:"Distillate turbines (2 units, 1971)", f:"diesel", mw:42.0, ns:42.0}],
-   ns:42.0, src:["eia860m"]},
+   {u:"Yabucoa 1-1", f:"diesel", mw:21.0, ns:0.0},
+   {u:"Yabucoa 1-2", f:"diesel", mw:21.0, ns:0.0}],
+   ns:0.0, src:["dar","eia860m"]},
+ {id:"s-humacao", name:"Humacao Solar (Fonroche)", muni:"Humacao", lat:18.134597, lon:-65.822342, ...IPP("Fonroche Energy America, Inc."), units:[
+   {u:"Fonroche", f:"solar", mw:40.0, ns:40.0}],
+   ns:40.0, src:["dar","eia860m"]},
  {id:"h-yauco", name:"Yauco hydro", muni:"Yauco", lat:18.1105, lon:-66.871, ...PREPA_H, units:[
-   {u:"Hydro (3 units, 1956)", f:"hydro", mw:34.0, ns:34.0}],
-   ns:34.0, src:["eia860m"]},
- {id:"s-sanfermin", name:"San Ferm\u00edn solar + storage", muni:"Lo\u00edza", lat:18.4115, lon:-65.9045, ...IPP("San Fermin Solar Farm LLC"), units:[
-   {u:"Solar PV (1 unit, 2015)", f:"solar", mw:20.0, ns:20.0},
-   {u:"Distillate turbines (1 unit, 2015)", f:"diesel", mw:4.0, ns:4.0},
-   {u:"Battery storage (1 unit, 2015)", f:"bess", mw:3.6, ns:3.6}],
-   ns:27.6, src:["eia860m"]},
+   {u:"Yauco 1-1", f:"hydro", mw:25.0, ns:0.0},
+   {u:"Yauco 2-1", f:"hydro", mw:4.5, ns:0.0},
+   {u:"Yauco 2-2", f:"hydro", mw:4.5, ns:0.0}],
+   ns:0.0, src:["dar","eia860m"]},
  {id:"w-puntalima", name:"Punta Lima wind", muni:"Naguabo", lat:18.189872, lon:-65.695197, ...IPP("Punta Lima Wind Farm, LLC"), units:[
-   {u:"Wind (1 unit, 2024)", f:"wind", mw:26.0, ns:26.0}],
-   ns:26.0,
-   note:"A further 23.4 MW at this site was retired in September 2017 after hurricane damage.", src:["eia860m"]},
+   {u:"Punta Lima", f:"wind", mw:26.0, ns:26.0}],
+   ns:26.0, src:["dar","eia860m"]},
  {id:"h-caonillas", name:"Caonillas hydro", muni:"Utuado", lat:18.277, lon:-66.656, ...PREPA_H, units:[
-   {u:"Hydro (3 units, 1949\u20131952)", f:"hydro", mw:22.0, ns:22.0}],
-   ns:22.0, src:["eia860m"]},
+   {u:"Caonillas 1-1", f:"hydro", mw:9.0, ns:0.0},
+   {u:"Caonillas 1-2", f:"hydro", mw:9.0, ns:0.0},
+   {u:"Caonillas 2-1", f:"hydro", mw:3.6, ns:0.0}],
+   ns:0.0, src:["dar","eia860m"]},
  {id:"s-ilumina", name:"AES Ilumina", muni:"Guayama", lat:17.947524, lon:-66.158874, ...IPP("AES ILUMINA, LLC"), units:[
-   {u:"Solar PV (1 unit, 2012)", f:"solar", mw:20.0, ns:15.0}],
-   ns:15.0, src:["eia860m"]},
- {id:"s-humacao", name:"Humacao Solar", muni:"Humacao", lat:18.134597, lon:-65.822342, ...IPP("Fonroche Energy America, Inc."), units:[
-   {u:"Solar PV (1 unit, 2016)", f:"solar", mw:20.0, ns:20.0}],
-   ns:20.0, src:["eia860m"]},
- {id:"s-horizon", name:"Horizon Energy solar + storage", muni:"Salinas", lat:17.979256, lon:-66.220533, ...IPP("Horizon Energy LLC"), units:[
-   {u:"Solar PV (1 unit, 2015)", f:"solar", mw:10.0, ns:10.0},
-   {u:"Battery storage (1 unit, 2015)", f:"bess", mw:5.1, ns:5.1}],
-   ns:15.1, src:["eia860m"]},
+   {u:"AES Ilumina", f:"solar", mw:20.0, ns:20.0}],
+   ns:20.0, src:["dar","eia860m"]},
+ {id:"s-sanfermin", name:"San Ferm\u00edn solar", muni:"Lo\u00edza", lat:18.4115, lon:-65.9045, ...IPP("San Fermin Solar Farm LLC"), units:[
+   {u:"San Fermin", f:"solar", mw:20.0, ns:20.0}],
+   ns:20.0, src:["dar","eia860m"]},
  {id:"h-dosbocas", name:"Dos Bocas hydro", muni:"Arecibo", lat:18.337, lon:-66.667, ...PREPA_H, units:[
-   {u:"Hydro (3 units, 1942\u20131945)", f:"hydro", mw:15.0, ns:15.0}],
-   ns:15.0, src:["eia860m"]},
+   {u:"Dos Bocas 1", f:"hydro", mw:5.0, ns:5.0},
+   {u:"Dos Bocas 2", f:"hydro", mw:5.0, ns:5.0},
+   {u:"Dos Bocas 3", f:"hydro", mw:5.0, ns:5.0}],
+   ns:15.0, src:["dar","eia860m"]},
  {id:"h-garzas", name:"Garzas hydro", muni:"Pe\u00f1uelas", lat:18.0733, lon:-66.73, ...PREPA_H, units:[
-   {u:"Hydro (3 units, 1941)", f:"hydro", mw:12.2, ns:12.2}],
-   ns:12.2, src:["eia860m"]},
- {id:"s-cotolaurel", name:"Coto Laurel Solar", muni:"Ponce", lat:18.059965, lon:-66.550428, ...IPP("PV Properties, Inc."), units:[
-   {u:"Solar PV (1 unit, 2020)", f:"solar", mw:10.0, ns:10.0}],
-   ns:10.0, src:["eia860m"]},
+   {u:"Garzas 1-1", f:"hydro", mw:3.6, ns:3.6},
+   {u:"Garzas 1-2", f:"hydro", mw:3.6, ns:0.0},
+   {u:"Garzas 2-1", f:"hydro", mw:5.0, ns:0.0}],
+   ns:3.6, src:["dar","eia860m"]},
  {id:"h-toronegro", name:"Toro Negro hydro", muni:"Villalba", lat:18.1317, lon:-66.488, ...PREPA_H, units:[
-   {u:"Hydro (4 units, 1937)", f:"hydro", mw:8.5, ns:8.5}],
-   ns:8.5, src:["eia860m"]},
+   {u:"Toro Negro 1-1", f:"hydro", mw:1.5, ns:1.0},
+   {u:"Toro Negro 1-2", f:"hydro", mw:1.5, ns:1.0},
+   {u:"Toro Negro 1-3", f:"hydro", mw:1.5, ns:0.0},
+   {u:"Toro Negro 1-4", f:"hydro", mw:4.0, ns:0.0},
+   {u:"Toro Negro 2-1", f:"hydro", mw:2.0, ns:0.0}],
+   ns:2.0, src:["dar","eia860m"]},
+ {id:"s-cotolaurel", name:"Coto Laurel Solar", muni:"Ponce", lat:18.059965, lon:-66.550428, ...IPP("X-Elio North America Inc"), units:[
+   {u:"Coto Laurel", f:"solar", mw:10.0, ns:10.0}],
+   ns:10.0, src:["dar","eia860m"]},
+ {id:"s-horizon", name:"Horizon Energy solar", muni:"Salinas", lat:17.979256, lon:-66.220533, ...IPP("Horizon Energy LLC"), units:[
+   {u:"Horizon", f:"solar", mw:10.0, ns:10.0}],
+   ns:10.0, src:["dar","eia860m"]},
  {id:"vieques", name:"Vieques emergency plant", muni:"Vieques", lat:18.152679, lon:-65.431763, ...PREPA_T, units:[
-   {u:"Fuel oil No. 6 steam (2 units, 2004)", f:"bunker", mw:6.6, ns:6.4}],
-   ns:6.4, src:["eia860m"]},
- {id:"s-ftbuchanan", name:"Fort Buchanan distributed", muni:"Guaynabo", lat:18.408354, lon:-66.116163, ...IPP("Directorate Of Public Works USAG Fort Buchanan"), units:[
-   {u:"Solar PV (1 unit, 2014)", f:"solar", mw:5.8, ns:5.8},
-   {u:"Wind (1 unit, 2014)", f:"wind", mw:0.6, ns:0.6}],
-   ns:6.4, src:["eia860m"]},
- {id:"s-gasna", name:"GASNA 18P solar", muni:"San Juan", lat:18.453211, lon:-66.092419, ...IPP("X-Elio North America Inc"), units:[
-   {u:"Solar PV (1 unit, 2014)", f:"solar", mw:5.0, ns:5.0}],
-   ns:5.0, src:["eia860m"]},
- {id:"h-rioblanco", name:"R\u00edo Blanco hydro", muni:"Naguabo", lat:18.268, lon:-65.794, ...PREPA_H, units:[
-   {u:"Hydro (2 units, 1929)", f:"hydro", mw:5.0, ns:5.0}],
-   ns:5.0, src:["eia860m"]},
- {id:"s-medtronic", name:"Medtronic solar", muni:"Juncos", lat:18.236289, lon:-65.911609, ...IPP("REA Investments, LLC"), units:[
-   {u:"Solar PV (1 unit, 2019)", f:"solar", mw:4.0, ns:4.0}],
-   ns:4.0, src:["eia860m"]},
- {id:"s-martino", name:"Martino solar", muni:"Ponce", lat:18.05695, lon:-66.578949, ...IPP("PV Properties, Inc."), units:[
-   {u:"Solar PV (1 unit, 2011)", f:"solar", mw:3.6, ns:3.6}],
-   ns:3.6, src:["eia860m"]},
- {id:"s-pfizer", name:"Pfizer Vega Alta solar", muni:"Vega Alta", lat:18.450607, lon:-66.350001, ...IPP("PV Properties, Inc."), units:[
-   {u:"Solar PV (1 unit, 2016)", f:"solar", mw:3.1, ns:3.1}],
-   ns:3.1, src:["eia860m"]},
- {id:"s-amo", name:"AMO Puerto Rico solar", muni:"A\u00f1asco", lat:18.291344, lon:-67.135141, ...IPP("Enernet CHP One LLC"), units:[
-   {u:"Natural gas (2 units, 2026)", f:"gas", mw:2.6, ns:2.6}],
-   ns:2.6, src:["eia860m"]},
- {id:"s-uscg", name:"US Coast Guard solar", muni:"Aguadilla", lat:18.498007, lon:-67.130519, ...IPP("United States Coast Guard Puerto Rico"), units:[
-   {u:"Solar PV (1 unit, 2011)", f:"solar", mw:2.3, ns:1.7}],
-   ns:1.7, src:["eia860m"]},
+   {u:"Vieques 1", f:"diesel", mw:3.0, ns:0.0},
+   {u:"Vieques 2", f:"diesel", mw:3.0, ns:0.0}],
+   ns:0.0, src:["dar","eia860m"]},
  {id:"culebra", name:"Culebra emergency plant", muni:"Culebra", lat:18.316713, lon:-65.27956, ...PREPA_T, units:[
-   {u:"Fuel oil No. 6 steam (4 units, 1972)", f:"bunker", mw:2.1, ns:2.1}],
-   ns:2.1, src:["eia860m"]},
- {id:"s-elyunque", name:"El Yunque filtration solar", muni:"R\u00edo Grande", lat:18.37739, lon:-65.817551, ...IPP("PV Properties, Inc."), units:[
-   {u:"Solar PV (1 unit, 2013)", f:"solar", mw:2.0, ns:2.0}],
-   ns:2.0, src:["eia860m"]},
- {id:"h-patillas", name:"Patillas hydro", muni:"Patillas", lat:18.017, lon:-66.019, ...PREPA_H, units:[
-   {u:"Hydro (2 units, 1985)", f:"hydro", mw:1.4, ns:1.4}],
-   ns:1.4, src:["eia860m"]},
- {id:"s-arecibofp", name:"Arecibo filtration solar", muni:"Arecibo", lat:18.426418, lon:-66.632501, ...IPP("PV Properties, Inc."), units:[
-   {u:"Solar PV (1 unit, 2014)", f:"solar", mw:1.0, ns:1.0}],
-   ns:1.0, src:["eia860m"]},
- {id:"s-canovanasfp", name:"Can\u00f3vanas filtration solar", muni:"Can\u00f3vanas", lat:18.377243, lon:-65.879311, ...IPP("PV Properties, Inc."), units:[
-   {u:"Solar PV (1 unit, 2013)", f:"solar", mw:1.0, ns:1.0}],
-   ns:1.0, src:["eia860m"]},
+   {u:"Culebra 1", f:"diesel", mw:2.0, ns:2.0},
+   {u:"Culebra 2", f:"diesel", mw:2.0, ns:2.0},
+   {u:"Culebra 3", f:"diesel", mw:2.0, ns:2.0}],
+   ns:6.0, src:["dar","eia860m"]},
+ {id:"h-rioblanco", name:"R\u00edo Blanco hydro", muni:"Naguabo", lat:18.268, lon:-65.794, ...PREPA_H, units:[
+   {u:"Rio Blanco 1-1", f:"hydro", mw:2.5, ns:0.0},
+   {u:"Rio Blanco 1-2", f:"hydro", mw:2.5, ns:0.0}],
+   ns:0.0, src:["dar","eia860m"]},
  {id:"lfg-fajardo", name:"Fajardo landfill gas", muni:"Fajardo", lat:18.2939, lon:-65.6813, ...IPP("Landfill Gas Technologies of Fajardo, LLC"), units:[
-   {u:"Landfill gas (2 units)", f:"lfg", mw:2.4, ns:2.4}],
-   ns:2.4, note:"Sells to PREPA under a power purchase agreement. EIA classes the owner's sector as commercial rather than independent power producer, so this site falls outside the sector filter used for the rest of this list and is added back explicitly.", src:["eia860m","prebList"]},
+   {u:"Fajardo", f:"lfg", mw:2.4, ns:2.4}],
+   ns:2.4, src:["dar","eia860m"]},
  {id:"lfg-toabaja", name:"Toa Baja landfill gas", muni:"Toa Baja", lat:18.4221, lon:-66.2019, ...IPP("Landfill Gas Technologies of Fajardo, LLC"), units:[
-   {u:"Landfill gas (2 units)", f:"lfg", mw:2.4, ns:2.4}],
-   ns:2.4, note:"Sells to PREPA under a power purchase agreement. Classed commercial by EIA and added back for the same reason as the Fajardo site.", src:["eia860m","prebList"]},
- {id:"tempsanjuan", name:"San Juan temporary units (FEMA)", muni:"San Juan", lat:18.429, lon:-66.106, ...PREPA_T, units:[
-   {u:"TM2500 mobile turbines (FEMA-funded, in service Sept 2023)", f:"gas", mw:200, ns:200}],
-   ns:200, note:"Absent from EIA's September 2026 inventory, which carries no record of the FEMA-funded temporary units. Included because they are physically on the grid; the capacity is as reported by the operator, not by EIA, and is not independently verified.", src:["nfe","vocero"]},
- {id:"temppaloseco", name:"Palo Seco temporary units (FEMA)", muni:"Toa Baja", lat:18.457, lon:-66.15, ...PREPA_T, units:[
-   {u:"FT8 MobilePac units (FEMA-funded, in service June 2023)", f:"gas", mw:150, ns:150}],
-   ns:150, note:"Absent from EIA's September 2026 inventory. LUMA's October 2026 report refers to an environmental waiver to operate three FT8 MobilePac units at Palo Seco on an emergency basis. Capacity is as reported by the operator, not by EIA.", src:["nfe","collab"]},
+   {u:"Toa Baja", f:"lfg", mw:2.4, ns:2.4}],
+   ns:2.4, src:["dar","eia860m"]},
+ {id:"s-martino", name:"Cantera Martino solar", muni:"Ponce", lat:18.05695, lon:-66.578949, ...IPP("PV Properties, Inc."), units:[
+   {u:"Cantera Martino", f:"solar", mw:2.1, ns:2.1}],
+   ns:2.1, src:["dar","eia860m"]},
+ {id:"h-patillas", name:"Patillas hydro", muni:"Patillas", lat:18.017, lon:-66.019, ...PREPA_H, units:[
+   {u:"Patillas 1-1", f:"hydro", mw:0.8, ns:0.0},
+   {u:"Patillas 1-2", f:"hydro", mw:0.6, ns:0.0}],
+   ns:0.0, src:["dar","eia860m"]},
+ {id:"w-bechara", name:"Bechara wind", muni:null, lat:null, lon:null, ...PREPA_T, units:[
+   {u:"Bechara", f:"wind", mw:1.0, ns:0.0}],
+   ns:0.0,
+   note:"A 1 MW wind unit in LUMA's availability report with no corresponding EIA record, so its location is not known and it is not drawn on the map.", src:["dar"]},
 ];
 
 // ---- Board-approved projects (2020 onward) ----
@@ -1351,18 +1400,18 @@ const DAR = {
 };
 
 function renderFigures(){
+  const ex = d3.sum(ASSETS,a=>a.mw);
+  const av = d3.sum(ASSETS,a=>d3.sum(a.units,u=>u.ns||0));
   const priv = d3.sum(ASSETS.filter(a=>a.sector==="private"),a=>a.mw);
-  const exAsset = d3.sum(ASSETS,a=>a.mw);
-  const avPct = DAR.av/DAR.np*100;
+  const avPct = av/ex*100;
   const asOf = fmtD(DAR.asOf);
-  const G = {oil:["bunker","diesel"], gas:["gas"], coal:["coal"], ren:["solar","wind","hydro","lfg"]};
-  const sum = (ks,k) => d3.sum(ks,f=>(DAR.byFuel[f]||{})[k]||0);
-  const exParts = [
-    {l:"Oil", mw:sum(G.oil,"np"), c:fc("bunker")},
-    {l:"Gas", mw:sum(G.gas,"np"), c:fc("gas")},
-    {l:"Coal", mw:sum(G.coal,"np"), c:fc("coal")},
-    {l:"Renewable", mw:sum(G.ren,"np"), c:fc("wind")}
-  ].filter(x=>x.mw>0);
+  const zero = ASSETS.flatMap(a=>a.units).filter(u=>!u.ns);
+  const zeroMW = d3.sum(zero,u=>u.mw);
+  const G = [["Oil",["bunker","diesel"],"--f-bunker"],["Gas",["gas"],"--f-gas"],
+             ["Coal",["coal"],"--f-coal"],["Renewable",["solar","wind","hydro","lfg"],"--f-wind"]];
+  const tally = k => G.map(([l,fs,c])=>({l, c:css(c),
+      mw:d3.sum(ASSETS.flatMap(a=>a.units).filter(u=>fs.includes(u.f)), u=> k==="mw"?u.mw:(u.ns||0))}))
+    .filter(x=>x.mw>0);
 
   const ap = PROJECTS.filter(live), rv = PROJECTS.filter(x=>x.status==="review");
   const apMW = d3.sum(ap,x=>x.mw), rvMW = d3.sum(rv,x=>x.mw);
@@ -1379,27 +1428,22 @@ function renderFigures(){
   document.getElementById("figures").innerHTML = `
     <div class="kpi hero">
       <div class="lab">On the grid — nameplate</div>
-      ${kpiNum(DAR.np,"MW")}
-      <div class="sub">${DAR.units} units in LUMA's availability report of ${asOf} · ${Math.round(priv/exAsset*100)}% privately owned</div>
-      ${segBlock(exParts, DAR.np)}
+      ${kpiNum(ex,"MW")}
+      <div class="sub">${d3.sum(ASSETS,a=>a.units.length)} units across ${ASSETS.length} plants, as reported on ${asOf} · ${Math.round(priv/ex*100)}% privately owned</div>
+      ${segBlock(tally("mw"), ex)}
     </div>
     <div class="kpi">
       <div class="lab">Operational now</div>
-      ${kpiNum(DAR.av,"MW")}
-      <div class="sub"><b style="color:var(--ink)">${avPct.toFixed(0)}% of nameplate</b> was available on ${asOf}. ${fmt(DAR.zeroNp)} MW across ${DAR.zeroN} units carried capacity but delivered nothing.</div>
-      <div class="spacer"></div>
-      <div class="seglegend" style="border-top:1px solid var(--rule-2);padding-top:9px">
-        <span>Peak demand that day <b style="color:var(--ink)">${fmt(DAR.peak)} MW</b></span>
-        <span>Reserves <b style="color:var(--st-pause)">${fmt(DAR.reserves)} MW</b> against ${fmt(DAR.reqReserves)} MW required</span></div>
+      ${kpiNum(av,"MW")}
+      <div class="sub"><b style="color:var(--ink)">${avPct.toFixed(0)}% of nameplate</b> available on ${asOf} · ${fmt(zeroMW)} MW across ${zero.length} units delivered nothing</div>
+      ${segBlock(tally("ns"), av)}
     </div>
     <div class="kpi accent">
       <div class="lab">Approved by the Oversight Board since 2021</div>
       ${kpiNum(apMW,"MW")}
-      <div class="sub">${fmt(onMW)} MW online, ${pct.toFixed(1)}% of it · a further ${fmt(rvMW)} MW still before the Board</div>
-      <div class="spacer"></div>
-      <div class="kpirows">
-        ${TECHG.map(([f,l,c])=>miniBar(l,c,t[f].on,t[f].ap)).join("")}
-      </div>
+      <div class="sub">A further ${fmt(rvMW)} MW is still before the Board</div>
+      <div class="onlinebig"><b>${pct.toFixed(1)}%</b><span>online<br><b>${fmt(onMW)} MW</b> of it</span></div>
+      <div class="kpirows">${TECHG.map(([f,l,c])=>miniBar(l,c,t[f].on,t[f].ap)).join("")}</div>
     </div>`;
 }
 
@@ -1427,7 +1471,7 @@ const muniNames = GEO.features.map(f=>f.properties.n).sort((a,b)=>a.localeCompar
 function muniStats(){
   const m = {};
   muniNames.forEach(n=>m[n]={ex:0,ap:0});
-  ASSETS.forEach(a=>{ if(state.fuels.has(a.primary)||a.units.some(u=>state.fuels.has(u.f))) m[a.muni].ex += d3.sum(a.units.filter(u=>state.fuels.has(u.f)),u=>u.mw); });
+  ASSETS.forEach(a=>{ if(a.muni && m[a.muni] && (state.fuels.has(a.primary)||a.units.some(u=>state.fuels.has(u.f)))) m[a.muni].ex += d3.sum(a.units.filter(u=>state.fuels.has(u.f)),u=>u.mw); });
   PROJECTS.filter(live).forEach(p=>{ if(p.muni) m[p.muni].ap += p.mw; });
   return m;
 }
@@ -1455,7 +1499,7 @@ gLabels.selectAll("text").data(GEO.features).join("text").attr("class","muni-lab
 
 const rA = d3.scaleSqrt().domain([0,1500]).range([2.5,24]);
 // asset positions with small offset for exact overlaps
-ASSETS.forEach(a=>{ const p=projection([a.lon,a.lat]); a.x=p[0]; a.y=p[1]; });
+ASSETS.forEach(a=>{ if(a.lat==null||a.lon==null){ a.x=a.y=null; return; } const p=projection([a.lon,a.lat]); a.x=p[0]; a.y=p[1]; });
 // project positions: ring around municipal centroid
 d3.groups(PROJECTS.filter(p=>p.muni),p=>p.muni).forEach(([m,list])=>{
   const c = centroid[m];
@@ -1469,7 +1513,7 @@ const rP = d3.scaleSqrt().domain([0,550]).range([3.2,16]);
 const diamond = s => `M0,${-s}L${s},0L0,${s}L${-s},0Z`;
 
 function drawMarkers(){
-  const assets = state.showAssets ? ASSETS.filter(a=>a.units.some(u=>state.fuels.has(u.f))) : [];
+  const assets = state.showAssets ? ASSETS.filter(a=>a.x!=null && a.units.some(u=>state.fuels.has(u.f))) : [];
   gAssets.selectAll("circle").data(assets.sort((a,b)=>b.mw-a.mw), d=>d.id).join("circle")
     .attr("class",a=>"asset"+(state.openAsset===a.id?" hl":""))
     .attr("cx",a=>a.x).attr("cy",a=>a.y)
